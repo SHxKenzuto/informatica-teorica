@@ -25,6 +25,14 @@
   let S = fresh();
   try { S = Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) { }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } };
+  // Archivio separato: chiave e formato dei progressi già esistenti restano invariati.
+  const ANSWERS_KEY = KEY + "-answers";
+  let quizAnswers = {};
+  try {
+    const stored = JSON.parse(localStorage.getItem(ANSWERS_KEY) || "{}");
+    if (stored && typeof stored === "object" && !Array.isArray(stored)) quizAnswers = stored;
+  } catch (e) { }
+  const saveAnswers = () => { try { localStorage.setItem(ANSWERS_KEY, JSON.stringify(quizAnswers)); } catch (e) { } };
   const dkey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const today = () => dkey(new Date());
   function addXP(n, msg) {
@@ -189,7 +197,9 @@
     const les = isLesson ? byN[opt.n] : null;
     const deck = isLesson ? buildDeck(opt.n) : opt.deck;
     const st = isLesson ? L(opt.n) : { pos: 0 };
-    let pos = Math.min(st.pos || 0, deck.length - 1);
+    let pos = Math.max(0, Math.min(st.pos || 0, deck.length - 1));
+    // Il ripasso permette un nuovo tentativo, conservandolo durante questa sessione.
+    const sessionAnswers = {};
     const sess = { xp0: S.xp, right: 0, total: 0, t0: Date.now() };
     const bar = h("i", { style: "width:0%" }), cnt = h("span", { class: "pcount" });
     const body = h("main", { class: "pbody" }), foot = h("footer", { class: "pfoot" });
@@ -199,10 +209,11 @@
     function setFoot(...kids) { foot.replaceChildren(...kids); }
     function backBtn() { return h("button", { type: "button", class: "ghost", "aria-label": "Scheda precedente", disabled: pos === 0 ? true : null, onclick: () => { if (pos > 0) { pos--; show(); } } }, icon("back")); }
     function next() {
-      if (isLesson) { st.pos = Math.min(pos + 1, deck.length - 1); save(); }
       if (pos < deck.length - 1) { pos++; show(); } else finish();
     }
     function show() {
+      // Vale sia per Continua sia per Scheda precedente, anche dopo una riapertura.
+      if (isLesson) { st.pos = pos; save(); }
       bar.style.width = `${(100 * pos) / deck.length}%`;
       cnt.textContent = `${pos + 1}/${deck.length}`;
       const c = deck[pos], el = h("article", { class: "card" });
@@ -225,25 +236,37 @@
     }
     function renderQuiz(c, el) {
       el.append(h("span", { class: "quiz-tag" }, "Domanda"), h("div", { class: "qtext", html: c.q }));
-      let sel = null, done = false;
-      const btns = c.opts.map((o, i) => h("button", { type: "button", class: "opt", "aria-pressed": "false", onclick: () => { if (done) return; sel = i; btns.forEach((b, j) => { b.classList.toggle("sel", j === i); b.setAttribute("aria-pressed", j === i ? "true" : "false"); }); check.disabled = false; } },
+      const stored = (isLesson ? quizAnswers : sessionAnswers)[c.id];
+      let done = Number.isInteger(stored) && stored >= 0 && stored < c.opts.length;
+      let sel = done ? stored : null;
+      const btns = c.opts.map((o, i) => h("button", { type: "button", class: "opt", "aria-pressed": i === sel ? "true" : "false", onclick: () => { if (done) return; sel = i; btns.forEach((b, j) => { b.classList.toggle("sel", j === i); b.setAttribute("aria-pressed", j === i ? "true" : "false"); }); check.disabled = false; } },
         h("span", { class: "l" }, "ABCDEF"[i]), h("span", { html: o })));
       const fb = h("div");
       el.append(h("div", { class: "opts" }, ...btns), fb);
-      const check = h("button", { type: "button", class: "big", disabled: true, onclick: () => {
+      function showAnswer() {
+        const ok = sel === c.correct;
+        btns.forEach((b, j) => {
+          b.disabled = true; b.classList.toggle("sel", j === sel);
+          if (j === c.correct) b.classList.add("right"); else if (j === sel) b.classList.add("wrong");
+        });
+        fb.replaceChildren(h("div", { class: "feedback " + (ok ? "ok" : "bad") }, h("b", null, ok ? "Esatto!" : "Non proprio."), h("div", { html: c.why || "" })));
+        math(fb);
+        check.disabled = false; check.textContent = "Continua"; check.className = "big " + (ok ? "ok" : "bad");
+      }
+      const check = h("button", { type: "button", class: "big", disabled: done ? null : true, onclick: () => {
         if (done) { next(); return; }
+        if (sel === null) return;
         done = true; sess.total++; S.answered++;
         const ok = sel === c.correct;
-        btns.forEach((b, j) => { b.disabled = true; if (j === c.correct) b.classList.add("right"); else if (j === sel) b.classList.add("wrong"); });
+        quizAnswers[c.id] = sel; sessionAnswers[c.id] = sel; saveAnswers();
         if (ok) { sess.right++; S.correct++; S.wrong = S.wrong.filter(x => x !== c.id); addXP(10, "risposta giusta"); }
         else if (!S.wrong.includes(c.id)) S.wrong.push(c.id);
         save();
-        fb.replaceChildren(h("div", { class: "feedback " + (ok ? "ok" : "bad") }, h("b", null, ok ? "Esatto!" : "Non proprio."), h("div", { html: c.why || "" })));
-        math(fb);
-        check.textContent = "Continua"; check.className = "big " + (ok ? "ok" : "bad");
+        showAnswer();
         fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
       } }, "Verifica");
       setFoot(h("div", { class: "row" }, backBtn(), check));
+      if (done) showAnswer();
     }
     function renderEx(c, el) {
       const sol = h("div", { class: "sol", hidden: true, html: c.sol });
@@ -319,7 +342,7 @@
       h("button", { type: "button", class: "ghost", style: "color:var(--bad)", onclick: () => {
         confirmBox.replaceChildren(h("div", { class: "feedback bad" }, h("b", null, "Cancellare tutti i progressi?"), h("div", { class: "row", style: "display:grid;grid-template-columns:1fr 1fr;gap:8px" },
           h("button", { type: "button", class: "ghost", onclick: () => confirmBox.replaceChildren() }, "Annulla"),
-          h("button", { type: "button", class: "big bad", onclick: () => { S = fresh(); save(); profileScreen(); toast("Progressi azzerati"); } }, "Cancella"))));
+          h("button", { type: "button", class: "big bad", onclick: () => { S = fresh(); quizAnswers = {}; save(); saveAnswers(); profileScreen(); toast("Progressi azzerati"); } }, "Cancella"))));
       } }, "Azzera i progressi"), confirmBox);
     shell("profilo", [p1, p2, p3, p4]);
   }
