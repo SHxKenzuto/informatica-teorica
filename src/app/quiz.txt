@@ -1,769 +1,1729 @@
-# Formato: "## n" = lezione; "@k" = dopo la sezione k; "+" risposta giusta; "-" sbagliata; ">" spiegazione
+# Formato compatibile con build.py: ## n = lezione; @k = sezione; + giusta; - distrattore; > spiegazione.
+# Metadati prima del testo: [id=ID;at=k.h] = fine del sotto-argomento h della sezione k.
+# at=k = fine sezione (come @k); at=k.0 = introduzione prima del primo h3.
+# at=k.h.b = dopo il riquadro b (.def/.thm/.example) del micro-argomento h; gli indici ripartono da 1.
+# Esempio: @3 [id=8-s3-h2;at=3.2] Testo = domanda dopo il secondo h3 della sezione 3.
+# id espliciti e immutabili: quelli numerici conservano esattamente gli id del banco originario.
+# Le domande preesistenti mantengono testo, risposte e spiegazioni; solo gli ancoraggi sono più precisi.
 
 ## 1
-@2 Quanti elementi ha \(\mathcal P(\{a,b,c\})\)?
+@2 [id=1-0;at=2.1.1] Quanti elementi ha \(\mathcal P(\{a,b,c\})\)?
 - 3
 - 6
 + 8
 - 9
 > Ogni elemento si prende o non si prende: \(2^3 = 8\) sottoinsiemi, compresi \(\emptyset\) e l'insieme intero.
 
-@2 Quale affermazione è vera?
+@2 [id=1-1;at=2.0] Quale affermazione è vera?
 - \(\emptyset = \{\emptyset\}\)
 + \(\emptyset \subseteq A\) per ogni insieme \(A\)
 - \((1,2) = (2,1)\)
 - \(\{1,2\} \neq \{2,1\}\)
 > L'insieme vuoto è sottoinsieme di ogni insieme. \(\{\emptyset\}\) ha un elemento, le coppie sono ordinate, gli insiemi no.
 
-@3 La relazione \(x \, R\, y \iff |x - y| \le 1\) su \(\mathbb N\) è…
+@3 [id=1-2;at=3] La relazione \(x \, R\, y \iff |x - y| \le 1\) su \(\mathbb N\) è…
 - di equivalenza
 + riflessiva e simmetrica ma non transitiva
 - transitiva ma non simmetrica
 - solo riflessiva
 > \(0\,R\,1\) e \(1\,R\,2\) ma non \(0\,R\,2\): manca la transitività.
 
-@4 La funzione \(h(n) = n - 1\) su \(\mathbb N\) è…
+@4 [id=1-3;at=4.0.3] La funzione \(h(n) = n - 1\) su \(\mathbb N\) è…
 - totale e iniettiva
 + parziale: \(h(0)\!\uparrow\)
 - totale e suriettiva
 - costante
 > \(-1 \notin \mathbb N\), quindi \(h\) non è definita in 0. La versione totale è la sottrazione troncata \(n \mathbin{\dot-} 1\).
 
-@5 Quanto vale \(L\,\emptyset\) per un linguaggio qualsiasi \(L\)?
+@5 [id=1-4;at=5.1] Quanto vale \(L\,\emptyset\) per un linguaggio qualsiasi \(L\)?
 + \(\emptyset\)
 - \(L\)
 - \(\{\varepsilon\}\)
 - dipende da \(L\)
 > Per formare \(xy\) serve una \(y \in \emptyset\), che non esiste. \(\emptyset\) è lo «zero» della concatenazione.
 
-@5 Quanto vale \(\emptyset^*\)?
+@5 [id=1-5;at=5.1] Quanto vale \(\emptyset^*\)?
 - \(\emptyset\)
 + \(\{\varepsilon\}\)
 - \(\Sigma^*\)
 - non è definito
 > \(L^* = L^0 \cup L^1 \cup \dots\) e \(L^0 = \{\varepsilon\}\) sempre.
 
-@6 In una dimostrazione per induzione, nel passo induttivo si può usare…
+@6 [id=1-6;at=6.3] In una dimostrazione per induzione, nel passo induttivo si può usare…
 - la tesi da dimostrare
 + l'ipotesi induttiva sul caso più piccolo
 - un esempio numerico
 - solo la base
 > Si suppone vera \(P(n)\) e si dimostra \(P(n+1)\). Usare la tesi stessa è un ragionamento circolare.
 
+@1 [id=1-micro-1;at=1] Quale domanda studia l'informatica teorica?
++ Quali problemi ammettono un algoritmo e con quali risorse
+- Quale sintassi rende un programma più breve
+- Quale computer ha più memoria oggi
+> Il corso formalizza possibilità e limiti del calcolo attraverso modelli matematici.
+
+@2 [id=1-micro-2-1;at=2.1] Con \(A=\{1,2\}\) e \(B=\{2,3\}\), quanto vale \(A\setminus B\)?
+- \(\{2\}\)
+- \(\{1,3\}\)
++ \(\{1\}\)
+> La differenza conserva gli elementi di A che non appartengono a B.
+
+@3 [id=1-micro-3-0-1;at=3.0.1] Due classi di una relazione di equivalenza hanno un elemento in comune. Cosa segue?
+- La relazione non è riflessiva
++ Sono la stessa classe
+- Si intersecano in un solo elemento
+> Le classi di equivalenza sono uguali oppure disgiunte: un elemento comune le identifica.
+
+@4 [id=1-micro-4-0-1;at=4.0.1] Perché \(f(n)=2n\), da naturali a naturali, non è suriettiva?
++ Nessun numero dispari è nell'immagine
+- Due input diversi hanno la stessa immagine
+- Non è definita in zero
+> La suriettività richiede di raggiungere ogni elemento del codominio; i dispari restano esclusi.
+
+@4 [id=1-micro-4-0-2;at=4.0.2] Se un programma diverge sull'input x, come si descrive la funzione calcolata?
+- Vale zero in x
+- Non può essere una funzione
++ È indefinita in x
+> La divergenza corrisponde a un valore indefinito, non a un particolare risultato numerico.
+
+@4 [id=1-micro-4;at=4] Nella convenzione del corso, un predicato deve essere…
+- Sempre uguale a 1
++ Totale e a valori in \(\{0,1\}\)
+- Parziale e a valori naturali qualsiasi
+> Un predicato assegna a ogni input un valore di verità: 1 per vero, 0 per falso.
+
+@5 [id=1-micro-5-0-1;at=5.0.1] Che cosa distingue \(\varepsilon\) da \(\emptyset\)?
++ Il primo è una stringa di lunghezza zero, il secondo un insieme senza elementi
+- Entrambi sono stringhe di lunghezza zero
+- Il primo contiene tutte le stringhe, il secondo solo una
+> Una stringa vuota può essere un elemento di un linguaggio; il linguaggio vuoto non contiene alcuna stringa.
+
+@5 [id=1-micro-5-0;at=5.0] Un linguaggio su \(\Sigma\) deve essere…
+- Un insieme necessariamente finito
+- Uguale a \(\Sigma^*\)
++ Un sottoinsieme di \(\Sigma^*\)
+> Un linguaggio è una qualunque collezione di stringhe sull'alfabeto, finita oppure infinita.
+
+@5 [id=1-micro-5-2;at=5.2] Perché l'ordine shortlex permette di elencare tutte le stringhe?
+- Esclude la stringa vuota
++ Ogni stringa ha solo un numero finito di predecessori
+- Tutte le stringhe hanno la stessa lunghezza
+> Si visitano lunghezze crescenti e per ogni lunghezza esistono solo finitissime stringhe.
+
+@6 [id=1-micro-6-0;at=6.0] Una prova generale può essere sostituita dalla verifica di dieci esempi?
++ No: gli esempi non coprono tutti i casi possibili
+- Sì, se gli esempi sono abbastanza diversi
+- Sì, se tutti hanno lunghezza almeno dieci
+> Una dimostrazione deve giustificare la proprietà per un elemento arbitrario del dominio.
+
+@6 [id=1-micro-6-1;at=6.1] Per dimostrare l'esistenza di un automa per costruzione occorre…
+- Disegnare un automa senza controllarne le transizioni
+- Assumere che il linguaggio sia riconosciuto
++ Descriverlo e dimostrare che riconosce il linguaggio richiesto
+> La costruzione fornisce il testimone, la verifica dimostra che soddisfa la proprietà richiesta.
+
+@6 [id=1-micro-6-2-1;at=6.2.1] Perché \(0w=w1\) è impossibile?
+- Una stringa non può iniziare con zero
++ Il lato sinistro contiene uno zero in più del destro
+- Il lato sinistro è sempre più lungo
+> Le lunghezze coincidono, ma il conteggio degli zeri differisce di uno.
+
+@6 [id=1-micro-6-2;at=6.2] Nella prova dell'irrazionalità di \(\sqrt2\), perché si sceglie una frazione ridotta ai minimi termini?
++ Per contraddire la coprimalità quando numeratore e denominatore risultano pari
+- Per garantire che il numeratore sia dispari per definizione
+- Per poter supporre già irrazionale il rapporto
+> La contraddizione è che entrambi sarebbero divisibili per 2, contro la scelta della frazione ridotta.
+
+@6 [id=1-micro-6-3-1;at=6.3.1] Qual è l'inverso della concatenazione \(uv\)?
+- \(u^Rv^R\)
+- \(uv^R\)
++ \(v^Ru^R\)
+> Invertire una stringa composta scambia anche l'ordine dei due blocchi.
+
+@6 [id=1-micro-6-4;at=6.4] Quale passaggio rende circolare un'induzione?
+- Verificare separatamente il caso base
++ Usare \(P(n+1)\) per dimostrare \(P(n+1)\)
+- Usare \(P(n)\) nel passo induttivo
+> Nel passo si può assumere l'ipotesi sul caso precedente, non la tesi del caso corrente.
+
 ## 2
-@2 Quale di questi insiemi NON è numerabile?
+@2 [id=2-0;at=2.3] Quale di questi insiemi NON è numerabile?
 - \(\mathbb Z\)
 - \(\mathbb N \times \mathbb N\)
 - \(\Sigma^*\)
 + \(\mathcal P(\mathbb N)\)
 > Per il teorema di Cantor \(\mathcal P(\mathbb N)\) non è numerabile; gli altri si elencano.
 
-@2 Perché elencare \(\mathbb N \times \mathbb N\) riga per riga non funziona?
+@2 [id=2-1;at=2.2] Perché elencare \(\mathbb N \times \mathbb N\) riga per riga non funziona?
 + La prima riga è infinita e non si arriva mai alla seconda
 - Le coppie sono troppe
 - Si ripetono elementi
 - Funziona, è solo più lento
 > Serve un ordine in cui ogni elemento compare in posizione finita: per diagonali.
 
-@3 Nella prova di Cantor l'insieme diagonale è…
+@3 [id=2-2;at=3.0.1] Nella prova di Cantor l'insieme diagonale è…
 - \(\{i : i \in S_i\}\)
 + \(\{i : i \notin S_i\}\)
 - \(\bigcup_i S_i\)
 - \(\mathbb N \setminus S_0\)
 > Capovolgendo la diagonale si ottiene un insieme diverso da ogni \(S_i\) nel punto \(i\).
 
-@4 Perché esistono linguaggi che nessuna macchina di Turing riconosce?
+@4 [id=2-3;at=4] Perché esistono linguaggi che nessuna macchina di Turing riconosce?
 - Perché alcuni linguaggi sono infiniti
 + Le macchine sono numerabili, i linguaggi no
 - Perché il nastro è finito
 - Perché alcuni alfabeti sono infiniti
 > Ogni macchina è una stringa finita, quindi sono numerabili; i linguaggi sono tanti quanti \(\mathcal P(\mathbb N)\).
 
+@1 [id=2-micro-1;at=1] Per provare che due insiemi hanno la stessa cardinalità basta trovare…
++ Una biiezione tra loro
+- Un'iniezione in una sola direzione
+- Un elemento che appartiene a entrambi
+> Una biiezione associa gli elementi dei due insiemi senza omissioni né duplicazioni.
+
+@2 [id=2-micro-2-1;at=2.1] La mappa \(n\mapsto 2n\) mostra che…
+- I pari sono un insieme finito
+- Ogni naturale è pari
++ I naturali e i naturali pari hanno la stessa cardinalità
+> È una biiezione dai naturali ai pari, anche se questi sono una parte propria dei naturali.
+
+@3 [id=2-micro-3-0;at=3.0] Quale affermazione esprime il teorema di Cantor per un insieme A?
+- A e \(\mathcal P(A)\) hanno sempre la stessa cardinalità
++ Non esiste una suriezione da A a \(\mathcal P(A)\)
+- Ogni sottoinsieme di A è numerabile
+> L'insieme diagonale sfugge all'immagine di ogni funzione proposta da A al suo insieme delle parti.
+
+@3 [id=2-micro-3-1;at=3.1] Un reale costruito cambiando la cifra diagonale di ogni riga sfugge all'elenco perché…
++ Differisce dalla riga i almeno nella cifra i
+- Ha più cifre degli altri reali
+- Non appartiene all'intervallo considerato
+> Scegliendo cifre che evitano ambiguità decimali, il numero differisce da ogni voce in una posizione precisa.
+
 ## 3
-@2 In un DFA la funzione \(\delta\) è…
+@2 [id=3-0;at=2.0.1] In un DFA la funzione \(\delta\) è…
 + totale: una transizione per ogni stato e simbolo
 - parziale
 - a valori in \(\mathcal P(Q)\)
 - definita anche su \(\varepsilon\)
 > Il determinismo richiede esattamente una mossa per ogni coppia (stato, simbolo).
 
-@2 Lo stato iniziale deve essere finale se e solo se…
+@2 [id=3-1;at=2.1] Lo stato iniziale deve essere finale se e solo se…
 - il linguaggio è infinito
 + \(\varepsilon \in L\)
 - c'è uno stato pozzo
 - \(L = \Sigma^*\)
 > Su \(\varepsilon\) l'automa non si muove: accetta solo se \(q_0 \in F\).
 
-@3 Nel DFA «termina con 01», da \(q_2\) (fine 01) leggendo 1 si va in…
+@3 [id=3-2;at=3] Nel DFA «termina con 01», da \(q_2\) (fine 01) leggendo 1 si va in…
 + \(q_0\)
 - \(q_1\)
 - \(q_2\)
 - in uno stato pozzo
 > La fine diventa «11», che non è un inizio utile di 01.
 
-@4 Nel DFA dei multipli di 3 in binario, da \(r_2\) leggendo 0 si va in…
+@4 [id=3-3;at=4] Nel DFA dei multipli di 3 in binario, da \(r_2\) leggendo 0 si va in…
 - \(r_0\)
 + \(r_1\)
 - \(r_2\)
 > Nuovo resto \((2 \cdot 2 + 0) \bmod 3 = 1\).
 
-@7 Come si dimostra che un DFA riconosce esattamente \(L\)?
+@7 [id=3-4;at=7] Come si dimostra che un DFA riconosce esattamente \(L\)?
 - Provando qualche stringa
 + Invariante sugli stati e induzione sulla lunghezza
 - Minimizzandolo
 - Con il pumping lemma
 > Si associa a ogni stato una proprietà del prefisso letto e la si dimostra per induzione.
 
+@1 [id=3-micro-1;at=1] Che cosa può ricordare un DFA dopo un prefisso arbitrariamente lungo?
++ Una tra un numero finito di informazioni, rappresentate dagli stati
+- L'intero prefisso senza limiti
+- Solo l'ultimo simbolo in qualunque DFA
+> La memoria del modello è lo stato corrente, che appartiene a un insieme finito scelto nel progetto.
+
+@2 [id=3-micro-2-0;at=2.0] Quando un DFA accetta una stringa non vuota?
+- Appena visita uno stato finale, anche se restano simboli
+- Solo se ogni stato visitato è finale
++ Se dopo aver letto tutta la stringa si trova in uno stato finale
+> L'accettazione dipende dallo stato raggiunto alla fine dell'input.
+
+@5 [id=3-micro-5;at=5] Come si completa un DFA con transizioni mancanti destinate al rifiuto?
+- Si rendono finali tutti gli stati incompleti
++ Si aggiunge un pozzo non finale con cappi su tutti i simboli
+- Si eliminano i simboli privi di frecce dall'alfabeto
+> Il pozzo raccoglie i casi ormai rifiutati e rende totale la funzione di transizione.
+
+@6 [id=3-micro-6;at=6] Per ricordare parità degli 0 e parità degli 1 insieme, quale informazione serve?
++ Una coppia di parità, con quattro combinazioni
+- Solo la parità della lunghezza totale
+- Il numero esatto di 0 e di 1
+> Le due parità sono indipendenti; il prodotto dei due insiemi di stati contiene quattro coppie.
+
 ## 4
-@2 In una macchina di Mealy l'uscita dipende da…
+@2 [id=4-0;at=2.0] In una macchina di Mealy l'uscita dipende da…
 - solo lo stato
 + stato e simbolo letto
 - solo il simbolo letto
 - l'intera stringa letta
 > \(\lambda : Q \times \Sigma \to \Delta\): l'uscita sta sugli archi.
 
-@3 Su un input di \(n\) simboli una macchina di Moore produce…
+@2 [id=4-1;at=2.2] In un rilevatore di 101 con sovrapposizioni, dopo aver riconosciuto 101 si va nello stato…
+- iniziale
++ «ho visto 1»
+- «ho visto 10»
+> L'ultimo 1 può essere l'inizio di una nuova occorrenza (es. 10101).
+
+@3 [id=4-2;at=3.0.1] Su un input di \(n\) simboli una macchina di Moore produce…
 - \(n\) simboli
 + \(n + 1\) simboli
 - \(n - 1\) simboli
 - 1 simbolo
 > C'è anche l'uscita dello stato iniziale, prima di leggere.
 
-@4 Trasformando una Mealy in una Moore gli stati diventano…
+@4 [id=4-3;at=4] Trasformando una Mealy in una Moore gli stati diventano…
 - gli stessi
 + coppie (stato, ultima uscita)
 - coppie di stati
 - insiemi di stati
 > Lo stato deve ricordare quale uscita mostrare: al più \(|Q|\cdot|\Delta|\) stati.
 
-@2 In un rilevatore di 101 con sovrapposizioni, dopo aver riconosciuto 101 si va nello stato…
-- iniziale
-+ «ho visto 1»
-- «ho visto 10»
-> L'ultimo 1 può essere l'inizio di una nuova occorrenza (es. 10101).
-
-@6 Nel sommatore seriale lo stato memorizza…
+@6 [id=4-4;at=6] Nel sommatore seriale lo stato memorizza…
 - il risultato parziale
 + il riporto
 - i bit letti
 - la lunghezza
 > Basta sapere se c'è riporto: due stati.
 
+@1 [id=4-micro-1;at=1] Che cosa distingue un trasduttore da un riconoscitore?
++ Produce una sequenza d'uscita durante la lettura
+- Ha necessariamente memoria infinita
+- Accetta solo la stringa vuota
+> Un trasduttore associa un'uscita all'input, mentre un riconoscitore decide l'appartenenza a un linguaggio.
+
+@2 [id=4-micro-2-1;at=2.1] Il rilevatore Mealy di 11 legge 111. In quante posizioni segnala un'occorrenza?
+- Una
+- Tre
++ Due
+> Le coppie nelle posizioni 1–2 e 2–3 sono entrambe 11; le occorrenze possono sovrapporsi.
+
+@2 [id=4-micro-2-3;at=2.3] Una macchina di parità progressiva è nello stato dispari e legge 0. Che cosa succede?
+- Si azzera indipendentemente dallo stato
++ Resta dispari
+- Passa a pari
+> Uno zero non cambia il conteggio degli 1, quindi non cambia la sua parità.
+
+@3 [id=4-micro-3;at=3] Perché il rilevatore Moore di 11 distingue «ultimo 1» da «ultimi due 11»?
++ I due casi richiedono uscite di stato diverse
+- Perché una Moore non può avere cappi
+- Perché l'alfabeto contiene tre simboli
+> L'uscita dipende solo dallo stato: occorre separare la situazione con uscita 0 da quella con uscita 1.
+
+@5 [id=4-micro-5;at=5] Come si vede un DFA come macchina di Moore?
+- Si assegna uscita 1 a ogni arco
+- Si sostituiscono gli stati con stringhe d'uscita
++ Si assegna uscita 1 agli stati finali e 0 agli altri
+> L'uscita dello stato raggiunto indica se il prefisso letto appartiene al linguaggio.
+
 ## 5
-@3 In un NFA \(\delta(q, a)\) è…
+@3 [id=5-0;at=3.0.1] In un NFA \(\delta(q, a)\) è…
 - uno stato
 + un insieme di stati, eventualmente vuoto
 - una stringa
 - sempre non vuoto
 > \(\delta : Q \times \Sigma_\varepsilon \to \mathcal P(Q)\).
 
-@3 Un NFA accetta \(w\) se…
+@3 [id=5-1;at=3] Un NFA accetta \(w\) se…
 - tutti i rami accettano
 + almeno un ramo consuma \(w\) e finisce in \(F\)
 - il primo ramo accetta
 - nessun ramo si blocca
 > L'accettazione è esistenziale.
 
-@5 Nella costruzione per sottoinsiemi lo stato iniziale è…
+@5 [id=5-2;at=5] Nella costruzione per sottoinsiemi lo stato iniziale è…
 - \(\{q_0\}\)
 + \(E(\{q_0\})\)
 - \(Q\)
 - \(\emptyset\)
 > L'automa può muoversi con \(\varepsilon\) prima di leggere.
 
-@6 Quali insiemi sono finali nel DFA costruito?
+@6 [id=5-3;at=6.1] Quali insiemi sono finali nel DFA costruito?
 - Quelli contenuti in \(F\)
 + Quelli che contengono almeno uno stato di \(F\)
 - Solo \(F\)
 - Quelli non vuoti
 > Basta che una copia dell'NFA sia in uno stato finale.
 
-@7 Per «il \(k\)-esimo simbolo dalla fine è 1» il DFA minimo ha…
+@7 [id=5-4;at=7] Per «il \(k\)-esimo simbolo dalla fine è 1» il DFA minimo ha…
 - \(k\) stati
 - \(k+1\) stati
 + \(2^k\) stati
 - \(k^2\) stati
 > Deve ricordare gli ultimi \(k\) simboli: tutte le \(2^k\) combinazioni sono distinguibili.
 
+@1 [id=5-micro-1;at=1] In un NFA alcuni rami rifiutano e uno accetta dopo aver letto tutto l'input. L'input è…
++ Accettato
+- Rifiutato
+- Accettato solo se i rami accettanti sono la maggioranza
+> L'accettazione è esistenziale: basta almeno un ramo accettante.
+
+@2 [id=5-micro-2;at=2] Nell'interpretazione dell'NFA che «si clona», lo stato globale dopo un prefisso è…
+- Un solo stato scelto dalla maggioranza dei rami
+- L'insieme dei simboli non letti
++ L'insieme degli stati attivi
+> Ogni possibile computazione contribuisce uno stato attivo; la costruzione per sottoinsiemi usa proprio questo insieme.
+
+@4 [id=5-micro-4-1;at=4.1] Per cercare una sottostringa, perché un NFA può restare nell'iniziale e anche avviare un tentativo sullo stesso simbolo?
+- Tutti i rami devono trovare la sottostringa
++ Conserva contemporaneamente più possibili posizioni d'inizio
+- Deve consumare lo stesso simbolo due volte sullo stesso ramo
+> Le scelte non deterministiche permettono di tentare l'inizio del pattern senza perdere le possibilità successive.
+
+@4 [id=5-micro-4-2;at=4.2] Nell'NFA per lunghezze multiple di 2 oppure di 3, una parola di lunghezza 3 è…
++ Accettata dal ramo del ciclo di lunghezza 3
+- Rifiutata perché non è multipla di 2
+- Accettata solo se attraversa entrambi i cicli
+> L'unione richiede che almeno uno dei due controlli accetti, non entrambi.
+
+@6 [id=5-micro-6-0;at=6.0] L'equivalenza tra NFA e DFA riguarda…
+- La stessa sequenza di stati su ogni input
+- Lo stesso numero di stati in tutti i casi
++ I linguaggi riconosciuti, anche se il numero di stati può cambiare
+> Il determinismo non cambia la classe dei linguaggi regolari, ma la conversione può aumentare molto gli stati.
+
 ## 6
-@2 Per complementare un linguaggio regolare si…
+@2 [id=6-0;at=2] Per complementare un linguaggio regolare si…
 + scambiano finali e non finali in un DFA completo
 - scambiano finali e non finali in un NFA
 - invertono le frecce
 - aggiunge uno stato pozzo finale
 > Con un NFA non funziona: una stringa può avere rami che accettano e rami che no.
 
-@3 Nel prodotto, per l'intersezione gli stati finali sono…
+@3 [id=6-1;at=3.0.1] Nel prodotto, per l'intersezione gli stati finali sono…
 + \(F_1 \times F_2\)
 - \(F_1 \cup F_2\)
 - \((F_1 \times Q_2) \cup (Q_1 \times F_2)\)
 - \(Q_1 \times F_2\)
 > Entrambe le componenti devono accettare.
 
-@4 Perché per la concatenazione si usano NFA?
+@4 [id=6-2;at=4.2] Perché per la concatenazione si usano NFA?
 - Perché sono più piccoli
 + Per indovinare dove finisce la prima parte
 - Perché i DFA non sono chiusi per concatenazione
 - Per gestire \(\emptyset\)
 > L'automa non sa dove tagliare la stringa: una \(\varepsilon\)-mossa lo indovina.
 
-@6 \(L \cap 0^*1^* = \{0^n1^n\}\). Cosa si deduce?
+@6 [id=6-3;at=6.0.1] \(L \cap 0^*1^* = \{0^n1^n\}\). Cosa si deduce?
 + \(L\) non è regolare
 - \(L\) è regolare
 - \(0^*1^*\) non è regolare
 - niente
 > Se \(L\) fosse regolare, anche l'intersezione con un regolare lo sarebbe.
 
+@1 [id=6-micro-1;at=1] Dire che i regolari sono chiusi per unione significa che…
++ L'unione di due linguaggi regolari è ancora regolare
+- Ogni linguaggio è unione di due regolari
+- L'unione regolare obbliga entrambi gli operandi a essere regolari
+> La chiusura parte da operandi appartenenti alla classe e garantisce che vi rimanga il risultato.
+
+@3 [id=6-micro-3-0;at=3.0] Nel prodotto tra «numero pari di 0» e «termina con 1», quale coppia accetta l'intersezione?
+- Parità pari e suffisso diverso da 1
+- Qualunque coppia con almeno una componente finale
++ Parità pari e suffisso finale 1
+> Per l'intersezione entrambe le proprietà devono valere contemporaneamente.
+
+@3 [id=6-micro-3-1;at=3.1] Nel prodotto di due DFA, quali coppie accettano la differenza simmetrica?
+- Quelle con nessuna componente finale
++ Quelle con esattamente una componente finale
+- Quelle con entrambe le componenti finali
+> La differenza simmetrica contiene le parole appartenenti a uno solo dei due linguaggi.
+
+@4 [id=6-micro-4-0;at=4.0] Perché il non determinismo aiuta nella concatenazione?
++ Permette di scegliere il punto di passaggio tra i due linguaggi
+- Permette di leggere l'input da destra a sinistra
+- Rende inutili gli stati finali
+> Non conosciamo in anticipo dove dividere l'input in una parte del primo linguaggio e una del secondo.
+
+@4 [id=6-micro-4-1;at=4.1] Nella costruzione NFA dell'unione, il nuovo iniziale si collega ai due automi con…
+- Una lettura obbligatoria di un simbolo nuovo
+- Una transizione che consuma tutto l'input
++ Transizioni epsilon
+> Le mosse epsilon scelgono il ramo senza modificare la parola da riconoscere.
+
+@4 [id=6-micro-4-3;at=4.3] Perché nella costruzione della stella si introduce un nuovo iniziale finale?
+- Per imporre almeno una ripetizione del linguaggio
++ Accetta epsilon senza rendere accettabili ritorni impropri al vecchio iniziale
+- Per escludere tutte le parole non vuote
+> Il nuovo stato accetta il prodotto di zero fattori; rendere finale il vecchio iniziale può aggiungere parole indesiderate.
+
+@5 [id=6-micro-5;at=5] Per costruire un NFA per \(L^R\), che cosa si fa alle transizioni?
++ Si inverte il verso e si scambiano i ruoli di iniziale e finali con un nuovo iniziale
+- Si cambiano solo gli stati finali
+- Si scambiano tutti i simboli dell'alfabeto
+> I cammini accettanti vengono percorsi al contrario, con mosse epsilon dal nuovo iniziale ai vecchi finali.
+
+@6 [id=6-micro-6;at=6] Se il linguaggio dei conteggi uguali di 0 e 1 non è regolare, che cosa si deduce sul suo complemento?
+- È sicuramente regolare
+- È necessariamente vuoto
++ Non è regolare
+> Se il complemento fosse regolare, complementandolo ancora si otterrebbe un linguaggio regolare, contro l'ipotesi.
+
 ## 7
-@2 Quale espressione descrive «almeno un 1» su \(\{0,1\}\)?
+@2 [id=7-0;at=2.0] Quale espressione descrive «almeno un 1» su \(\{0,1\}\)?
 - \(1^*\)
 + \(\Sigma^*1\Sigma^*\)
 - \(0^*1\)
 - \((01)^*\)
 > Un 1 con qualunque cosa prima e dopo.
 
-@2 \((RS)^*\) e \(R^*S^*\) sono uguali?
+@2 [id=7-1;at=2.1] \((RS)^*\) e \(R^*S^*\) sono uguali?
 - Sì sempre
 + No: \(0101 \in (01)^*\) ma non sta in \(0^*1^*\)
 - Solo se \(R = S\)
 > La stella di una concatenazione alterna i blocchi.
 
-@3 Nell'eliminazione di uno stato da un GNFA, il nuovo arco \(p \to r\) è…
+@3 [id=7-2;at=3.2] Nell'eliminazione di uno stato da un GNFA, il nuovo arco \(p \to r\) è…
 - \(R_1R_3\)
 + \(R_1R_2^*R_3 \cup R_4\)
 - \(R_1 \cup R_2 \cup R_3\)
 - \(R_4^*\)
 > Si aggiungono i cammini che passano per lo stato eliminato al vecchio arco diretto.
 
-@3 La direzione «espressione regolare → NFA» si dimostra per…
+@3 [id=7-3;at=3.1] La direzione «espressione regolare → NFA» si dimostra per…
 + induzione sulla struttura dell'espressione
 - assurdo
 - diagonalizzazione
 - pumping lemma
 > Casi base \(a, \varepsilon, \emptyset\) e le tre costruzioni di chiusura.
 
+@3 [id=7-micro-3-2-1;at=3.2.1] Perché un GNFA in forma speciale ha un nuovo iniziale senza archi entranti e un unico finale senza archi uscenti?
++ Per poter eliminare gli altri stati mantenendo fissi gli estremi dei cammini accettanti
+- Per impedire che accetti epsilon
+- Per far sparire tutte le espressioni regolari dagli archi
+> La normalizzazione conserva il linguaggio e lascia due estremi che non vengono eliminati.
+
+@1 [id=7-micro-1;at=1] Quale linguaggio descrive l'espressione \(\varepsilon\)?
+- \(\emptyset\)
+- \(\Sigma^*\)
++ \(\{\varepsilon\}\)
+> L'espressione epsilon descrive il linguaggio con una sola parola, quella vuota.
+
+@3 [id=7-micro-3-0;at=3.0] Il teorema di Kleene permette di passare…
+- Da ogni grammatica context-free a un DFA
++ Da automi finiti a espressioni regolari e viceversa
+- Da qualunque linguaggio a un DFA
+> Automi finiti ed espressioni regolari descrivono esattamente la stessa classe di linguaggi.
+
 ## 8
-@2 Nel pumping lemma regolare, \(p\) è…
+@2 [id=8-0;at=2] Nel pumping lemma regolare, \(p\) è…
 + il numero di stati di un DFA per \(L\)
 - la lunghezza della stringa
 - scelto da chi dimostra
 - sempre 1
 > Viene dalla dimostrazione: cassetti sugli stati.
 
-@3 Nello schema della dimostrazione, la scomposizione \(xyz\)…
+@3 [id=8-1;at=3] Nello schema della dimostrazione, la scomposizione \(xyz\)…
 - la scegli tu
 + è dell'avversario: devi battere tutte quelle ammesse
 - è sempre \(x = \varepsilon\)
 - non conta
 > \(\exists x,y,z\) nel lemma: per contraddirlo devi vincere contro ogni scomposizione.
 
-@4 Con \(s = 0^p1^p\) e \(|xy| \le p\), la parte \(y\) contiene…
+@4 [id=8-2;at=4.0.1] Con \(s = 0^p1^p\) e \(|xy| \le p\), la parte \(y\) contiene…
 + solo 0
 - solo 1
 - 0 e 1
 - dipende da \(p\)
 > I primi \(p\) simboli sono tutti 0.
 
-@4 Per \(\{0^i1^j : i > j\}\) con \(s = 0^{p+1}1^p\) quale \(i\) conviene?
+@4 [id=8-3;at=4.0.3] Per \(\{0^i1^j : i > j\}\) con \(s = 0^{p+1}1^p\) quale \(i\) conviene?
 + \(i = 0\)
 - \(i = 2\)
 - \(i = 5\)
 > Togliendo degli 0 non sono più strettamente più degli 1.
 
-@6 Myhill–Nerode dice che \(L\) è regolare se e solo se…
+@6 [id=8-4;at=6.0.2] Myhill–Nerode dice che \(L\) è regolare se e solo se…
 - soddisfa il pumping lemma
 + la relazione di indistinguibilità ha finite classi
 - è finito
 - è CF
 > E il numero di classi è il numero di stati del DFA minimo.
 
+@1 [id=8-micro-1;at=1] Perché una computazione di p passi in un DFA con p stati visita due volte uno stato?
++ Si considerano p+1 visite, compresa quella iniziale
+- Ogni simbolo forza un ritorno all'iniziale
+- Tutti gli stati sono finali
+> Il principio dei cassetti applicato alle p+1 visite produce una ripetizione e quindi un ciclo.
+
+@4 [id=8-micro-4-0-2;at=4.0.2] Per il linguaggio \(\{ww\}\), perché scegliere \(0^p1\,0^p1\) invece di soli zeri?
+- La stringa di soli zeri non appartiene mai al linguaggio
+- La stringa scelta ha lunghezza p
++ I due simboli 1 rendono visibile uno squilibrio tra le due copie
+> Alterare solo il primo blocco di zeri rompe la corrispondenza delle due metà; coi soli zeri alcune scomposizioni non la rompono.
+
+@4 [id=8-micro-4-0-4;at=4.0.4] Nella prova per lunghezze quadrate, che cosa garantisce \(p^2&lt;p^2+k&lt;(p+1)^2\)?
+- La stringa pompata è più corta di p
++ La lunghezza pompata non è un quadrato
+- La lunghezza pompata è ancora un quadrato
+> Non esistono quadrati interi strettamente tra due quadrati consecutivi.
+
+@4 [id=8-micro-4;at=4] Perché intersecare «stesso numero di 0 e 1» con \(0^*1^*\) aiuta?
++ Isola \(\{0^n1^n\}\), noto non regolare, usando una chiusura dei regolari
+- Trasforma ogni linguaggio non regolare in uno regolare
+- Dimostra direttamente che l'unione è vuota
+> Se il linguaggio di partenza fosse regolare, anche l'intersezione con un regolare dovrebbe esserlo.
+
+@5 [id=8-micro-5;at=5] Una stringa test fissata, per esempio 0011, basta per una prova generale col pumping lemma?
+- Sì, se non si riesce a pomparla
+- Sì, perché ogni stringa lunga contiene 0011
++ No, la lunghezza di pumping potrebbe essere maggiore di 4
+> La stringa test deve appartenere al linguaggio e avere lunghezza almeno p per qualunque p scelto dall'avversario.
+
+@6 [id=8-micro-6-0-1;at=6.0.1] Che cosa dimostra che x e y sono distinguibili rispetto a L?
+- Il solo fatto che x e y abbiano lunghezze diverse
++ Un suffisso z per cui una sola tra xz e yz appartiene a L
+- Due suffissi diversi che rendono entrambe le stringhe accettate
+> La distinzione richiede lo stesso proseguimento z e due risposte diverse.
+
+@6 [id=8-micro-6;at=6] Per distinguere \(0^i\) e \(0^j\) con \(i\ne j\) rispetto a \(\{0^n1^n\}\), quale suffisso basta?
++ \(1^i\)
+- \(0^{i+j}\)
+- \(\varepsilon\)
+> La prima parola diventa bilanciata; la seconda ha j zeri e i uni e resta fuori dal linguaggio.
+
 ## 9
-@2 Perché le grammatiche si chiamano «context-free»?
+@2 [id=9-0;at=2.0.1] Perché le grammatiche si chiamano «context-free»?
 + Il lato sinistro è una sola variabile, riscrivibile ovunque
 - Non hanno variabili
 - Generano linguaggi finiti
 - Non usano \(\varepsilon\)
 > La riscrittura di \(A\) non dipende da ciò che la circonda.
 
-@3 Quale linguaggio genera \(S \to aSb \mid \varepsilon\)?
+@3 [id=9-1;at=3.0.1] Quale linguaggio genera \(S \to aSb \mid \varepsilon\)?
 - \(a^*b^*\)
 + \(\{a^nb^n : n \ge 0\}\)
 - \((ab)^*\)
 - \(\{a^nb^m\}\)
 > Ogni applicazione aggiunge una \(a\) a sinistra e una \(b\) a destra.
 
-@5 Ogni albero sintattico corrisponde a esattamente…
+@5 [id=9-2;at=5] Ogni albero sintattico corrisponde a esattamente…
 - una derivazione
 + una derivazione sinistra
 - due derivazioni
 - infinite derivazioni sinistre
 > Fissando l'ordine (variabile più a sinistra) la corrispondenza è uno a uno.
 
-@6 Una grammatica è ambigua se…
+@6 [id=9-3;at=6] Una grammatica è ambigua se…
 - genera infinite stringhe
 + una stringa ha due alberi sintattici distinti
 - ha due regole per la stessa variabile
 - contiene \(\varepsilon\)
 > Equivalentemente: due derivazioni sinistre distinte.
 
-@7 Le grammatiche con regole \(A \to aB\), \(A \to a\), \(A \to \varepsilon\) generano…
+@7 [id=9-4;at=7] Le grammatiche con regole \(A \to aB\), \(A \to a\), \(A \to \varepsilon\) generano…
 + esattamente i linguaggi regolari
 - tutti i CF
 - solo linguaggi finiti
 > Variabili = stati, \(A \to aB\) = transizione.
 
+@1 [id=9-micro-1;at=1] Che cosa fa una grammatica, rispetto a un automa riconoscitore?
++ Descrive come generare le stringhe del linguaggio
+- Decide sempre ogni linguaggio in tempo costante
+- Legge obbligatoriamente l'input una sola volta
+> Le grammatiche definiscono un linguaggio attraverso produzioni, invece di descrivere solo come riconoscere una parola data.
+
+@2 [id=9-micro-2;at=2] Una derivazione da S produce una forma con ancora una variabile. È già una parola del linguaggio generato?
+- Sì, ogni forma intermedia è una parola del linguaggio
+- Sì, se la variabile compare una volta sola
++ No, occorre una stringa composta solo da terminali
+> Il linguaggio contiene le stringhe terminali derivabili dall'iniziale, non le forme sentenziali intermedie.
+
+@3 [id=9-micro-3-0-2;at=3.0.2] Nella grammatica \(S\to(S)S\mid\varepsilon\), a cosa serve l'ultima S della prima regola?
+- A impedire che si generi epsilon
++ A concatenare un altro blocco di parentesi bilanciate
+- A introdurre una parentesi chiusa senza la sua aperta
+> La prima S genera l'interno della coppia, la seconda ciò che segue la coppia.
+
+@3 [id=9-micro-3-0-3;at=3.0.3] Perché una regola come \(S\to aSa\) conserva la proprietà di essere palindroma?
++ Aggiunge lo stesso simbolo alle due estremità
+- Aggiunge due simboli qualunque in fondo
+- Impedisce ogni derivazione di lunghezza dispari
+> Avvolgere un palindromo con due a produce ancora un palindromo; i casi base determinano le lunghezze possibili.
+
+@3 [id=9-micro-3;at=3] Nella grammatica per lo stesso numero di a e b, perché si possono aggiungere insieme una a e una b?
+- Impone che tutte le a precedano le b
+- Elimina la necessità del caso base
++ L'aggiunta mantiene uguali i due conteggi
+> Le regole conservano l'invariante dei conteggi; per coprire ogni ordine serve anche una costruzione che permetta le diverse disposizioni.
+
+@4 [id=9-micro-4;at=4] Per dimostrare che una grammatica genera esattamente L occorre verificare…
+- Solo che non contenga regole unitarie
++ Sia che non generi parole fuori da L, sia che generi tutte quelle di L
+- Solo che generi almeno una parola di L
+> L'uguaglianza tra il linguaggio generato e quello richiesto richiede entrambe le inclusioni.
+
 ## 10
-@1 Quale regola è ammessa in CNF?
+@1 [id=10-0;at=1.0] Quale regola è ammessa in CNF?
 + \(A \to BC\)
 - \(A \to aB\)
 - \(A \to B\)
 - \(A \to BCD\)
 > Solo \(A \to BC\), \(A \to a\) e \(S \to \varepsilon\).
 
-@1 In CNF una stringa di lunghezza 5 si deriva in…
+@1 [id=10-1;at=1.1] In CNF una stringa di lunghezza 5 si deriva in…
 - 5 passi
 + 9 passi
 - 10 passi
 - dipende
 > \(2n - 1\): 4 regole binarie + 5 regole terminali.
 
-@2 Perché si eliminano le \(\varepsilon\)-regole prima delle unitarie?
+@2 [id=10-2;at=2.2] Perché si eliminano le \(\varepsilon\)-regole prima delle unitarie?
 + Eliminando le \(\varepsilon\) possono nascere nuove regole unitarie
 - È solo una convenzione
 - Le unitarie generano \(\varepsilon\)
 > Per esempio \(S \to SA\) con \(A\) annullabile produce \(S \to S\).
 
-@4 L'algoritmo CYK ha complessità…
+@4 [id=10-3;at=4] L'algoritmo CYK ha complessità…
 - \(O(n)\)
 - \(O(n^2)\)
 + \(O(n^3)\)
 - esponenziale
 > \(O(n^2)\) celle, \(O(n)\) tagli per cella.
 
+@2 [id=10-micro-2-0;at=2.0] Che cosa promette il teorema di forma normale di Chomsky?
++ Una grammatica equivalente con sole forme di regole ammesse, con l'eccezione prevista per epsilon
+- Un DFA equivalente per ogni grammatica
+- L'eliminazione di tutti i terminali
+> La trasformazione conserva il linguaggio pur restringendo le forme delle produzioni.
+
+@2 [id=10-micro-2-1;at=2.1] Perché si introduce una nuova variabile iniziale \(S_0\to S\)?
+- Per rendere ogni variabile iniziale
+- Per cancellare la parola vuota anche quando appartiene al linguaggio
++ Per avere un iniziale che non compare nei lati destri
+> Il nuovo iniziale permette di gestire l'eventuale produzione di epsilon senza far comparire l'iniziale nei lati destri.
+
+@2 [id=10-micro-2-3;at=2.3] Per eliminare una regola unitaria \(A\to B\), che cosa si trasferisce ad A?
+- Tutti i simboli terminali dell'alfabeto come regole isolate
++ Le produzioni non unitarie raggiungibili attraverso catene unitarie da B
+- Solo la regola \(A\to A\)
+> Bisogna conservare ciò che A può derivare tramite la catena unitaria, eliminando i passaggi unitari.
+
+@2 [id=10-micro-2-4;at=2.4] Come si sostituisce una produzione \(A\to BCD\) con produzioni binarie?
++ \(A\to BX,\ X\to CD\), con X nuova
+- \(A\to BC\), scartando D
+- \(A\to B\mid C\mid D\)
+> La variabile ausiliaria conserva l'ordine e la concatenazione dei tre simboli.
+
+@2 [id=10-micro-2-5;at=2.5] Come si tratta un terminale a nel lato destro \(A\to aB\) durante la conversione in CNF?
+- Si elimina a
+- Si sostituisce B con a
++ Si usa \(T_a\to a\) e si sostituisce con \(A\to T_aB\)
+> Le regole binarie della CNF hanno due variabili; i terminali vengono isolati in produzioni di lunghezza uno.
+
+@3 [id=10-micro-3;at=3] Se la grammatica originale genera epsilon, una CNF equivalente deve…
+- Sostituirla con un nuovo terminale
++ Conservare epsilon mediante l'eccezione per l'iniziale
+- Eliminare epsilon dal linguaggio
+> L'equivalenza comprende la parola vuota, che richiede una gestione speciale rispetto alle altre produzioni CNF.
+
+@5 [id=10-micro-5;at=5] Nella forma normale di Greibach, una produzione ordinaria inizia con…
++ Un terminale, seguito eventualmente da variabili
+- Due variabili e poi un terminale
+- Una variabile seguita da soli terminali
+> La forma è un terminale seguito da zero o più variabili; ogni passo produce il prossimo simbolo terminale.
+
 ## 11
-@2 Una mossa \(1, 0 \to \varepsilon\) significa…
+@2 [id=11-0;at=2.0.1] Una mossa \(1, 0 \to \varepsilon\) significa…
 + leggi 1 e togli 0 dalla cima
 - leggi 0 e metti 1
 - leggi 1 e metti 0
 - togli 1 senza leggere
 > Formato: letto, tolto \(\to\) messo.
 
-@2 A cosa serve il simbolo \(\$\)?
+@2 [id=11-1;at=2] A cosa serve il simbolo \(\$\)?
 - A terminare l'input
 + A riconoscere la pila vuota
 - A separare gli stati
 - A indicare l'accettazione
 > La definizione non permette di testare direttamente la pila vuota.
 
-@5 Per \(\{ww^R\}\) il PDA deve…
+@5 [id=11-2;at=5] Per \(\{ww^R\}\) il PDA deve…
 + indovinare dove sta la metà
 - contare i simboli
 - usare due pile
 - leggere due volte l'input
 > Con una \(\varepsilon\)-mossa passa dalla fase di impilamento a quella di confronto.
 
-@6 Il non determinismo aggiunge potere ai PDA?
+@6 [id=11-3;at=6.0] Il non determinismo aggiunge potere ai PDA?
 + Sì: \(\{ww^R\}\) non è riconosciuto da un PDA deterministico
 - No, come per gli automi finiti
 - Solo per linguaggi finiti
 > DCFL è un sottoinsieme proprio dei CF.
 
+@1 [id=11-micro-1;at=1] Che vantaggio offre una pila rispetto alla sola memoria di un automa finito?
++ Può conservare una quantità non limitata di simboli in ordine LIFO
+- Permette di accedere direttamente a qualunque simbolo memorizzato
+- Rende finita la lunghezza degli input
+> La pila cresce con l'input, ma consente di consultare e rimuovere solo la cima.
+
+@3 [id=11-micro-3;at=3] Nel PDA per \(0^n1^n\), che cosa fa la fase di lettura degli 1?
+- Aggiunge un simbolo per ogni 1
+- Ritorna a leggere 0 dopo ogni 1
++ Toglie un simbolo di pila per ogni 1
+> Gli 0 sono stati contati impilando simboli; gli 1 li consumano, verificando l'uguaglianza dei conteggi.
+
+@4 [id=11-micro-4;at=4] Per contare 0 e 1 in qualunque ordine, che cosa rappresenta la pila?
+- Sempre il numero di 0, ignorando gli 1
++ L'eccesso dei simboli di un tipo rispetto all'altro
+- L'intera parola nello stesso ordine di lettura
+> Un simbolo opposto cancella la cima, uno dello stesso tipo aumenta l'eccesso.
+
+@6 [id=11-micro-6-0-1;at=6.0.1] In un DPDA può esserci una scelta tra una mossa epsilon e una mossa che legge input, con stesso stato e cima?
++ No, perché introdurrebbe una scelta non deterministica
+- Sì, purché la mossa epsilon venga scelta per prima
+- Sì, purché entrambe portino a stati finali
+> Il determinismo richiede anche di evitare il conflitto tra mosse senza lettura e mosse con lettura.
+
+@6 [id=11-micro-6-1;at=6.1] Quale differenza distingue DCFL e CF rispetto al complemento?
+- Entrambe le classi sono chiuse per complemento
+- Solo i CF sono chiusi per complemento
++ I DCFL sono chiusi per complemento, i CF in generale no
+> Il determinismo dei PDA consente la chiusura dei DCFL per complemento, che non vale per tutti i CF.
+
+@7 [id=11-micro-7;at=7] Nel progettare un PDA, che cosa conviene descrivere prima delle transizioni?
+- Un limite fisso alla lunghezza dell'input
++ Il significato della pila e le fasi del riconoscimento
+- Solo il nome dello stato finale
+> Gli invarianti della pila e degli stati guidano la costruzione e la prova di correttezza.
+
 ## 12
-@1 Nella costruzione CFG → PDA la pila contiene…
+@1 [id=12-0;at=2.1] Nella costruzione CFG → PDA la pila contiene…
 + la parte della forma sentenziale ancora da verificare
 - l'input letto
 - gli stati visitati
 - le regole usate
 > Il PDA simula una derivazione sinistra.
 
-@1 Quando in cima c'è un terminale \(a\), il PDA…
+@1 [id=12-1;at=2.2] Quando in cima c'è un terminale \(a\), il PDA…
 - lo sostituisce con una regola
 + lo confronta con l'input e lo toglie
 - accetta
 - lo ignora
 > Mossa \(a, a \to \varepsilon\).
 
-@2 La variabile \(A_{pq}\) genera le stringhe che portano il PDA…
+@2 [id=12-2;at=3.2] La variabile \(A_{pq}\) genera le stringhe che portano il PDA…
 + da \(p\) a \(q\) partendo e arrivando a pila vuota
 - da \(p\) a \(q\) in un passo
 - da \(q\) a \(p\)
 - in uno stato finale
 > È l'invariante della costruzione PDA → grammatica.
 
+@1 [id=12-micro-1;at=1] Quale relazione c'è tra linguaggi generati da CFG e riconosciuti da PDA non deterministici?
++ Le due classi coincidono
+- I PDA riconoscono solo una parte dei CF
+- Ogni PDA riconosce tutti i linguaggi decidibili
+> L'equivalenza permette di scegliere tra grammatica e automa a pila per descrivere lo stesso linguaggio.
+
+@3 [id=12-micro-3-1;at=3.1] Perché si normalizza il PDA prima di costruire la grammatica?
+- Per eliminare del tutto la pila
+- Per renderlo necessariamente deterministico
++ Per separare push e pop e organizzare computazioni tra pile vuote
+> Le condizioni preparatorie rendono possibili le regole che accoppiano un push con il relativo pop.
+
+@4 [id=12-micro-4;at=4] Perché intersecare un CF con un regolare richiede una sola pila?
+- L'intersezione elimina tutte le operazioni di pila
++ Nel prodotto, il DFA aggiunge solo uno stato finito alla memoria del PDA
+- Il DFA copia la pila e ne usa una seconda
+> Si memorizza una coppia di stati, mantenendo l'unica pila del PDA originale.
+
 ## 13
-@2 Nel pumping lemma CF si pompano…
+@2 [id=13-0;at=2] Nel pumping lemma CF si pompano…
 - solo \(v\)
 + \(v\) e \(y\) insieme, con lo stesso esponente
 - solo \(x\)
 - \(u\) e \(z\)
 > Il pezzo ripetuto dell'albero produce una parte a sinistra e una a destra.
 
-@2 Il vincolo \(|vxy| \le p\) dice…
+@2 [id=13-1;at=2] Il vincolo \(|vxy| \le p\) dice…
 + quanto è larga la finestra, non dove sta
 - che \(vxy\) sta all'inizio
 - che \(v = y\)
 > A differenza del caso regolare, la finestra può stare ovunque: si ragiona per casi.
 
-@4 Perché \(0^p1\,0^p1\) non basta per \(\{ww\}\)?
+@4 [id=13-2;at=4.0.2] Perché \(0^p1\,0^p1\) non basta per \(\{ww\}\)?
 + L'avversario pompa uno 0 per parte attorno al primo 1
 - Non sta nel linguaggio
 - È troppo corta
 > \(0^{p-1+i}1\,0^{p-1+i}1\) resta della forma \(ww\). Serve \(0^p1^p0^p1^p\).
 
-@5 I linguaggi CF sono chiusi per…
+@5 [id=13-3;at=5.0] I linguaggi CF sono chiusi per…
 - intersezione
 - complemento
 + unione, concatenazione, stella
 - differenza
 > Non per intersezione: \(\{a^nb^nc^m\} \cap \{a^mb^nc^n\}\).
 
+@1 [id=13-micro-1;at=1] Da quale ripetizione nasce il pumping lemma per i CF?
++ La stessa variabile lungo un ramo di un albero sintattico
+- Lo stesso terminale in due parole diverse
+- Lo stesso stato in un DFA minimo
+> La parte tra due occorrenze della variabile può essere ripetuta o rimossa, producendo due porzioni pompabili.
+
+@3 [id=13-micro-3;at=3] Nel pumping lemma CF, dove può trovarsi la finestra vxy?
+- Solo nei primi p simboli
+- Sempre al centro della stringa
++ In qualunque punto della stringa, purché sia lunga al più p
+> Il vincolo riguarda l'ampiezza della finestra, non la distanza dall'inizio.
+
+@4 [id=13-micro-4-0-1;at=4.0.1] Su \(a^pb^pc^p\), perché una finestra lunga al più p non tocca sia a sia c?
+- Perché v e y devono essere entrambi vuoti
++ Tra una a e una c deve includere tutto il blocco di p lettere b
+- Perché deve iniziare con a
+> Per toccare i blocchi esterni servirebbero almeno p+2 simboli; almeno un conteggio resta quindi invariato nel pumping.
+
+@4 [id=13-micro-4;at=4] Per \(a^ib^jc^k\) con \(i\le j\le k\), perché a volte si pompa in basso e a volte in alto?
++ La scelta dipende dai blocchi che la finestra può modificare
+- Bisogna usare sempre entrambi gli esponenti nella stessa stringa
+- Il lemma obbliga a scegliere l'esponente prima della scomposizione
+> Si sceglie l'esponente dopo aver considerato la posizione della finestra, per rompere almeno una disuguaglianza.
+
+@5 [id=13-micro-5-1;at=5.1] Per escludere che «uguale numero di a, b e c» sia CF, perché si interseca con \(a^*b^*c^*\)?
+- Ogni intersezione tra due CF è CF
+- L'intersezione produce necessariamente un linguaggio finito
++ È regolare e isola il linguaggio non CF \(a^nb^nc^n\)
+> I CF sono chiusi per intersezione con regolari; l'ipotesi CF porterebbe a una contraddizione.
+
 ## 14
-@2 Quale macchina riconosce i linguaggi di tipo 1?
+@2 [id=14-0;at=2] Quale macchina riconosce i linguaggi di tipo 1?
 - automa a pila
 + automa lineare limitato
 - automa finito
 - macchina di Turing senza limiti
 > Una TM che non esce dalla porzione di nastro dell'input.
 
-@3 Perché l'appartenenza è decidibile per le grammatiche monotone?
+@3 [id=14-1;at=3.1] Perché l'appartenenza è decidibile per le grammatiche monotone?
 + Le forme sentenziali non si accorciano: sono finite quelle da esplorare
 - Perché sono CF
 - Perché hanno pochi simboli
 > Tutte le forme utili hanno lunghezza \(\le |w|\).
 
-@3 Quale regola riordina le variabili nella grammatica per \(a^nb^nc^n\)?
+@3 [id=14-2;at=3.0] Quale regola riordina le variabili nella grammatica per \(a^nb^nc^n\)?
 + \(CB \to BC\)
 - \(S \to aSBC\)
 - \(aB \to ab\)
 - \(cC \to cc\)
 > È una regola con contesto, impossibile in una grammatica CF.
 
-@5 Quale catena di inclusioni è corretta?
+@5 [id=14-3;at=5] Quale catena di inclusioni è corretta?
 + regolari ⊊ CF ⊊ CS ⊊ decidibili ⊊ r.e.
 - regolari ⊊ CS ⊊ CF ⊊ r.e.
 - CF = CS
 - decidibili = r.e.
 > Testimoni: \(0^n1^n\), \(a^nb^nc^n\), una diagonale, HALT.
 
+@3 [id=14-micro-3-1-1;at=3.1.1] Qual è il limite di memoria di un LBA sull'input?
++ La porzione di nastro occupata dall'input, secondo il modello della lezione
+- Un numero costante di celle indipendente dall'input
+- Un nastro illimitato come in una TM generale
+> Un LBA dispone di spazio limitato linearmente dalla lunghezza dell'input, pur mantenendo il controllo di una TM.
+
+@1 [id=14-micro-1;at=1] In una grammatica di tipo 0, che vincolo resta sul lato sinistro di una produzione?
+- Deve essere un solo terminale
+- Deve essere più corto del lato destro
++ Deve contenere almeno una variabile
+> Il lato sinistro non è una stringa terminale pura; non vale invece il vincolo di non contrazione del tipo 1.
+
+@4 [id=14-micro-4;at=4] Quali linguaggi generano le grammatiche di tipo 0?
+- Solo i linguaggi context-free
++ I linguaggi Turing-riconoscibili
+- Solo i linguaggi decidibili
+> Il tipo 0 corrisponde alle macchine di Turing riconoscitrici, che possono divergere sugli input non accettati.
+
+@6 [id=14-micro-6;at=6] Essere Turing-riconoscibile garantisce un algoritmo che risponda sempre sì o no?
++ No: il riconoscitore può non terminare sui casi negativi
+- Sì, perché ogni grammatica è finita
+- Sì, purché il linguaggio sia infinito
+> La riconoscibilità garantisce la conferma dei casi positivi; la decisione richiede terminazione su ogni input.
+
 ## 15
-@2 Cosa fa \(V \leftarrow V - 1\) se \(V = 0\)?
+@2 [id=15-0;at=2.0.2] Cosa fa \(V \leftarrow V - 1\) se \(V = 0\)?
 - Errore
 - Il programma termina
 + Lascia \(V = 0\)
 - \(V\) diventa negativa
 > Le variabili sono naturali: decremento troncato.
 
-@2 Quando termina un programma S?
+@2 [id=15-1;at=2.1] Quando termina un programma S?
 + Dopo l'ultima istruzione o saltando a un'etichetta assente
 - Quando \(Y \neq 0\)
 - Dopo un numero fissato di passi
 - Mai
 > Per convenzione si usa l'etichetta \(E\) per uscire.
 
-@3 Se un programma non termina su \(x\), allora \(\Psi_{\mathcal P}(x)\)…
+@3 [id=15-2;at=3.0.1] Se un programma non termina su \(x\), allora \(\Psi_{\mathcal P}(x)\)…
 - vale 0
 + è indefinita
 - vale \(x\)
 - vale il valore corrente di \(Y\)
 > È così che nascono le funzioni parziali.
 
-@4 Il programma «[A] X ← X−1; Y ← Y+1; IF X ≠ 0 GOTO A» su input 0 restituisce…
+@4 [id=15-3;at=4.0.1] Il programma «[A] X ← X−1; Y ← Y+1; IF X ≠ 0 GOTO A» su input 0 restituisce…
 - 0
 + 1
 - non termina
 > Il corpo del ciclo viene eseguito una volta prima del test.
 
-@5 Come si realizza un salto incondizionato?
+@5 [id=15-4;at=5.0] Come si realizza un salto incondizionato?
 + \(Z \leftarrow Z + 1\) seguito da \(\mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ L\)
 - \(\mathrm{IF}\ Y \neq 0\ \mathrm{GOTO}\ L\)
 - con un'etichetta \(E\)
 > Dopo l'incremento \(Z \neq 0\), quindi il salto avviene sempre.
 
+@1 [id=15-micro-1;at=1] Perché si formalizza la nozione di algoritmo con un linguaggio semplice come S?
++ Per ragionare rigorosamente sulle operazioni e sui limiti del calcolo
+- Per far dipendere la calcolabilità dall'interfaccia grafica
+- Per limitare tutti gli algoritmi a input di una cifra
+> Un modello preciso consente di definire esecuzione, risultato e non terminazione senza ambiguità.
+
+@2 [id=15-micro-2-0-1;at=2.0.1] All'avvio di un programma S, quale valore ha la variabile d'uscita Y?
+- Il valore del primo input
+- Un valore non specificato
++ Zero
+> Le variabili d'ingresso ricevono gli input; Y e le variabili ausiliarie sono inizializzate a zero.
+
+@2 [id=15-micro-2-0;at=2.0] Quali operazioni costituiscono il nucleo del linguaggio S?
+- Solo assegnazioni di costanti
++ Incremento, decremento troncato e salto condizionato
+- Moltiplicazione, divisione e lettura di file
+> Le operazioni più complesse vengono realizzate come macro espanse nelle istruzioni elementari.
+
+@3 [id=15-micro-3;at=3] Quando una funzione calcolata da un programma è totale?
++ Quando il programma termina su ogni input del dominio previsto
+- Quando termina almeno su un input
+- Quando restituisce sempre lo stesso valore, se termina
+> La totalità richiede un valore definito per ogni input; non basta la terminazione su alcuni casi.
+
+@4 [id=15-micro-4;at=4] Per copiare x in Y con un ciclo di decrementi, perché si controlla x prima di entrare nel ciclo?
+- Per impedire che il programma termini
+- Per rendere negativo x
++ Per evitare un incremento spurio di Y quando x è zero
+> Un ciclo che incrementa Y prima di controllare l'input produce erroneamente 1 sul caso zero.
+
+@5 [id=15-micro-5-0-1;at=5.0.1] Come si conserva l'input durante una copia ottenuta per decrementi?
+- Si lascia l'input modificato e si cambia la definizione di copia
++ Si usa una variabile ausiliaria per ripristinare il valore consumato
+- Si decrementa contemporaneamente anche Y
+> La variabile ausiliaria conta i decrementi e permette di ricostruire il valore originale.
+
+@5 [id=15-micro-5-0-2;at=5.0.2] Come si realizza la somma con le operazioni elementari di S?
++ Si copia un addendo e si incrementa l'uscita tante volte quanto vale l'altro
+- Si esegue un solo incremento qualunque siano gli input
+- Si decrementano entrambi fino a zero senza contare
+> La ripetizione degli incrementi implementa l'addizione e può essere espansa in istruzioni di S.
+
+@5 [id=15-micro-5-1;at=5.1] Una macro condizionale su un predicato è legittima quando…
+- Il predicato ha un nome matematico
+- Il predicato è vero su molti esempi
++ Il predicato è calcolabile e la macro si può espandere in S
+> Una macro è un'abbreviazione di un programma effettivo, non un modo per introdurre un oracolo non calcolabile.
+
 ## 16
-@2 Quali sono le funzioni iniziali?
+@2 [id=16-0;at=2] Quali sono le funzioni iniziali?
 + successore, zero, proiezioni
 - somma, prodotto, potenza
 - successore e predecessore
 - costanti e identità
 > \(s(x) = x+1\), \(n(x) = 0\), \(u^n_i\).
 
-@3 Lo schema di ricorsione primitiva corrisponde a…
+@3 [id=16-1;at=3.0.2] Lo schema di ricorsione primitiva corrisponde a…
 + un ciclo for con numero di iterazioni noto
 - un ciclo while
 - un salto incondizionato
 - una ricerca illimitata
 > Per questo le primitive ricorsive terminano sempre.
 
-@4 Perché ogni primitiva ricorsiva è calcolabile?
+@4 [id=16-2;at=4] Perché ogni primitiva ricorsiva è calcolabile?
 + Le calcolabili totali formano una classe PRC
 - Perché sono finite
 - Per la tesi di Church
 - Perché sono crescenti
 > E le primitive ricorsive sono la più piccola classe PRC.
 
-@6 La funzione di Ackermann è…
+@6 [id=16-3;at=6] La funzione di Ackermann è…
 - primitiva ricorsiva
 + calcolabile e totale ma non primitiva ricorsiva
 - non calcolabile
 - parziale
 > Cresce più di ogni primitiva ricorsiva.
 
+@1 [id=16-micro-1;at=1] Perché i cicli che corrispondono alla ricorsione primitiva terminano?
++ Il numero delle iterazioni è fissato prima del ciclo
+- Il risultato è sempre zero
+- Non usano mai funzioni ausiliarie
+> La ricorsione procede fino a un limite naturale dato e applica a ogni passo funzioni totali.
+
+@3 [id=16-micro-3-0-1;at=3.0.1] Nella composizione \(h(g_1(x),g_2(x))\), che ruolo ha h?
+- Sceglie un numero illimitato di iterazioni
+- Cambia il dominio in base alla terminazione
++ Combina i risultati delle due funzioni interne
+> La composizione calcola prima gli argomenti interni e poi applica la funzione esterna.
+
+@3 [id=16-micro-3;at=3] Come si ottengono le funzioni primitive ricorsive?
+- Elencando tutte le funzioni totali senza una regola effettiva
++ Con un numero finito di composizioni e ricorsioni primitive dalle funzioni iniziali
+- Applicando ricerche non limitate a qualunque predicato
+> La definizione è costruttiva: parte dai mattoni iniziali e usa solo le due operazioni ammesse.
+
+@4 [id=16-micro-4-0-1;at=4.0.1] Che cosa deve contenere una classe PRC?
++ Le funzioni iniziali ed essere chiusa per composizione e ricorsione primitiva
+- Tutte le funzioni parzialmente calcolabili
+- Solo le funzioni costanti
+> Queste proprietà garantiscono per induzione che ogni funzione primitiva ricorsiva appartenga alla classe.
+
+@5 [id=16-micro-5-0-1;at=5.0.1] Nella definizione ricorsiva della somma, che cosa fa il passo \(g(t,v,x)\)?
+- Restituisce \(v+x\)
+- Restituisce \(t\cdot x\)
++ Restituisce \(v+1\)
+> Il valore precedente è x+t; per ottenere x+(t+1) si applica il successore.
+
+@5 [id=16-micro-5-0-2;at=5.0.2] Nella ricorsione per il prodotto, qual è il passo a partire dal valore precedente v?
+- \(v\cdot x\)
++ \(v+x\)
+- \(v+1\)
+> Passare da x per t a x per t+1 significa aggiungere x al prodotto precedente.
+
+@5 [id=16-micro-5;at=5] Per provare che una funzione è primitiva ricorsiva, basta scrivere una ricorrenza?
++ No: bisogna giustificare anche base e funzione del passo con funzioni già note
+- Sì, qualunque ricorrenza definisce una funzione primitiva ricorsiva
+- Sì, se si verificano tre valori iniziali
+> La prova deve ricondurre la ricorrenza allo schema ammesso e ai mattoni già costruiti.
+
 ## 17
-@1 Come si esprime \(P \wedge Q\) per predicati p.r.?
+@1 [id=17-0;at=1.0] Come si esprime \(P \wedge Q\) per predicati p.r.?
 + \(P \cdot Q\)
 - \(P + Q\)
 - \(\alpha(P)\)
 - \(\max(P,Q)\)
 > Il prodotto vale 1 solo se entrambi valgono 1.
 
-@3 \(\min_{t \le y} P(t, x)\) se nessun \(t \le y\) soddisfa \(P\) vale…
+@3 [id=17-1;at=3.0.1] \(\min_{t \le y} P(t, x)\) se nessun \(t \le y\) soddisfa \(P\) vale…
 + 0
 - \(y\)
 - \(y + 1\)
 - è indefinita
 > Convenzione di DSW: così resta totale.
 
-@4 \(\mu t\,[t \cdot t = x]\) su \(x = 5\)…
+@4 [id=17-2;at=4] \(\mu t\,[t \cdot t = x]\) su \(x = 5\)…
 - vale 2
 - vale 0
 + è indefinita
 > Nessun \(t\) ha quadrato 5: la ricerca non termina.
 
-@5 Le funzioni parziali ricorsive coincidono con…
+@5 [id=17-3;at=5] Le funzioni parziali ricorsive coincidono con…
 + le parzialmente calcolabili
 - le primitive ricorsive
 - le totali
 - le crescenti
 > Teorema di forma normale di Kleene.
 
+@1 [id=17-micro-1-0-1;at=1.0.1] Se \(\alpha(x)\) vale 1 esattamente quando x è zero, perché \(\alpha(\lvert x-y\rvert)\) esprime l'uguaglianza?
++ La differenza assoluta è zero esattamente quando x e y coincidono
+- La differenza assoluta è sempre 1
+- Il valore di alpha non dipende dal suo argomento
+> Il predicato risulta 1 nei casi di uguaglianza e 0 in tutti gli altri.
+
+@1 [id=17-micro-1-1;at=1.1] Perché la definizione per casi \(gP+h(1-P)\) seleziona un solo risultato?
+- g e h sono necessariamente uguali
+- Si calcola solo la funzione più piccola
++ P vale 0 oppure 1, quindi uno dei due coefficienti è zero
+> Con funzioni totali, i due valori sono definiti e il predicato accende un solo addendo.
+
+@2 [id=17-micro-2-0-1;at=2.0.1] Una somma di una funzione p.r. da t=0 fino a y resta p.r. perché…
+- È una ricerca non limitata
++ Si costruisce per ricorsione primitiva sul limite y
+- Ogni somma ha un numero costante di termini
+> L'accumulatore aggiunge un termine per passo, con un numero di passi determinato da y.
+
+@2 [id=17-micro-2-0-2;at=2.0.2] Come si esprime un quantificatore universale limitato su predicati 0–1?
++ Con il prodotto finito dei valori del predicato
+- Con una ricerca senza limite
+- Con la sola valutazione nel punto zero
+> Il prodotto vale 1 se tutti i fattori sono 1, altrimenti vale 0.
+
+@2 [id=17-micro-2;at=2] Perché la divisibilità \(y\mid x\) è un predicato p.r.?
+- Richiede una ricerca senza alcun limite
+- Ogni divisione ha sempre resto zero
++ Si può cercare un t non maggiore di x con \(yt=x\)
+> L'esistenza del quoziente può essere espressa mediante un quantificatore limitato su un predicato p.r.
+
+@3 [id=17-micro-3-0-2;at=3.0.2] Che cosa garantisce la ricerca limitata rispetto alla terminazione?
+- Può provare infiniti candidati prima di rispondere
++ Si arresta anche quando non trova un testimone
+- Si arresta solo se il predicato è vero in zero
+> Il limite finito consente di concludere anche in assenza di soluzioni, usando il valore convenzionale.
+
+@3 [id=17-micro-3;at=3] Per calcolare \(\lfloor\sqrt{x}\rfloor\), perché si cerca il primo t con \((t+1)^2>x\)?
++ Quel t è l'ultimo intero il cui quadrato non supera x
+- Quel t è sempre uguale a x
+- La condizione assicura che x sia un quadrato perfetto
+> Il primo superamento individua il bordo tra i quadrati non maggiori di x e quelli maggiori.
+
+@4 [id=17-micro-4-0-1;at=4.0.1] Che differenza c'è tra ricerca limitata e non limitata se non esiste un testimone?
+- Entrambe restituiscono necessariamente zero
+- La non limitata trova sempre un testimone
++ La limitata restituisce il valore convenzionale, la non limitata resta indefinita
+> Senza un limite la ricerca continua per sempre quando nessun candidato soddisfa il predicato.
+
+@5 [id=17-micro-5-0-1;at=5.0.1] Quale operazione estende le primitive ricorsive alle parziali ricorsive?
+- La sola somma limitata
++ La minimalizzazione non limitata
+- La sola composizione con il successore
+> La ricerca non limitata ammette la divergenza e permette di descrivere tutte le funzioni parzialmente calcolabili.
+
 ## 18
-@2 Quanto vale \(\langle 2, 1\rangle = 2^x(2y+1) - 1\)?
+@2 [id=18-0;at=2] Quanto vale \(\langle 2, 1\rangle = 2^x(2y+1) - 1\)?
 - 9
 + 11
 - 12
 - 7
 > \(4 \cdot 3 - 1 = 11\).
 
-@2 Decodifica \(z = 23\): \(l(z), r(z)\) = ?
+@2 [id=18-1;at=2] Decodifica \(z = 23\): \(l(z), r(z)\) = ?
 + 3, 1
 - 1, 3
 - 2, 5
 - 4, 1
 > \(24 = 2^3 \cdot 3\), \(2y + 1 = 3\).
 
-@3 Quanto vale \([2, 0, 1]\)?
+@3 [id=18-2;at=3] Quanto vale \([2, 0, 1]\)?
 - 12
 + 20
 - 30
 - 6
 > \(2^2 \cdot 3^0 \cdot 5^1 = 20\).
 
-@4 Nel codice di un'istruzione \(\langle a, \langle b, c\rangle\rangle\), \(b = 1\) significa…
+@4 [id=18-3;at=4.0.2] Nel codice di un'istruzione \(\langle a, \langle b, c\rangle\rangle\), \(b = 1\) significa…
 - \(V \leftarrow V\)
 + \(V \leftarrow V + 1\)
 - \(V \leftarrow V - 1\)
 - salto
 > 0 = istruzione vuota, 1 = incremento, 2 = decremento, \(\#(L)+2\) = salto.
 
-@5 Perché ogni numero naturale è un programma?
+@5 [id=18-4;at=5] Perché ogni numero naturale è un programma?
 + La codifica è biiettiva grazie al −1 e alla convenzione sull'ultima istruzione
 - Perché i programmi sono infiniti
 - Perché si ignorano i numeri non validi
 > Quindi \(\Phi_0, \Phi_1, \dots\) elenca tutte le funzioni parzialmente calcolabili.
 
+@1 [id=18-micro-1;at=1] Perché si rappresentano i programmi mediante numeri naturali?
++ Per permettere ad altri programmi di riceverli ed elaborarli come dati
+- Per garantire che ogni programma termini
+- Per rendere finito l'insieme di tutti i programmi
+> Una codifica effettiva trasforma operazioni sui programmi in operazioni aritmetiche sui loro codici.
+
+@2 [id=18-micro-2-0-1;at=2.0.1] Nella codifica \(z+1=2^x(2y+1)\), come si recupera x?
+- Contando le cifre decimali di z
+- Prendendo il resto di z diviso 2
++ Contando i fattori 2 di z+1
+> La parte dispari identifica 2y+1 e l'esponente di 2 identifica x, in modo unico.
+
+@2 [id=18-micro-2-0-2;at=2.0.2] Perché le inverse della funzione di accoppiamento sono p.r.?
+- Perché si assume che il codice sia primo
++ I componenti si possono cercare entro un limite ricavato dal codice
+- Perché ogni funzione inversa è p.r.
+> Le inverse sono ottenute con minimalizzazioni e quantificazioni limitate su relazioni p.r.
+
+@2 [id=18-micro-2;at=2] Che cosa garantisce la biiettività dell'accoppiamento?
++ Ogni naturale codifica una e una sola coppia di naturali
+- Ogni coppia ha infiniti codici diversi
+- Solo le coppie di numeri distinti hanno un codice
+> Esistenza e unicità consentono di passare senza ambiguità tra coppie e codici.
+
+@3 [id=18-micro-3-0-1;at=3.0.1] Nel codice di Gödel di una sequenza, dove si legge il suo i-esimo elemento?
+- Nel valore dell'i-esimo primo stesso
+- Nel numero di cifre del codice
++ Nell'esponente dell'i-esimo primo
+> La fattorizzazione in primi conserva gli elementi come esponenti associati a posizioni fisse.
+
+@3 [id=18-micro-3-0-2;at=3.0.2] Perché la lunghezza ricavata dall'ultimo primo divisore non rileva zeri finali?
+- I primi finali sono sempre uguali a 2
++ Un primo elevato a zero vale 1 e non modifica il prodotto
+- Zero non è ammesso come elemento di una sequenza
+> Aggiungere un esponente finale zero lascia invariato il numero di Gödel.
+
+@3 [id=18-micro-3-0-3;at=3.0.3] L'unicità del codice per sequenze della stessa lunghezza deriva da…
++ L'unicità della fattorizzazione in primi
+- L'ordine decimale delle cifre
+- Il fatto che gli elementi siano tutti diversi
+> A primi fissati, l'uguaglianza dei prodotti impone l'uguaglianza di ciascun esponente.
+
+@4 [id=18-micro-4-0-1;at=4.0.1] Secondo la numerazione del corso, quale numero identifica \(X_i\)?
+- \(2i+1\)
+- \(i-1\)
++ \(2i\)
+> Y occupa la prima posizione, poi si alternano variabili d'ingresso X e ausiliarie Z.
+
+@4 [id=18-micro-4-0-3;at=4.0.3] Perché si sottrae 1 al codice di Gödel della sequenza di istruzioni?
+- Per garantire che il codice sia dispari
++ Per assegnare codice zero al programma vuoto
+- Per cancellare l'ultima istruzione
+> La sequenza vuota ha prodotto 1; sottrarre 1 consente di rappresentarla con il naturale zero.
+
+@4 [id=18-micro-4-0-4;at=4.0.4] Quali informazioni conserva il codice di un'istruzione?
++ Etichetta, tipo di operazione e variabile coinvolta
+- Solo il valore attuale della variabile
+- Solo la posizione dell'istruzione nel programma
+> L'accoppiamento annidato permette di ricostruire tutti i dati sintattici dell'istruzione.
+
+@4 [id=18-micro-4;at=4] Per decodificare il programma di numero 199, quale numero va prima fattorizzato?
+- 199
+- 198
++ 200
+> Il codice del programma è il prodotto dei primi meno 1; prima si riaggiunge 1 per recuperare la sequenza di codici.
+
 ## 19
-@2 Il programma diagonale nella prova di HALT è…
+@2 [id=19-0;at=2.0] Il programma diagonale nella prova di HALT è…
 + \([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ A\)
 - \([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ E\)
 - \(Y \leftarrow \mathrm{HALT}(X,X)\)
 > Deve fare l'opposto della diagonale: andare in loop quando HALT dice «termina».
 
-@2 Su quale input si esegue il programma diagonale per ottenere la contraddizione?
+@2 [id=19-1;at=2.0] Su quale input si esegue il programma diagonale per ottenere la contraddizione?
 - 0
 + il suo stesso numero
 - un input qualsiasi
 > \(\mathrm{HALT}(y_0, y_0) \iff \neg\mathrm{HALT}(y_0, y_0)\).
 
-@3 Il programma universale tiene lo stato della computazione simulata…
+@3 [id=19-2;at=3.0] Il programma universale tiene lo stato della computazione simulata…
 + come numero di Gödel delle variabili
 - su un nastro
 - in una pila
 > \(S = \prod p_i^{v_i}\): incremento = moltiplica per \(p_i\).
 
-@4 Il predicato STP(x, y, t) («termina entro t passi») è…
+@4 [id=19-3;at=3.1] Il predicato STP(x, y, t) («termina entro t passi») è…
 + primitivo ricorsivo
 - non calcolabile
 - semidecidibile ma non decidibile
 > HALT \(= \exists t\ \mathrm{STP}\): è il quantificatore illimitato a renderlo indecidibile.
 
+@1 [id=19-micro-1;at=1] HALT(x,y) riguarda…
++ La terminazione del programma y eseguito sull'input x
+- Il valore restituito dal programma x sull'input y
+- Solo i programmi che non hanno input
+> L'ordine degli argomenti è input, codice del programma; il predicato parla di terminazione, non di valore.
+
+@2 [id=19-micro-2-1;at=2.1] Quale ipotesi rende possibile costruire il programma che contraddice la diagonale di HALT?
+- Supporre che tutti i programmi terminino
+- Supporre che i numeri naturali siano finiti
++ Supporre che HALT sia calcolabile e utilizzabile come test
+> Il programma diagonale usa il presunto algoritmo per HALT e ne inverte il comportamento sulla diagonale.
+
+@4 [id=19-micro-4;at=4] L'indecidibilità di HALT impedisce di dimostrare la terminazione di un singolo programma?
+- No: basta sempre eseguire il programma per un minuto
++ No: esclude un metodo generale che risponda correttamente per ogni programma e input
+- Sì, ogni prova di terminazione è impossibile
+> Molti casi particolari si possono analizzare; è impossibile un decisore universale per tutti i casi.
+
 ## 20
-@2 La configurazione \(u\,q\,v\) significa…
+@2 [id=20-0;at=2.1] La configurazione \(u\,q\,v\) significa…
 + nastro \(uv\), stato \(q\), testina sul primo simbolo di \(v\)
 - testina sull'ultimo simbolo di \(u\)
 - nastro \(u\) e input \(v\)
 > È la notazione del Sipser.
 
-@2 Una macchina che riconosce \(L\) sulle stringhe fuori da \(L\)…
+@2 [id=20-1;at=2.2] Una macchina che riconosce \(L\) sulle stringhe fuori da \(L\)…
 - rifiuta sempre
 + può rifiutare o non fermarsi
 - accetta
 > Un decisore invece si ferma sempre.
 
-@4 Simulando una NTM con una TM deterministica si visita l'albero…
+@4 [id=20-2;at=4.2] Simulando una NTM con una TM deterministica si visita l'albero…
 + in ampiezza
 - in profondità
 - a caso
 > In profondità un ramo infinito bloccherebbe la ricerca.
 
-@4 Simulare \(t\) passi di una macchina multinastro con un nastro costa…
+@4 [id=20-3;at=4.1] Simulare \(t\) passi di una macchina multinastro con un nastro costa…
 - \(O(t)\)
 + \(O(t^2)\)
 - \(2^{O(t)}\)
 > Ogni passo richiede di scorrere \(O(t)\) celle.
 
-@5 La tesi di Church–Turing è…
+@5 [id=20-4;at=5] La tesi di Church–Turing è…
 - un teorema dimostrato da Turing
 + un'ipotesi non dimostrabile ma universalmente accettata
 - falsa
 > Collega il concetto informale di algoritmo a quello formale.
 
+@4 [id=20-micro-4-0;at=4.0] Che cosa mostra la robustezza del modello di Turing?
++ Molte varianti ragionevoli conservano la stessa potenza di calcolo
+- Tutte le varianti richiedono esattamente lo stesso tempo
+- Le TM risolvono anche ogni problema indecidibile
+> Le simulazioni reciproche mantengono la classe di funzioni o linguaggi, anche se possono cambiare i tempi.
+
+@1 [id=20-micro-1;at=1] Quale risorsa distingue la macchina di Turing da un automa finito?
+- Un insieme infinito di stati interni
+- Un alfabeto d'ingresso necessariamente infinito
++ Un nastro modificabile con spazio non limitato a priori
+> Il controllo resta finito, ma il nastro offre memoria espandibile e rileggibile.
+
+@2 [id=20-micro-2-0;at=2.0] Una mossa ordinaria di una TM può…
+- Modificare arbitrariamente tutte le celle insieme
++ Leggere un simbolo, scriverne uno e spostare la testina
+- Leggere l'intera stringa in un solo passo
+> La funzione di transizione descrive un aggiornamento locale di stato, simbolo scritto e direzione.
+
+@3 [id=20-micro-3-0-1;at=3.0.1] Nella TM per \(0^n1^n\), perché si marcano una 0 e una 1 a ogni ciclo?
++ Per verificare la corrispondenza uno a uno tra i due blocchi
+- Per cancellare il vincolo sull'ordine dei simboli
+- Per trasformare il problema in uno su lunghezze dispari
+> Ogni coppia marcata elimina un elemento da ciascun conteggio; i casi residui rivelano uno squilibrio.
+
+@3 [id=20-micro-3-0-2;at=3.0.2] Nell'algoritmo per lunghezze potenze di 2, che cosa segnala un numero dispari di simboli rimasti, maggiore di uno?
+- L'accettazione immediata
+- La necessità di raddoppiare il nastro
++ Il rifiuto
+> Dimezzando ripetutamente una potenza di 2 si incontra una lunghezza dispari solo quando resta un simbolo.
+
+@3 [id=20-micro-3;at=3] Per incrementare un numero binario, perché si parte dal bit meno significativo?
+- Per invertire l'ordine dei bit nel risultato
++ Per propagare il riporto attraverso gli 1 finali
+- Perché gli altri bit non possono mai cambiare
+> Gli 1 finali diventano 0 finché il riporto raggiunge uno 0, che diventa 1, o richiede una nuova cifra.
+
+@4 [id=20-micro-4-3;at=4.3] Che cosa deve stampare un enumeratore di un linguaggio?
++ Tutte e sole le parole del linguaggio, anche con ripetizioni
+- Le parole necessariamente in ordine crescente
+- Una risposta sì o no per ogni input
+> Un enumeratore produce gli elementi nel tempo; l'ordine e l'assenza di ripetizioni non sono richiesti.
+
+@4 [id=20-micro-4-4;at=4.4] L'equivalenza tra TM e linguaggio S afferma che…
+- Usano lo stesso numero di passi per ogni calcolo
+- Hanno identiche istruzioni primitive
++ Calcolano le stesse funzioni parziali, tramite opportune codifiche
+> Le simulazioni reciproche preservano il risultato e la divergenza, senza promettere identici tempi.
+
 ## 21
-@1 Un insieme r.e. è…
+@1 [id=21-0;at=1] Un insieme r.e. è…
 + il dominio di una funzione parzialmente calcolabile
 - l'immagine di una funzione non calcolabile
 - un insieme finito
 - un insieme decidibile
 > \(W_n = \{x : \Phi_n(x)\!\downarrow\}\).
 
-@3 \(B\) è ricorsivo se e solo se…
+@3 [id=21-1;at=3.0.1] \(B\) è ricorsivo se e solo se…
 + \(B\) e \(\overline B\) sono r.e.
 - \(B\) è r.e.
 - \(\overline B\) è finito
 - \(B\) è infinito
 > Teorema di Post: semidecisori eseguiti in parallelo.
 
-@3 \(\overline K\) è…
+@3 [id=21-2;at=3] \(\overline K\) è…
 - ricorsivo
 - r.e. non ricorsivo
 + non r.e.
 > Se fosse r.e., \(K\) sarebbe ricorsivo.
 
-@4 Per dimostrare che gli r.e. sono chiusi per unione si…
+@4 [id=21-3;at=4] Per dimostrare che gli r.e. sono chiusi per unione si…
 + eseguono i due semidecisori in parallelo
 - eseguono uno dopo l'altro
 - complementa
 > Uno dei due potrebbe non terminare.
 
-@6 Il teorema del parametro serve a…
+@6 [id=21-4;at=6] Il teorema del parametro serve a…
 + fissare argomenti di un programma in modo calcolabile
 - dimostrare che HALT è r.e.
 - minimizzare automi
 > È lo strumento tecnico delle riduzioni.
 
+@1 [id=21-micro-1-0-1;at=1.0.1] Che cosa distingue un decisore da un programma che termina solo sugli elementi dell'insieme?
++ Il decisore termina e risponde anche sui casi negativi
+- Il decisore usa necessariamente meno memoria
+- Il decisore accetta ogni input
+> La decidibilità richiede una risposta corretta e terminante per tutti gli input.
+
+@2 [id=21-micro-2-0-1;at=2.0.1] Che cosa significa \(n\in K\)?
+- Il programma n termina su ogni input
+- Il programma n restituisce sempre n
++ Il programma n termina quando riceve il proprio codice come input
+> K raccoglie i casi di terminazione lungo la diagonale programma-input.
+
+@2 [id=21-micro-2;at=2] Perché K è r.e. anche se non è ricorsivo?
+- Ogni insieme non ricorsivo è r.e.
++ Si può simulare il programma n su n e confermare i casi che terminano
+- La simulazione può sempre riconoscere un ciclo infinito
+> La simulazione universale fornisce un semidecisore, ma non un metodo per rispondere a tutti i casi negativi.
+
+@5 [id=21-micro-5-0-1;at=5.0.1] Per enumerare il dominio di un programma parziale, perché si alternano input e budget finiti di passi?
++ Per evitare di restare bloccati su un input divergente
+- Per eliminare tutte le ripetizioni dall'elenco
+- Per decidere immediatamente ogni caso negativo
+> Il dovetailing dedica tempo a tutte le computazioni e raggiunge ogni caso positivo dopo un numero finito di fasi.
+
+@5 [id=21-micro-5;at=5] Perché un elenco calcolabile strettamente crescente di un insieme infinito ne permette la decisione?
+- Si confronta soltanto con il primo elemento
+- Gli insiemi infiniti sono tutti ricorsivi
++ Si genera fino a raggiungere o superare l'elemento cercato
+> La crescita e l'infinità garantiscono che si arrivi oltre ogni input; a quel punto l'appartenenza è decisa.
+
 ## 22
-@1 Per dimostrare che \(B\) è indecidibile si mostra…
+@1 [id=22-0;at=1] Per dimostrare che \(B\) è indecidibile si mostra…
 + \(K \le_m B\)
 - \(B \le_m K\)
 - \(B \le_m \emptyset\)
 > La difficoltà passa nel verso della freccia: dal problema noto a quello nuovo.
 
-@1 La funzione di riduzione deve essere…
+@1 [id=22-1;at=1.0.1] La funzione di riduzione deve essere…
 + calcolabile e totale
 - parziale
 - biiettiva
 - primitiva ricorsiva per forza
 > Deve terminare sempre.
 
-@3 Rice si applica a «il programma ha meno di 10 istruzioni»?
+@3 [id=22-2;at=3.1] Rice si applica a «il programma ha meno di 10 istruzioni»?
 - Sì
 + No: è una proprietà sintattica
 > Programmi equivalenti possono avere lunghezze diverse.
 
-@3 Cosa garantisce il teorema di Rice?
+@3 [id=22-3;at=3.0] Cosa garantisce il teorema di Rice?
 + \(R_\Gamma\) non ricorsivo per \(\Gamma\) non banale
 - \(R_\Gamma\) non r.e.
 - \(R_\Gamma\) r.e.
 > Non dice nulla sull'essere r.e.
 
+@1 [id=22-micro-1-0-2;at=1.0.2] Se \(A\le_m B\) e B è decidibile, che cosa segue?
++ A è decidibile
+- B è necessariamente indecidibile
+- A e B sono lo stesso insieme
+> Si calcola la riduzione totale e poi si usa il decisore di B, ottenendo un decisore per A.
+
+@2 [id=22-micro-2-0-1;at=2.0.1] Nella riduzione da K a TOT, che cosa deve fare il programma costruito se la simulazione diagonale termina?
+- Terminare solo sul proprio codice
+- Divergere su tutti gli input
++ Terminare su tutti gli input
+> La costruzione lega l'appartenenza a K alla totalità del nuovo programma: se la simulazione termina, ogni esecuzione può terminare.
+
+@2 [id=22-micro-2-0-2;at=2.0.2] Per dimostrare indecidibile la vuotezza del dominio, quale distinzione è utile costruire?
+- Un programma il cui codice è sempre zero
++ Un programma con dominio vuoto oppure non vuoto secondo un caso di terminazione
+- Un programma sempre totale indipendentemente dal caso iniziale
+> Un decisore della vuotezza distinguerebbe le due situazioni e risolverebbe il problema di terminazione usato nella riduzione.
+
+@2 [id=22-micro-2;at=2] Perché il teorema del parametro è utile nelle riduzioni sui programmi?
++ Garantisce che il codice del programma costruito dipenda effettivamente dall'istanza
+- Garantisce che il programma costruito termini sempre
+- Rende decidibili tutte le proprietà semantiche
+> La riduzione deve essere una funzione totale calcolabile sui codici, anche quando i programmi prodotti possono divergere.
+
+@3 [id=22-micro-3-0-1;at=3.0.1] Che cosa rende una proprietà un insieme di indici?
+- Dipende dal numero di istruzioni del testo
+- Contiene un solo codice per ogni funzione
++ Dipende dalla funzione calcolata e resta uguale per programmi equivalenti
+> Una proprietà semantica non cambia scegliendo un altro programma che calcola la stessa funzione parziale.
+
+@3 [id=22-micro-3-1-1;at=3.1.1] «La funzione calcolata è totale» è una proprietà non banale per Rice perché…
+- Dipende dalla lunghezza del codice
++ Vale per alcune funzioni calcolabili e non per altre
+- Vale per tutti i programmi
+> Esistono funzioni calcolabili totali e funzioni parziali non totali; la proprietà dipende dalla funzione e non dalla sintassi.
+
 ## 23
-@1 Il PCP chiede se esiste…
+@1 [id=23-0;at=1.0.1] Il PCP chiede se esiste…
 + una sequenza di tessere con sopra e sotto uguali
 - una tessera con sopra = sotto
 - un insieme di tessere minimo
 > Con ripetizioni ammesse.
 
-@1 Il PCP su alfabeto unario è…
+@1 [id=23-1;at=1] Il PCP su alfabeto unario è…
 + decidibile
 - indecidibile
 - r.e. non decidibile
 > Conta solo la differenza di lunghezze tra sopra e sotto.
 
-@4 Quale problema sulle grammatiche CF è decidibile?
+@2 [id=23-2;at=2] Una storia di computazione accettante è…
++ la sequenza di configurazioni da \(q_0w\) a una configurazione accettante
+- l'insieme degli stati visitati
+- la tabella di transizione
+> Verificarla richiede solo controlli locali.
+
+@4 [id=23-3;at=4.1] Quale problema sulle grammatiche CF è decidibile?
 + \(L(G) = \emptyset\)?
 - \(G\) è ambigua?
 - \(L(G) = \Sigma^*\)?
 - \(L(G_1) = L(G_2)\)?
 > Si marcano le variabili che generano stringhe terminali.
 
-@2 Una storia di computazione accettante è…
-+ la sequenza di configurazioni da \(q_0w\) a una configurazione accettante
-- l'insieme degli stati visitati
-- la tabella di transizione
-> Verificarla richiede solo controlli locali.
+@1 [id=23-micro-1-0-2;at=1.0.2] Nel PCP, come si verifica una sequenza candidata di tessere?
++ Si concatenano i lati superiori e inferiori nello stesso ordine e si confrontano
+- Si confronta ogni tessera separatamente senza concatenare
+- Si riordinano liberamente le lettere dei due lati
+> La soluzione richiede l'uguaglianza delle due stringhe concatenate usando la medesima sequenza non vuota di indici.
+
+@3 [id=23-micro-3;at=3] Nella riduzione al PCP, che cosa deve rappresentare una soluzione di tessere?
+- Un elenco arbitrario di stati senza transizioni
+- La sola configurazione iniziale, qualunque sia l'esito
++ Una storia valida di computazione accettante
+> Le tessere impongono che le configurazioni consecutive siano collegate da mosse valide e portino all'accettazione.
+
+@4 [id=23-micro-4-0;at=4.0] Quale problema sulle CFG è in generale indecidibile?
+- Stabilire se il linguaggio generato è vuoto
++ Stabilire se due CFG generano lo stesso linguaggio
+- Stabilire se una data parola appartiene al linguaggio
+> Appartenenza e vuotezza sono decidibili; l'equivalenza richiede confrontare globalmente due linguaggi e non è decidibile in generale.
 
 ## 24
-@2 \(2^{2n} = O(2^n)\)?
+@2 [id=24-0;at=2] \(2^{2n} = O(2^n)\)?
 - Sì
 + No
 > \(2^{2n} = 4^n\): il rapporto con \(2^n\) cresce senza limite.
 
-@4 Perché P è robusta?
+@4 [id=24-1;at=4] Perché P è robusta?
 + I modelli deterministici ragionevoli si simulano con costo polinomiale
 - Perché usa un solo nastro
 - Perché è infinita
 > Un polinomio di un polinomio è un polinomio.
 
-@4 Provare tutti i divisori di \(N\) fino a \(\sqrt N\) è…
+@4 [id=24-2;at=4] Provare tutti i divisori di \(N\) fino a \(\sqrt N\) è…
 - polinomiale
 + esponenziale nella lunghezza dell'input
 - lineare
 > L'input ha \(\approx \log_2 N\) cifre; \(\sqrt N = 2^{n/2}\).
 
-@5 Ogni linguaggio context-free è in P grazie a…
+@5 [id=24-3;at=5] Ogni linguaggio context-free è in P grazie a…
 + CYK
 - Euclide
 - la visita in ampiezza
 - Cook–Levin
 > Programmazione dinamica in \(O(n^3)\).
 
+@1 [id=24-micro-1;at=1] Il tempo di una TM decisore su input di lunghezza n, nel caso peggiore, è…
++ Il massimo dei passi sugli input di quella lunghezza
+- La media dei passi su tutte le lunghezze
+- Il numero di stati della macchina
+> La misura considera l'input più costoso a lunghezza fissata, contando le transizioni eseguite.
+
+@2 [id=24-micro-2-0-1;at=2.0.1] Che differenza c'è tra \(f=O(g)\) e \(f=o(g)\)?
+- Sono due notazioni sempre equivalenti
+- o indica soltanto che f e g sono positive
++ O ammette un rapporto limitato, o richiede che il rapporto tenda a zero
+> O esprime un limite superiore a meno di una costante; o esprime una crescita strettamente inferiore in senso asintotico.
+
+@3 [id=24-micro-3-0;at=3.0] Che cosa significa \(L\in\mathrm{TIME}(t(n))\)?
+- L contiene soltanto parole di lunghezza t(n)
++ Esiste una TM deterministica che decide L in tempo \(O(t(n))\)
+- Ogni algoritmo per L impiega esattamente t(n) passi
+> La classe è definita dall'esistenza di un decisore con quel limite asintotico di tempo.
+
+@3 [id=24-micro-3-1-1;at=3.1.1] Simulare una TM multinastro in tempo t(n) su un nastro comporta nel risultato studiato…
++ Un costo al più quadratico in t(n)
+- La perdita della decidibilità
+- Sempre un costo costante
+> La simulazione cambia l'efficienza ma mantiene un sovraccosto polinomiale.
+
+@3 [id=24-micro-3-1;at=3.1] Perché un rallentamento polinomiale conserva l'appartenenza a P?
+- Ogni rallentamento è costante
+- Un polinomio supera sempre un esponenziale
++ Una composizione di limiti polinomiali resta polinomiale
+> I modelli ragionevoli possono differire nei tempi senza cambiare la classe dei problemi risolvibili in tempo polinomiale.
+
+@5 [id=24-micro-5-0-1;at=5.0.1] Perché una visita di un grafo risolve PATH in tempo polinomiale?
+- Prova tutte le permutazioni dei vertici
++ Visita un numero di vertici e archi limitato dalla dimensione del grafo
+- Elenca tutti i cammini semplici
+> La raggiungibilità non richiede enumerare tutti i percorsi, che potrebbero essere esponenzialmente numerosi.
+
+@5 [id=24-micro-5-0-2;at=5.0.2] Perché l'algoritmo di Euclide è adatto a RELPRIME?
++ Calcola il MCD in tempo polinomiale nella lunghezza binaria degli input
+- Prova tutti i numeri fino al prodotto degli input
+- Funziona soltanto su numeri di una cifra
+> Due numeri sono coprimi se il loro MCD è 1; il calcolo del MCD è efficiente rispetto alla lunghezza della codifica.
+
 ## 25
-@2 NP sta per…
+@2 [id=25-0;at=2] NP sta per…
 - non polinomiale
 + polinomiale non deterministico
 - non P
 > E include P.
 
-@3 Il certificato per CLIQUE è…
+@3 [id=25-1;at=3.0.1] Il certificato per CLIQUE è…
 + i \(k\) nodi della clique
 - il grafo
 - l'elenco degli archi mancanti
 > Si verifica in \(O(k^2)\) controlli.
 
-@5 \(B\) è NP-completo se…
+@5 [id=25-2;at=5.0.2] \(B\) è NP-completo se…
 + \(B \in\) NP e ogni problema di NP si riduce a \(B\) in tempo polinomiale
 - \(B\) non è in P
 - \(B\) è decidibile
 - \(B\) è in NP
 > La seconda condizione da sola è NP-difficile.
 
-@6 Nel teorema di Cook–Levin la formula descrive…
+@6 [id=25-3;at=6.0] Nel teorema di Cook–Levin la formula descrive…
 + il tableau della computazione accettante
 - l'input
 - il codice della macchina
 > Celle, inizio, finestre legali, accettazione.
 
-@7 Nella riduzione 3SAT \(\le_P\) CLIQUE il valore di \(k\) è…
+@7 [id=25-4;at=7.0] Nella riduzione 3SAT \(\le_P\) CLIQUE il valore di \(k\) è…
 + il numero di clausole
 - il numero di variabili
 - 3
 > Un nodo scelto per ogni clausola.
+
+@1 [id=25-micro-1;at=1] Perché verificare una soluzione può essere più semplice che trovarla?
++ La soluzione proposta fornisce informazioni che guidano il controllo
+- La verifica può ignorare l'istanza
+- Trovare e verificare richiedono sempre lo stesso algoritmo
+> Un certificato permette di controllare una proposta senza doverla cercare tra tutte le possibilità.
+
+@2 [id=25-micro-2-0-1;at=2.0.1] Quale limite deve avere il certificato nella definizione di NP?
+- Lunghezza arbitraria senza vincoli
+- Lunghezza necessariamente uguale a uno
++ Lunghezza polinomiale rispetto all'istanza
+> Un verificatore polinomiale deve poter controllare certificati di dimensione polinomiale rispetto all'input.
+
+@2 [id=25-micro-2-0-2;at=2.0.2] Un'istanza negativa di un linguaggio in NP può avere un certificato accettato dal verificatore corretto?
+- Sì, purché non venga trovato dall'algoritmo
++ No, nessun certificato ammesso deve farla accettare
+- Sì, se il certificato è abbastanza lungo
+> L'esistenza di un certificato accettante deve equivalere all'appartenenza al linguaggio.
+
+@3 [id=25-micro-3;at=3] Per verificare un certificato di ciclo hamiltoniano, quale controllo è necessario?
++ Ogni vertice compare una volta e i passi del ciclo sono archi del grafo
+- Il grafo contiene almeno un arco
+- L'elenco contiene anche vertici estranei al grafo
+> La sequenza deve descrivere un ciclo che attraversa tutti e soli i vertici una volta, tornando all'inizio.
+
+@4 [id=25-micro-4;at=4] Se un problema NP-completo fosse risolto in tempo polinomiale, che cosa seguirebbe?
+- \(P\ne NP\)
+- Che tutti i problemi indecidibili sarebbero decidibili
++ \(P=NP\)
+> Ogni problema in NP si riduce in tempo polinomiale a quello NP-completo, dando algoritmi polinomiali per tutta NP.
+
+@5 [id=25-micro-5-0-1;at=5.0.1] Nella riduzione polinomiale \(A\le_P B\), come devono essere correlate le risposte?
+- f deve decidere direttamente B su ogni input
++ \(x\in A\) se e solo se \(f(x)\in B\)
+- L'appartenenza di f(x) può essere indipendente da x
+> La trasformazione deve preservare sì e no ed essere calcolabile in tempo polinomiale.
+
+@5 [id=25-micro-5;at=5] Per dimostrare che un nuovo problema B è NP-completo, quale verso di riduzione serve da un noto NP-completo A?
++ \(A\le_P B\), insieme a \(B\in NP\)
+- Solo \(B\le_P A\)
+- Solo \(A\le_P B\), senza verificare \(B\in NP\)
+> Il verso scelto trasferisce a B la difficoltà di tutti i problemi in NP; l'appartenenza a NP completa la prova.
+
+@6 [id=25-micro-6-0-1;at=6.0.1] Che cosa chiede SAT su una formula booleana?
+- Se tutte le assegnazioni la rendono vera
+- Quante variabili contiene la formula
++ Se esiste un'assegnazione che rende vera la formula
+> La soddisfacibilità richiede almeno un'assegnazione vera, non la validità per tutte le assegnazioni.
+
+@6 [id=25-micro-6-1;at=6.1] Perché 3SAT rimane centrale anche se ogni clausola ha solo tre letterali?
+- Non appartiene più a NP
++ Resta NP-completo
+- Diventa automaticamente risolvibile in tempo lineare
+> La restrizione a tre letterali per clausola conserva la NP-completezza e facilita molte riduzioni.
+
+@7 [id=25-micro-7-1;at=7.1] Che cosa permette di concatenare riduzioni polinomiali tra problemi NP-completi?
++ La transitività delle riduzioni con costo ancora polinomiale
+- L'uguaglianza dei testi delle istanze
+- Il fatto che ogni riduzione sia reversibile
+> La composizione conserva l'equivalenza delle risposte e un limite polinomiale, trasferendo la difficoltà lungo la catena.

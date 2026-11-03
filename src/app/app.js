@@ -50,10 +50,23 @@
     renderMathInElement(el, { delimiters: [{ left: "\\[", right: "\\]", display: true }, { left: "\\(", right: "\\)", display: false }], ignoredClasses: ["bench"], throwOnError: false });
   }
 
+  /* Metadati nel testo: il build storico continua a leggere @k senza modifiche.
+     Gli id espliciti conservano anche i riferimenti già salvati in S.wrong. */
+  const quizzes = Object.fromEntries(Object.entries(QUIZ_DATA).map(([n, qs]) => [n, qs.map((q, i) => {
+    const m = q.q.match(/^\[id=([\w-]+)(?:;at=(\d+(?:\.\d+){0,2}))?\] /);
+    return { ...q, id: m ? m[1] : `${n}-${i}`, q: m ? q.q.slice(m[0].length) : q.q,
+      at: m && m[2] ? m[2] : String(q.s) };
+  })]));
+
   /* ---------- da lezione a mazzo di schede ---------- */
   const deckCache = {};
   const BOX = ".def,.thm,.proof,.example,.warn,.remark,.recap,.tblwrap,figure";
+  const IMPORTANT = ".def,.thm,.example";
   const words = (el) => (el.textContent || "").trim().split(/\s+/).filter(Boolean).length;
+  // Una formula a blocco può essere in un <p> oppure in un contenitore dedicato.
+  const display = el => el.matches(".katex-display,.math-display,[data-display]") || el.textContent.includes("\\[");
+  const keepNext = (el, next) => !!next && (el.tagName === "H3" ||
+    (el.tagName === "P" && (/:\s*$/.test(el.textContent) || next.matches(BOX + ",[data-w],table") || display(next))));
   function buildDeck(n) {
     if (deckCache[n]) return deckCache[n];
     const les = byN[n], tmp = document.createElement("div");
@@ -64,42 +77,48 @@
       else cur.els.push(el);
     }
     if (cur.els.length) sections.push(cur);
-    const quiz = (QUIZ_DATA[n] || []).map((q, i) => ({ ...q, id: `${n}-${i}` }));
-    const cards = [];
+    const quiz = quizzes[n] || [], emitted = new Set(), cards = [];
     sections.forEach((sec, si) => {
-      const secNo = si + 1; let first = true, card = null;
+      const secNo = si + 1; let first = true, card = null, micro = 0, block = 0;
       const head = () => { const f = first; first = false; return f ? { secNo, secTitle: sec.title, secTot: sections.length } : null; };
       const flush = () => { if (card && card.nodes.length) cards.push(card); card = null; };
-      const ensure = () => { if (!card) card = { type: "content", head: head(), nodes: [], words: 0, boxes: 0 }; };
-      for (const el of sec.els) {
-        if (el.matches("section.exercises")) {
-          flush();
-          [...el.querySelectorAll(".ex")].forEach((ex, k) => {
-            const sol = ex.querySelector("details.sol > div"); const lvl = ex.querySelector(".lvl");
-            const body = [...ex.children].filter(c => !c.matches("details.sol, .lvl")).map(c => c.outerHTML).join("");
-            cards.push({ type: "ex", head: head(), lvl: lvl ? lvl.textContent : "", body, sol: sol ? sol.innerHTML : "", id: `${n}-e${k}` });
-          });
+      const ask = at => {
+        const qs = quiz.filter(q => q.at === at && !emitted.has(q.id));
+        if (!qs.length) return;
+        flush(); qs.forEach(q => { cards.push({ type: "quiz", ...q }); emitted.add(q.id); });
+      };
+      const endMicro = () => ask(`${secNo}.${micro}`);
+      for (let i = 0; i < sec.els.length; i++) {
+        const el = sec.els[i];
+        if (el.tagName === "H3") { endMicro(); flush(); micro++; block = 0; }
+        if (el.matches("section.exercises,section.oral")) {
+          endMicro(); ask(String(secNo)); flush();
+          if (el.matches("section.exercises")) {
+            [...el.querySelectorAll(".ex")].forEach((ex, k) => {
+              const sol = ex.querySelector("details.sol > div"), lvl = ex.querySelector(".lvl");
+              const body = [...ex.children].filter(c => !c.matches("details.sol, .lvl")).map(c => c.outerHTML).join("");
+              cards.push({ type: "ex", head: head(), lvl: lvl ? lvl.textContent : "", body, sol: sol ? sol.innerHTML : "", id: `${n}-e${k}` });
+            });
+          } else cards.push({ type: "content", head: head() || { secNo, secTitle: "Domande da orale", secTot: sections.length, sub: true }, nodes: [el.outerHTML], words: 0, boxes: 1 });
           continue;
         }
-        if (el.matches("section.oral")) { flush(); cards.push({ type: "content", head: head() || { secNo, secTitle: "Domande da orale", secTot: sections.length, sub: true }, nodes: [el.outerHTML], words: 0, boxes: 1 }); continue; }
-        const w = words(el);
-        if (el.matches("[data-w]")) {
-          if (card && (card.words > 70 || card.boxes)) flush();
-          ensure(); card.nodes.push(el.outerHTML); flush(); continue;
-        }
-        if (el.matches(BOX)) {
-          if (card && (card.boxes > 0 || card.words + w > 170)) flush();
-          ensure(); card.nodes.push(el.outerHTML); card.boxes++; card.words += w;
-          if (w > 90) flush();
-          continue;
-        }
-        if (card && card.words > 0 && (card.boxes > 0 || card.words + w > 130)) flush();
-        ensure(); card.nodes.push(el.outerHTML); card.words += w;
+        // Decidiamo il taglio su gruppi indivisibili: titolo/introduzione + contenuto.
+        const unit = [el];
+        while (keepNext(sec.els[i], sec.els[i + 1])) unit.push(sec.els[++i]);
+        const w = unit.reduce((sum, e) => sum + words(e), 0);
+        const boxes = unit.filter(e => e.matches(BOX)).length;
+        const widget = unit.some(e => e.matches("[data-w]"));
+        if (card && (card.words + w > 160 || (boxes && card.boxes) || widget)) flush();
+        if (!card) card = { type: "content", head: head(), nodes: [], words: 0, boxes: 0 };
+        card.nodes.push(...unit.map(e => e.outerHTML)); card.words += w; card.boxes += boxes;
+        // Gli indici dei riquadri ripartono da 1 in ogni micro-argomento (0 = introduzione).
+        for (const e of unit) if (e.matches(IMPORTANT)) { block++; ask(`${secNo}.${micro}.${block}`); }
+        if (widget || (card && card.words >= 130)) flush();
       }
-      flush();
-      quiz.filter(q => q.s === secNo).forEach(q => cards.push({ type: "quiz", ...q }));
+      endMicro(); flush(); ask(String(secNo));
     });
-    quiz.filter(q => q.s > sections.length).forEach(q => cards.push({ type: "quiz", ...q }));
+    // Compatibilità con i vecchi quiz ancorati oltre l'ultima sezione.
+    quiz.filter(q => !emitted.has(q.id) && q.s > sections.length).forEach(q => cards.push({ type: "quiz", ...q }));
     return (deckCache[n] = cards);
   }
 
@@ -257,7 +276,7 @@
   }
 
   /* ---------- ripasso ---------- */
-  function quizById(id) { const [n, i] = id.split("-").map(Number); const q = (QUIZ_DATA[n] || [])[i]; return q ? { type: "quiz", ...q, id, head: { secTitle: `Dalla lezione ${n}`, secNo: 1, secTot: 1 } } : null; }
+  function quizById(id) { const n = +id.split("-")[0]; const q = (quizzes[n] || []).find(q => q.id === id); return q ? { type: "quiz", ...q, id, head: { secTitle: `Dalla lezione ${n}`, secNo: 1, secTot: 1 } } : null; }
   function exById(id) { const n = +id.split("-")[0]; return buildDeck(n).find(c => c.id === id); }
   function reviewScreen() {
     const qs = S.wrong.map(quizById).filter(Boolean), exs = S.exReview.map(exById).filter(Boolean);
@@ -267,7 +286,7 @@
     const p2 = h("section", { class: "panel" }, h("h2", null, "Esercizi da rivedere"),
       h("p", { class: "small" }, exs.length ? "Gli esercizi che hai segnato «da rivedere». Tocca per riprovare." : "Nessun esercizio segnato da rivedere."),
       h("div", { class: "list" }, ...exs.map(c => { const n = +c.id.split("-")[0]; const tmp = h("div", { html: c.body }); return h("button", { type: "button", class: "li", style: "text-align:left;cursor:pointer;color:var(--ink)", onclick: () => player({ mode: "review", back: "ripasso", deck: [{ ...c, head: { secTitle: byN[n].title, secNo: 1, secTot: 1 } }] }) }, h("span", { class: "m" }, `Lezione ${n} · ${c.lvl}`), h("span", { html: c.body.length > 260 ? tmp.textContent.slice(0, 160) + "…" : c.body })); })));
-    const all = LESSONS.flatMap(l => (QUIZ_DATA[l.n] || []).map((q, i) => `${l.n}-${i}`));
+    const all = LESSONS.flatMap(l => (quizzes[l.n] || []).map(q => q.id));
     const p3 = h("section", { class: "panel" }, h("h2", null, "Allenamento misto"), h("p", { class: "small" }, "Dieci domande a caso dalle lezioni che hai completato (o da tutto il corso, se non ne hai ancora completate)."),
       h("button", { type: "button", class: "ghost", onclick: () => {
         const doneN = new Set(LESSONS.filter(l => S.lessons[l.n] && S.lessons[l.n].done).map(l => l.n));
