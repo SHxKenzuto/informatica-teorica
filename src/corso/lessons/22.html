@@ -1,0 +1,159 @@
+<!--{"n":22,"mod":"C","title":"Indecidibilità: riduzioni e teorema di Rice","sipser":"cap. 5, §5.1 e §5.3 (PDF p. 208–237)","dsw":"§4.6–4.7 (PDF p. 107–131)","time":"3–4 ore","lead":"Dimostrare da zero ogni indecidibilità con una diagonalizzazione sarebbe faticoso. Una volta noto un problema indecidibile, gli altri si ottengono per riduzione: se sapessi risolvere B, sapresti risolvere A. Il teorema di Rice poi chiude la questione per un'intera famiglia di problemi."}-->
+
+<h2>L'idea della riduzione</h2>
+<p>Ridurre un problema \(A\) a un problema \(B\) significa mostrare che <b>un algoritmo per \(B\) darebbe un algoritmo per \(A\)</b>. Allora:</p>
+<ul>
+<li>se \(B\) è decidibile, anche \(A\) lo è;</li>
+<li>contronominale: <b>se \(A\) è indecidibile, anche \(B\) lo è</b>.</li>
+</ul>
+<p>È il secondo uso che ci interessa. Si parte da un problema già noto come indecidibile (HALT, \(K\), \(A_{\mathrm{TM}}\)) e lo si riduce al problema nuovo.</p>
+
+<div class="def"><span class="k">Definizione · riducibilità mediante funzione (many-one)</span>
+<p>\(A \le_m B\) se esiste una funzione <b>calcolabile e totale</b> \(f\) tale che, per ogni \(x\),
+\[x \in A \iff f(x) \in B.\]
+\(f\) si chiama <b>riduzione</b> da \(A\) a \(B\).</p>
+</div>
+<div data-w="reduction"></div>
+
+<div class="thm"><span class="k">Teorema</span>
+<p>Se \(A \le_m B\):</p>
+<ol>
+<li>se \(B\) è ricorsivo (decidibile), allora \(A\) è ricorsivo;</li>
+<li>se \(B\) è r.e., allora \(A\) è r.e.;</li>
+<li>quindi: se \(A\) non è ricorsivo, \(B\) non è ricorsivo; se \(A\) non è r.e., \(B\) non è r.e.</li>
+</ol>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Per decidere (o semidecidere) \(x \in A\): si calcola \(f(x)\), che termina sempre perché \(f\) è totale, e si esegue il decisore (o semidecisore) di \(B\) su \(f(x)\). Per la proprietà di \(f\) la risposta è quella giusta per \(A\).</p>
+</div>
+<p>Inoltre \(A \le_m B\) implica \(\overline A \le_m \overline B\) (con la stessa \(f\)). È utile per dimostrare che un insieme <b>non è r.e.</b>: basta ridurgli \(\overline K\).</p>
+
+<div class="warn"><span class="k">La direzione è tutto</span>
+<p>Per dimostrare che \(B\) è indecidibile si riduce un problema <b>noto</b> come indecidibile <b>a</b> \(B\): \(K \le_m B\). Ridurre \(B\) a \(K\) mostra solo che \(B\) «non è più difficile» di \(K\), cioè non dice nulla sull'indecidibilità di \(B\). È l'errore più frequente allo scritto. Un modo per ricordarlo: la freccia va dal problema che conosci verso quello che vuoi studiare, e «la difficoltà scorre nel verso della freccia».</p>
+</div>
+
+<h2>La tecnica nei programmi: il teorema del parametro</h2>
+<p>Nelle riduzioni tra problemi sui programmi, la funzione \(f\) prende il numero di un programma (e magari un input) e produce il numero di un <b>nuovo programma</b>, costruito apposta. Il teorema del parametro (lezione 21) garantisce che questa costruzione è calcolabile.</p>
+
+<div class="example"><span class="k">Esempio 1 · \(\mathrm{TOT} = \{x : \Phi_x \text{ è totale}\}\) non è ricorsivo</span>
+<p>Riduciamo \(K\) a TOT. Consideriamo la funzione di due argomenti
+\[g(y, x) = \begin{cases} 0 & \text{se } \Phi_x(x)\!\downarrow \\ \uparrow & \text{altrimenti}\end{cases}\]
+cioè «ignora \(y\), esegui il programma \(x\) su \(x\), poi restituisci 0». \(g\) è parzialmente calcolabile (programma universale), quindi \(g = \Phi^{(2)}_e\) per qualche \(e\). Per il teorema del parametro, \(g(y, x) = \Phi_{S(x, e)}(y)\), con \(f(x) = S(x, e)\) primitiva ricorsiva.</p>
+<p>Ora: se \(x \in K\), \(\Phi_{f(x)}\) è la costante 0, totale. Se \(x \notin K\), \(\Phi_{f(x)}\) non è mai definita. Quindi \(x \in K \iff f(x) \in \mathrm{TOT}\): \(K \le_m \mathrm{TOT}\).</p>
+</div>
+<p>Lo schema è sempre lo stesso: il nuovo programma <b>prima esegue la computazione «pericolosa»</b> \(\Phi_x(x)\), e <b>solo se termina</b> fa qualcosa che rende vera la proprietà cercata. Così la proprietà vale esattamente quando la computazione pericolosa termina.</p>
+
+<div class="example"><span class="k">Esempio 2 · \(E = \{x : W_x = \emptyset\}\) non è ricorsivo (versione DSW)</span>
+<p>Con la stessa \(f\) dell'esempio 1, \(W_{f(x)} = \mathbb N\) se \(x \in K\) e \(W_{f(x)} = \emptyset\) se \(x \notin K\). Quindi \(x \in \overline K \iff f(x) \in E\): \(\overline K \le_m E\). Siccome \(\overline K\) non è r.e., <b>\(E\) non è nemmeno r.e.</b> (mentre il suo complemento, «\(W_x \neq \emptyset\)», è r.e.: lezione 21).</p>
+</div>
+
+<p>Ecco la stessa prova nel linguaggio delle macchine di Turing, come la presenta il Sipser:</p>
+<div data-w="etm"></div>
+
+<div class="example"><span class="k">Esempio 3 · equivalenza di programmi</span>
+<p>\(\mathrm{EQ} = \{\langle x, y\rangle : \Phi_x = \Phi_y\}\) non è ricorsivo. Riduciamo \(E\) (o TOT) a EQ: sia \(z_0\) il numero di un programma che non termina mai. Allora \(W_x = \emptyset \iff \Phi_x = \Phi_{z_0}\), cioè \(x \mapsto \langle x, z_0\rangle\) riduce \(E\) a EQ. Conseguenza pratica: nessun compilatore può verificare in generale che un'ottimizzazione non cambi il comportamento del programma.</p>
+</div>
+
+<h2>Il teorema di Rice</h2>
+<p>Gli esempi precedenti hanno qualcosa in comune: chiedono qualcosa sulla <b>funzione calcolata</b> dal programma, non sul suo testo. Rice ha mostrato che <b>tutte</b> le domande di questo tipo sono indecidibili, tranne quelle banali.</p>
+<div class="def"><span class="k">Definizione · insieme di indici</span>
+<p>Sia \(\Gamma\) una classe di funzioni parzialmente calcolabili di un argomento. L'insieme
+\[R_\Gamma = \{x \in \mathbb N : \Phi_x \in \Gamma\}\]
+contiene i numeri di tutti i programmi la cui funzione sta in \(\Gamma\). Nota che se \(\Phi_x = \Phi_y\) allora \(x \in R_\Gamma \iff y \in R_\Gamma\): la proprietà dipende solo dalla funzione.</p>
+</div>
+<div class="thm"><span class="k">Teorema di Rice</span>
+<p>Se \(\Gamma\) è una classe di funzioni parzialmente calcolabili con \(\Gamma \neq \emptyset\) e \(\Gamma \neq\) tutte le funzioni parzialmente calcolabili, allora \(R_\Gamma\) <b>non è ricorsivo</b>.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Sia \(\bot\) la funzione mai definita. Supponiamo \(\bot \notin \Gamma\) (altrimenti si ragiona su \(\Gamma'\) = complemento di \(\Gamma\), che è ancora non banale, e \(R_{\Gamma'} = \overline{R_\Gamma}\): se uno fosse ricorsivo lo sarebbe anche l'altro). Poiché \(\Gamma \neq \emptyset\), esiste una funzione \(f \in \Gamma\), calcolata da qualche programma.</p>
+<p>Definiamo
+\[q(t, x) = \begin{cases} f(t) & \text{se } \Phi_x(x)\!\downarrow \\ \uparrow & \text{altrimenti}\end{cases}\]
+(prima esegui \(\Phi_x(x)\), poi, se termina, calcola \(f(t)\)). \(q\) è parzialmente calcolabile, e per il teorema del parametro \(q(t, x) = \Phi_{h(x)}(t)\) con \(h\) primitiva ricorsiva.</p>
+<ul>
+<li>se \(x \in K\): \(\Phi_{h(x)} = f \in \Gamma\), quindi \(h(x) \in R_\Gamma\);</li>
+<li>se \(x \notin K\): \(\Phi_{h(x)} = \bot \notin \Gamma\), quindi \(h(x) \notin R_\Gamma\).</li>
+</ul>
+<p>Dunque \(K \le_m R_\Gamma\) tramite \(h\), e \(R_\Gamma\) non è ricorsivo.</p>
+</div>
+<p>DSW (§4.7) dà una dimostrazione alternativa basata sul <b>teorema di ricorsione</b> (un programma può «conoscere il proprio numero»), che è elegante ma più astratta.</p>
+
+<h3>Come si applica</h3>
+<p>Per usare Rice bisogna verificare tre cose:</p>
+<ol>
+<li>la proprietà riguarda la <b>funzione calcolata</b> (o il linguaggio riconosciuto): due programmi equivalenti la hanno entrambi o nessuno dei due;</li>
+<li>qualche programma <b>ha</b> la proprietà;</li>
+<li>qualche programma <b>non ha</b> la proprietà.</li>
+</ol>
+<div class="example"><span class="k">Proprietà indecidibili per Rice</span>
+<ul>
+<li>\(\Phi_x\) è totale. · \(\Phi_x\) è la costante 0. · \(\Phi_x(5) = 7\). · Il dominio di \(\Phi_x\) è finito. · \(\Phi_x\) è definita su almeno un input. · \(W_x\) è un insieme regolare (vista come linguaggio).</li>
+</ul>
+</div>
+<div class="example"><span class="k">Proprietà a cui Rice NON si applica</span>
+<ul>
+<li>«Il programma \(x\) ha meno di 10 istruzioni»: è una proprietà del <b>testo</b>, non della funzione (due programmi equivalenti possono avere lunghezze diverse). È decidibile.</li>
+<li>«Il programma \(x\) termina su input 0 entro 100 passi»: dipende dal programma, non solo dalla funzione. È decidibile (STP).</li>
+<li>«\(\Phi_x\) è una funzione parzialmente calcolabile»: proprietà banale (vera per tutti), decidibile.</li>
+</ul>
+</div>
+
+<div class="remark"><span class="k">Rice e l'analisi dei programmi</span>
+<p>Il teorema dice che ogni strumento che pretenda di verificare automaticamente una proprietà <b>semantica</b> non banale di programmi arbitrari (assenza di null pointer, terminazione, correttezza rispetto a una specifica…) deve sbagliare o rispondere «non so» su qualche programma. I verificatori reali lavorano per approssimazione, su sottoclassi di programmi o con l'aiuto di annotazioni umane.</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Ridurre nel verso sbagliato (vedi sopra).</li>
+<li>Usare una \(f\) non totale: la riduzione deve terminare sempre.</li>
+<li>Applicare Rice a proprietà sintattiche o banali.</li>
+<li>Concludere da Rice che \(R_\Gamma\) non è r.e.: Rice dice solo «non ricorsivo». Alcuni \(R_\Gamma\) sono r.e. (es. «\(\Phi_x\) è definita da qualche parte»), altri no (es. TOT).</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>\(A \le_m B\): \(f\) calcolabile totale con \(x \in A \iff f(x) \in B\). \(A\) indecidibile ⇒ \(B\) indecidibile.</li>
+<li>Schema: il programma costruito esegue prima \(\Phi_x(x)\) e solo dopo fa ciò che rende vera la proprietà.</li>
+<li>Rice: ogni proprietà non banale della funzione calcolata è indecidibile.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Per ciascuna proprietà di \(x\), di' se Rice si applica e se è decidibile: (a) \(\Phi_x(0)\!\downarrow\); (b) \(x\) è pari; (c) \(\Phi_x\) è iniettiva; (d) il programma \(x\) contiene un'istruzione di salto.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) Rice si applica (semantica, non banale): indecidibile. (b) Proprietà del numero, non della funzione (programmi equivalenti hanno numeri di parità diversa): decidibile. (c) Rice: indecidibile. (d) Sintattica: decidibile.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra con una riduzione esplicita (senza Rice) che \(\{x : \Phi_x(0) = 0\}\) non è ricorsivo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Sia \(g(t, x)\) = «esegui \(\Phi_x(x)\); se termina restituisci 0». Per il teorema del parametro \(g(t, x) = \Phi_{h(x)}(t)\). Se \(x \in K\), \(\Phi_{h(x)}(0) = 0\); altrimenti \(\Phi_{h(x)}(0)\!\uparrow\). Quindi \(K \le_m \{x : \Phi_x(0) = 0\}\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(\mathrm{FIN} = \{x : W_x \text{ è finito}\}\) non è r.e.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Riduciamo \(\overline K\) a FIN. Sia \(g(t, x)\) = «esegui \(\Phi_x(x)\); se termina restituisci 0», con \(g(t,x) = \Phi_{h(x)}(t)\). Se \(x \in K\), \(W_{h(x)} = \mathbb N\) (infinito); se \(x \notin K\), \(W_{h(x)} = \emptyset\) (finito). Quindi \(x \in \overline K \iff h(x) \in \mathrm{FIN}\). Siccome \(\overline K\) non è r.e., FIN non è r.e.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(K \le_m \mathrm{HALT}\) e \(\mathrm{HALT} \le_m K\), dove \(\mathrm{HALT}\) è visto come insieme di coppie \(\{\langle x, y\rangle : \Phi_y(x)\!\downarrow\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(K \le_m \mathrm{HALT}\): \(f(x) = \langle x, x\rangle\). \(\mathrm{HALT} \le_m K\): dato \(\langle x, y\rangle\), sia \(h(x,y)\) il numero del programma che ignora l'input ed esegue \(\Phi_y(x)\) (teorema del parametro). Allora \(\Phi_y(x)\!\downarrow \iff \Phi_{h(x,y)}(h(x,y))\!\downarrow \iff h(x,y) \in K\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che \(\{x : W_x \text{ è un linguaggio regolare}\}\) (interpretando i numeri come stringhe binarie) non è ricorsivo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Con Rice: la proprietà dipende solo da \(W_x\) (cioè dalla funzione), \(\emptyset\) è regolare e \(\{0^n1^n\}\) (codificato) è r.e. ma non regolare. Con una riduzione esplicita (Sipser, teorema 5.3): il programma costruito su input \(w\) accetta se \(w\) è della forma \(0^n1^n\); altrimenti esegue \(\Phi_x(x)\) e accetta se termina. Il suo linguaggio è \(\Sigma^*\) (regolare) se \(x \in K\), \(\{0^n1^n\}\) (non regolare) altrimenti.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Cos'è una riduzione mediante funzione e cosa si deduce?</summary><div>\(f\) calcolabile totale con \(x \in A \iff f(x) \in B\). Se \(B\) è decidibile (r.e.) allora \(A\) lo è; quindi se \(A\) è indecidibile (non r.e.) lo è \(B\).</div></details>
+<details><summary>Enuncia e dimostra il teorema di Rice.</summary><div>Se \(\Gamma\) è non vuota e non è tutto, \(\{x : \Phi_x \in \Gamma\}\) non è ricorsivo. Prova: WLOG \(\bot \notin \Gamma\), \(f \in \Gamma\); il programma \(h(x)\) esegue \(\Phi_x(x)\) e poi calcola \(f\); \(K \le_m R_\Gamma\).</div></details>
+<details><summary>A quali proprietà non si applica Rice? Esempi.</summary><div>Proprietà sintattiche (numero di istruzioni), proprietà che dipendono dal programma e non dalla funzione (termina entro 100 passi), proprietà banali.</div></details>
+<details><summary>Perché TOT non è ricorsivo? È r.e.?</summary><div>Rice (non banale e semantica) o riduzione da \(K\). Non è nemmeno r.e., per diagonalizzazione.</div></details>
+</section>

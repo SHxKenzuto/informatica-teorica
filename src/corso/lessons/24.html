@@ -1,0 +1,131 @@
+<!--{"n":24,"mod":"D","title":"Complessità in tempo e classe P","sipser":"§7.1–7.2 (PDF p. 268–285)","dsw":"§15.1 (PDF p. 458)","time":"3 ore","lead":"Sapere che un problema è decidibile non basta: un algoritmo che impiega più tempo dell'età dell'universo è inutile. La teoria della complessità misura le risorse necessarie e individua la classe dei problemi «trattabili»."}-->
+
+<h2>Misurare il tempo</h2>
+<p>Da qui in poi consideriamo solo problemi <b>decidibili</b> e ci chiediamo <b>quanto costa</b> deciderli. La misura naturale è il numero di passi, in funzione della <b>lunghezza dell'input</b> \(n\). Si considera il <b>caso peggiore</b>: il massimo numero di passi su tutti gli input di lunghezza \(n\).</p>
+<div class="def"><span class="k">Definizione · tempo di esecuzione</span>
+<p>Sia \(M\) una macchina di Turing deterministica che si ferma su ogni input. Il suo <b>tempo di esecuzione</b> è la funzione \(f : \mathbb N \to \mathbb N\) dove \(f(n)\) è il numero massimo di passi che \(M\) esegue su un input di lunghezza \(n\). Si dice che \(M\) lavora in tempo \(f(n)\).</p>
+</div>
+
+<h2>Notazione asintotica</h2>
+<p>Il tempo esatto dipende da dettagli irrilevanti (l'alfabeto, la codifica, le costanti). Interessa l'<b>ordine di grandezza</b> per \(n\) grande.</p>
+<div class="def"><span class="k">Definizione · O grande e o piccolo</span>
+<p>\(f(n) = O(g(n))\) se esistono costanti \(c > 0\) e \(n_0\) tali che \(f(n) \le c\,g(n)\) per ogni \(n \ge n_0\): \(f\) cresce <b>al più</b> come \(g\).</p>
+<p>\(f(n) = o(g(n))\) se \(\lim_{n \to \infty} f(n)/g(n) = 0\): \(f\) cresce <b>strettamente meno</b> di \(g\).</p>
+</div>
+<div class="example"><span class="k">Esempi</span>
+<ul>
+<li>\(5n^3 + 2n^2 + 22n + 6 = O(n^3)\): si tiene il termine dominante e si ignora la costante.</li>
+<li>\(\log_2 n = O(\log_{10} n)\) e viceversa: cambiare base moltiplica per una costante, quindi si scrive solo \(O(\log n)\).</li>
+<li>\(n \log n = o(n^2)\), \(n^k = o(2^n)\) per ogni \(k\), \(2^n = o(n!)\).</li>
+<li>Limite polinomiale: \(n^{O(1)}\). Limite esponenziale: \(2^{n^{O(1)}}\) (o \(2^{O(n)}\)).</li>
+</ul>
+</div>
+<p>Il grafico mostra perché la distinzione tra polinomiale ed esponenziale è quella che conta. Con \(n = 60\) e un miliardo di operazioni al secondo, \(n^3\) richiede pochi millisecondi, \(2^n\) circa 36 anni.</p>
+<div data-w="growth"></div>
+
+<h2>Classi di complessità in tempo</h2>
+<div class="def"><span class="k">Definizione · \(\mathrm{TIME}(t(n))\)</span>
+<p>\(\mathrm{TIME}(t(n))\) è la classe dei linguaggi decisi da una macchina di Turing deterministica a <b>un nastro</b> in tempo \(O(t(n))\).</p>
+</div>
+
+<h3>Il modello conta (ma poco)</h3>
+<p>Consideriamo \(A = \{0^k1^k : k \ge 0\}\).</p>
+<ul>
+<li><b>Un nastro, zig-zag</b> (lezione 20): per ogni 0 si attraversa la stringa: \(O(n^2)\). Quindi \(A \in \mathrm{TIME}(n^2)\).</li>
+<li><b>Un nastro, dimezzando</b>: a ogni passata si controlla che il numero totale di 0 e 1 rimasti sia pari e si cancella uno 0 sì e uno no e un 1 sì e uno no. Bastano \(O(\log n)\) passate di costo \(O(n)\): \(O(n \log n)\).</li>
+<li><b>Due nastri</b>: si copiano gli 0 sul secondo nastro e poi si confrontano con gli 1: \(O(n)\).</li>
+</ul>
+<p>Si può dimostrare che una macchina a un nastro non fa meglio di \(O(n \log n)\) su questo linguaggio. Quindi la complessità dipende dal modello. Ma di quanto?</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Ogni macchina multinastro che lavora in tempo \(t(n) \ge n\) ha una macchina a un nastro equivalente che lavora in tempo \(O(t^2(n))\).</p>
+</div>
+<div class="proof"><span class="k">Idea</span>
+<p>Nella simulazione della lezione 20 i \(k\) nastri, dopo \(t\) passi, occupano al più \(O(t)\) celle in tutto. Simulare un passo richiede una o due passate su quella porzione: \(O(t)\). Per \(t\) passi, \(O(t^2)\).</p>
+</div>
+<div class="thm"><span class="k">Teorema</span>
+<p>Ogni macchina <b>non deterministica</b> che lavora in tempo \(t(n)\) ha una macchina deterministica equivalente che lavora in tempo \(2^{O(t(n))}\).</p>
+</div>
+<p>Tra modelli deterministici «ragionevoli» la differenza è al più <b>polinomiale</b>; tra deterministico e non deterministico, per quanto ne sappiamo, è <b>esponenziale</b>. Questa osservazione porta alla definizione delle classi P e NP.</p>
+
+<h2>La classe P</h2>
+<div class="def"><span class="k">Definizione · P</span>
+<p>\[\mathrm{P} = \bigcup_{k \ge 0} \mathrm{TIME}(n^k).\]
+È la classe dei linguaggi decidibili in <b>tempo polinomiale</b> da una macchina di Turing deterministica (a un nastro, o equivalentemente con qualunque modello deterministico ragionevole).</p>
+</div>
+<p>Due motivi per considerare P la classe dei problemi «trattabili»:</p>
+<ol>
+<li><b>Robustezza</b>: P non cambia se si cambia modello deterministico (un nastro, più nastri, RAM, programmi Java), perché le simulazioni costano un fattore polinomiale e un polinomio di un polinomio è un polinomio.</li>
+<li><b>Praticità</b>: un algoritmo polinomiale di solito si basa su una comprensione profonda della struttura del problema, mentre gli algoritmi esponenziali tipicamente sono ricerche a forza bruta. E i polinomi che compaiono nella pratica hanno esponenti piccoli.</li>
+</ol>
+<div class="remark"><span class="k">Codifiche ragionevoli</span>
+<p>Il tempo si misura sulla lunghezza della <b>codifica</b> dell'input. Le codifiche devono essere ragionevoli: grafi con liste o matrici di adiacenza (lunghezza polinomiale nel numero di nodi), numeri in <b>binario</b>, non in unario. Un numero \(N\) scritto in binario ha \(\approx \log_2 N\) cifre: un algoritmo che fa \(N\) passi è <b>esponenziale</b> nella lunghezza dell'input.</p>
+</div>
+
+<h2>Esempi di problemi in P</h2>
+<div class="example"><span class="k">PATH</span>
+<p>\(\mathrm{PATH} = \{\langle G, s, t\rangle : G \text{ è un grafo orientato con un cammino da } s \text{ a } t\}\). Provare tutti i cammini richiederebbe un tempo esponenziale. Una <b>visita in ampiezza</b> invece marca \(s\), poi ripete «marca ogni nodo raggiungibile con un arco da un nodo marcato» al più \(m\) volte (\(m\) nodi), ogni volta in tempo polinomiale. Accetta se \(t\) è marcato. Tempo polinomiale: \(\mathrm{PATH} \in \mathrm{P}\).</p>
+</div>
+<div class="example"><span class="k">RELPRIME</span>
+<p>\(\mathrm{RELPRIME} = \{\langle x, y\rangle : \mathrm{mcd}(x, y) = 1\}\). Provare tutti i divisori fino a \(\min(x,y)\) è <b>esponenziale</b> (i numeri sono in binario). L'<b>algoritmo di Euclide</b> (\(x \leftarrow x \bmod y\), poi scambia, finché \(y = 0\)) dimezza almeno uno dei due numeri ogni due iterazioni: \(O(\log x)\) iterazioni, cioè lineare nella lunghezza. \(\mathrm{RELPRIME} \in \mathrm{P}\).</p>
+</div>
+<div class="example"><span class="k">Ogni linguaggio context-free</span>
+<p>Dalla grammatica in CNF, l'algoritmo CYK (lezione 10) decide \(w \in L(G)\) in tempo \(O(n^3)\) con la programmazione dinamica. Quindi \(\mathrm{CF} \subseteq \mathrm{P}\). (L'algoritmo «prova tutte le derivazioni di \(2n-1\) passi» invece è esponenziale.)</p>
+</div>
+<p>Altri problemi in P che conosci dall'algoritmica: ordinamento, cammini minimi (Dijkstra), alberi ricoprenti minimi, flusso massimo, programmazione lineare, primalità (algoritmo AKS, 2002).</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Misurare il tempo rispetto al <b>valore</b> dei numeri invece che alla lunghezza della loro rappresentazione.</li>
+<li>Dire che un algoritmo è polinomiale perché «ha due cicli annidati» senza controllare quante volte gira ogni ciclo rispetto a \(n\).</li>
+<li>Pensare che P dipenda dal numero di nastri.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Tempo = passi nel caso peggiore in funzione di \(n\); notazione \(O\).</li>
+<li>Multinastro → un nastro: \(t^2\). Non deterministico → deterministico: \(2^{O(t)}\).</li>
+<li>P = \(\bigcup_k \mathrm{TIME}(n^k)\): robusta e corrispondente ai problemi trattabili.</li>
+<li>In P: PATH (BFS), RELPRIME (Euclide), ogni CF (CYK).</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Vero o falso: \(2n = O(n)\); \(n^2 = O(n)\); \(2^{n+1} = O(2^n)\); \(2^{2n} = O(2^n)\); \(n = o(2n)\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Vero, falso, vero (\(2^{n+1} = 2 \cdot 2^n\)), falso (\(2^{2n} = 4^n\), il rapporto con \(2^n\) è \(2^n\), illimitato), falso (\(n/2n = 1/2\) non tende a 0).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Perché l'algoritmo «prova a dividere \(N\) per tutti i numeri da 2 a \(\sqrt N\)» per la primalità non dimostra che PRIMES è in P?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>L'input ha lunghezza \(n \approx \log_2 N\). L'algoritmo fa circa \(\sqrt N = 2^{n/2}\) divisioni: esponenziale in \(n\). (PRIMES è in P, ma lo ha dimostrato l'algoritmo AKS con idee molto diverse.)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che P è chiusa per unione, intersezione, complemento e concatenazione.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Unione/intersezione: si eseguono i due decisori uno dopo l'altro (entrambi terminano): \(O(n^a + n^b)\). Complemento: si inverte la risposta. Concatenazione \(L_1L_2\): per ognuno degli \(n + 1\) punti di taglio \(w = xy\) si decide \(x \in L_1\) e \(y \in L_2\): \(O(n \cdot (n^a + n^b))\), polinomiale.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che P è chiusa per la stella di Kleene. (Suggerimento: programmazione dinamica.)</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Dato \(w = w_1 \cdots w_n\), sia \(T[i] = \) «\(w_1 \cdots w_i \in L^*\)». \(T[0]\) vero; \(T[i]\) vero se esiste \(j < i\) con \(T[j]\) vero e \(w_{j+1}\cdots w_i \in L\). Sono \(O(n^2)\) chiamate al decisore di \(L\), ognuna polinomiale. Accetta se \(T[n]\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Un grafo non orientato è <b>bipartito</b> se i nodi si possono colorare con due colori in modo che ogni arco colleghi colori diversi. Dimostra che BIPARTITE è in P.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Per ogni componente connessa: colora un nodo di rosso, poi con una visita in ampiezza colora ogni vicino con il colore opposto. Se si trova un arco tra due nodi dello stesso colore, rifiuta. Tempo \(O(|V| + |E|)\). (Equivalentemente: bipartito se e solo se non ha cicli dispari.)</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci \(\mathrm{TIME}(t(n))\) e la classe P.</summary><div>\(\mathrm{TIME}(t(n))\): linguaggi decisi da una MdT deterministica a un nastro in tempo \(O(t(n))\). \(\mathrm{P} = \bigcup_k \mathrm{TIME}(n^k)\).</div></details>
+<details><summary>Perché P non dipende dal modello deterministico usato?</summary><div>I modelli ragionevoli si simulano a vicenda con un costo polinomiale (multinastro → un nastro: \(t^2\)), e la composizione di polinomi è un polinomio.</div></details>
+<details><summary>Perché RELPRIME è in P? Perché l'algoritmo ingenuo non basta?</summary><div>Euclide fa \(O(\log x)\) iterazioni, lineare nella lunghezza. Provare tutti i divisori fa \(\approx x\) passi, esponenziale nella lunghezza binaria.</div></details>
+<details><summary>Dimostra che ogni linguaggio context-free è in P.</summary><div>Grammatica in CNF + algoritmo CYK di programmazione dinamica, \(O(n^3)\).</div></details>
+</section>

@@ -1,0 +1,142 @@
+<!--{"n":2,"mod":"0","title":"Cardinalità e diagonalizzazione","sipser":"§4.2, «The diagonalization method»","dsw":"§4.6 (PDF p. 107)","time":"2 ore","lead":"L'idea più importante del corso. La stessa mossa dimostra che i numeri reali non si possono elencare e che nessun programma può decidere se un altro programma termina."}-->
+
+<h2>Contare insiemi infiniti</h2>
+<p>Per insiemi finiti «avere tanti elementi quanti» è ovvio: si contano. Per insiemi infiniti Cantor propose un criterio che non richiede di contare: due insiemi hanno la stessa taglia se i loro elementi si possono <b>accoppiare uno a uno</b> senza avanzi da nessuna parte.</p>
+
+<div class="def"><span class="k">Definizione · stessa cardinalità, numerabilità</span>
+<p>\(A\) e \(B\) hanno la <b>stessa cardinalità</b> se esiste una biiezione \(f : A \to B\).</p>
+<p>\(A\) è <b>numerabile</b> se è finito oppure ha la stessa cardinalità di \(\mathbb{N}\). Equivalentemente, se i suoi elementi si possono disporre in una successione \(a_0, a_1, a_2, \dots\) in cui ogni elemento compare (almeno una volta).</p>
+</div>
+
+<p>La seconda formulazione è quella pratica: per mostrare che un insieme è numerabile basta descrivere un <b>elenco</b> in cui ogni elemento compare in una posizione finita. Ripetizioni non sono un problema (si possono eliminare).</p>
+
+<h2>Insiemi numerabili sorprendenti</h2>
+<h3>I pari e gli interi</h3>
+<p>I numeri pari sono numerabili tramite \(n \mapsto 2n\), anche se sono «la metà» di \(\mathbb{N}\). Gli interi \(\mathbb{Z}\) si elencano alternando i segni: \(0, 1, -1, 2, -2, 3, \dots\), cioè la biiezione che manda \(n\) pari in \(n/2\) e \(n\) dispari in \(-(n+1)/2\).</p>
+<p>La morale: per gli insiemi infiniti «parte propria» non implica «più piccolo». Anzi, un insieme è infinito proprio quando ha la stessa cardinalità di una sua parte propria.</p>
+
+<h3>Le coppie di naturali</h3>
+<p>\(\mathbb{N} \times \mathbb{N}\) sembra «infinito al quadrato», ma si può elencare. L'errore sarebbe elencare prima tutte le coppie \((0, y)\): non si finirebbe mai la prima riga. Il trucco è procedere <b>per diagonali</b>, cioè per valori crescenti di \(x + y\): sulla diagonale \(d\) ci sono solo \(d + 1\) coppie, quindi ogni diagonale si esaurisce in un tempo finito.</p>
+
+<div data-w="zigzag"></div>
+
+<p>La coppia \((x, y)\) sta nella diagonale \(d = x + y\), preceduta da \(1 + 2 + \dots + d = d(d+1)/2\) coppie delle diagonali precedenti. Una formula esplicita è quindi la <b>funzione di Cantor</b>
+\[\pi(x, y) = \frac{(x + y)(x + y + 1)}{2} + x.\]
+DSW usa una codifica diversa, \(\langle x, y\rangle = 2^x(2y + 1) - 1\), più comoda da decodificare (la vedremo nella lezione 18). Entrambe sono biiezioni \(\mathbb{N} \times \mathbb{N} \to \mathbb{N}\).</p>
+
+<h3>Conseguenze a catena</h3>
+<ul>
+<li>\(\mathbb{N}^k\) è numerabile per ogni \(k\) (si codifica una coppia alla volta: \(\langle x, \langle y, z \rangle\rangle\)).</li>
+<li>\(\mathbb{Q}\) è numerabile: ogni razionale positivo è una frazione \(p/q\), quindi una coppia.</li>
+<li><b>Un'unione numerabile di insiemi numerabili è numerabile</b>: si dispongono gli insiemi come righe di una tabella e si percorre la tabella per diagonali.</li>
+<li>\(\Sigma^*\) è numerabile per ogni alfabeto finito: è l'unione delle stringhe di lunghezza 0, 1, 2, … (ciascun gruppo finito), oppure semplicemente lo si elenca in ordine shortlex.</li>
+<li>L'insieme di <b>tutti i programmi</b> (in qualunque linguaggio) è numerabile: un programma è una stringa finita su un alfabeto finito. Lo stesso per le macchine di Turing e le grammatiche.</li>
+</ul>
+
+<h2>Il metodo diagonale</h2>
+<div class="thm"><span class="k">Teorema (Cantor)</span>
+<p>\(\mathcal{P}(\mathbb{N})\), l'insieme di tutti i sottoinsiemi di \(\mathbb{N}\), non è numerabile.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Supponiamo per assurdo che \(S_0, S_1, S_2, \dots\) sia un elenco che contiene <b>tutti</b> i sottoinsiemi di \(\mathbb{N}\). Definiamo
+\[D = \{\, i \in \mathbb{N} : i \notin S_i \,\}.\]
+\(D\) è un sottoinsieme di \(\mathbb{N}\), quindi deve comparire nell'elenco: \(D = S_k\) per qualche \(k\). Chiediamoci se \(k \in D\):</p>
+<ul>
+<li>se \(k \in D\), per definizione di \(D\) vale \(k \notin S_k = D\);</li>
+<li>se \(k \notin D\), cioè \(k \notin S_k\), per definizione di \(D\) vale \(k \in D\).</li>
+</ul>
+<p>In entrambi i casi una contraddizione. Quindi nessun elenco contiene tutti i sottoinsiemi.</p>
+</div>
+
+<p>Il nome «diagonale» viene dalla tabella: riga \(i\) = sottoinsieme \(S_i\), colonna \(j\) = numero \(j\), cella = 1 se \(j \in S_i\). L'insieme \(D\) si ottiene leggendo la <b>diagonale</b> e <b>capovolgendo</b> ogni bit. Per costruzione \(D\) differisce dalla riga \(i\) almeno nella colonna \(i\), per ogni \(i\). Provalo qui sotto: costruisci \(D\) e poi clicca su una riga per vedere dove differisce.</p>
+
+<div data-w="diag-cantor"></div>
+
+<div class="thm"><span class="k">Teorema (Cantor, forma generale)</span>
+<p>Per ogni insieme \(A\) non esiste una funzione suriettiva \(f : A \to \mathcal P(A)\). In particolare \(\mathcal P(A)\) ha cardinalità strettamente maggiore di \(A\).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Data \(f\), sia \(D = \{a \in A : a \notin f(a)\}\). Se fosse \(D = f(d)\) per qualche \(d\), allora \(d \in D \iff d \notin f(d) = D\). Contraddizione: \(D\) non è nell'immagine di \(f\).</p>
+</div>
+
+<h3>I numeri reali</h3>
+<p>Lo stesso argomento mostra che \([0,1)\) non è numerabile: in un elenco \(r_0, r_1, \dots\) di espansioni decimali si costruisce un numero la cui \(i\)-esima cifra decimale è diversa da quella di \(r_i\) (scegliendo cifre diverse da 0 e 9, per evitare le doppie rappresentazioni come \(0{,}0999\ldots = 0{,}1\)).</p>
+
+<h2>Perché ci interessa: esistono problemi non risolvibili</h2>
+<p>Mettiamo insieme due fatti:</p>
+<ul>
+<li>le macchine di Turing (o i programmi) sono <b>numerabili</b>, perché ciascuna è descritta da una stringa finita;</li>
+<li>i linguaggi su \(\Sigma\) sono i sottoinsiemi di \(\Sigma^*\), che è in biiezione con \(\mathbb{N}\); quindi i linguaggi sono tanti quanti \(\mathcal P(\mathbb{N})\), <b>non numerabili</b>.</li>
+</ul>
+<div class="thm"><span class="k">Corollario</span>
+<p>Esistono linguaggi che nessuna macchina di Turing riconosce, ed esistono funzioni \(\mathbb{N} \to \mathbb{N}\) che nessun programma calcola.</p>
+</div>
+<p>Anzi, «quasi tutti» i linguaggi non sono riconoscibili. Questo è un argomento di <b>esistenza</b>: non indica un problema concreto. Nella lezione 19 la stessa diagonalizzazione, applicata alla tabella «il programma \(i\) si ferma sull'input \(j\)?», darà un problema concreto e importante: il <b>problema della fermata</b>.</p>
+
+<div class="remark"><span class="k">Lo schema generale della diagonalizzazione</span>
+<ol>
+<li>Si suppone di avere un elenco completo di oggetti (sottoinsiemi, reali, programmi totali, …).</li>
+<li>Si costruisce un nuovo oggetto che, per ogni \(i\), differisce dall'\(i\)-esimo elemento «nel punto \(i\)».</li>
+<li>L'oggetto nuovo è del tipo giusto, quindi dovrebbe stare nell'elenco, ma non ci sta: contraddizione.</li>
+</ol>
+<p>Il passo delicato è il 3: bisogna verificare che l'oggetto costruito appartenga davvero alla classe elencata. Nella prova di indecidibilità sarà proprio l'ipotesi «esiste un programma che decide la fermata» a garantire che l'oggetto diagonale sia un programma.</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>«Non riesco a elencarli, quindi non sono numerabili» non è una dimostrazione: bisogna supporre un elenco qualsiasi e contraddirlo.</li>
+<li>Elencare \(\mathbb{N} \times \mathbb{N}\) riga per riga non funziona (la prima riga è infinita): serve un ordine in cui ogni elemento arriva in un tempo finito.</li>
+<li>Confondere «infinito» con «non numerabile»: \(\Sigma^*\) è infinito ma numerabile.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Stessa cardinalità = esiste una biiezione. Numerabile = elencabile.</li>
+<li>Numerabili: \(\mathbb Z\), \(\mathbb N^k\), \(\mathbb Q\), \(\Sigma^*\), l'insieme dei programmi.</li>
+<li>Non numerabili: \(\mathcal P(\mathbb N)\), \(\mathbb R\), l'insieme dei linguaggi, l'insieme delle funzioni \(\mathbb N \to \mathbb N\).</li>
+<li>Quindi esistono problemi che nessun programma risolve.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Scrivi una biiezione esplicita tra \(\mathbb N\) e l'insieme dei numeri dispari, e una tra \(\mathbb N\) e \(\mathbb N \setminus \{0, 1, 2\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(n \mapsto 2n + 1\) e \(n \mapsto n + 3\). Entrambe sono iniettive (sono strettamente crescenti) e suriettive sull'insieme indicato.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Calcola \(\pi(2, 1)\) con la funzione di Cantor e verifica il risultato contando nella figura delle diagonali.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\pi(2,1) = \frac{3 \cdot 4}{2} + 2 = 8\). Nella figura la coppia (riga 2, colonna 1) sta sulla diagonale 3, dopo le 6 coppie delle diagonali 0, 1, 2; nella diagonale 3 l'ordine è (0,3), (1,2), (2,1), (3,0), quindi è la posizione \(6 + 2 = 8\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che l'insieme dei sottoinsiemi <b>finiti</b> di \(\mathbb N\) è numerabile. Perché la dimostrazione di Cantor non si applica a questo insieme?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>A ogni sottoinsieme finito \(S\) si associa \(\sum_{i \in S} 2^i\): è una biiezione con \(\mathbb N\) (la scrittura binaria di un numero è un sottoinsieme finito di posizioni).</p>
+<p>L'insieme diagonale \(D = \{i : i \notin S_i\}\) costruito da un elenco di insiemi finiti in generale è <b>infinito</b>, quindi non appartiene alla classe elencata: il passo 3 dello schema fallisce e non c'è contraddizione.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che l'insieme delle funzioni \(f : \mathbb N \to \{0,1\}\) non è numerabile, usando direttamente la diagonalizzazione.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Per assurdo sia \(f_0, f_1, \dots\) un elenco completo. Definisco \(g(n) = 1 - f_n(n)\). \(g\) è una funzione \(\mathbb N \to \{0,1\}\), quindi \(g = f_k\) per qualche \(k\); ma allora \(g(k) = f_k(k)\) e insieme \(g(k) = 1 - f_k(k)\), impossibile.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Sia \(T\) l'insieme delle funzioni totali calcolabili \(\mathbb N \to \mathbb N\). Mostra che \(T\) è numerabile, ma che non esiste un programma che, dato \(i\), calcola la \(i\)-esima funzione di un elenco di \(T\) (cioè \(T\) non è «effettivamente enumerabile»).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(T\) è numerabile perché ogni funzione di \(T\) è calcolata da almeno un programma e i programmi sono numerabili.</p>
+<p>Se esistesse un programma che calcola \(F(i, x) = f_i(x)\) con \(f_0, f_1, \dots\) elenco di \(T\), allora \(g(x) = F(x, x) + 1\) sarebbe totale e calcolabile, quindi \(g = f_k\) per qualche \(k\), e \(g(k) = f_k(k) + 1 \neq f_k(k)\). Contraddizione. È l'argomento che mostra perché un linguaggio di programmazione in cui tutti i programmi terminano non può calcolare tutte le funzioni totali calcolabili.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Quando un insieme è numerabile? Fai tre esempi non ovvi.</summary><div>Quando è finito o in biiezione con \(\mathbb N\). Esempi: \(\mathbb Z\), \(\mathbb N \times \mathbb N\) (diagonali di Cantor), \(\mathbb Q\), \(\Sigma^*\), l'insieme dei programmi.</div></details>
+<details><summary>Enuncia e dimostra il teorema di Cantor.</summary><div>Non esiste una suriezione \(A \to \mathcal P(A)\). Data \(f\), \(D = \{a : a \notin f(a)\}\) non è immagine di nessun \(d\), perché altrimenti \(d \in D \iff d \notin D\).</div></details>
+<details><summary>Perché esistono linguaggi non Turing-riconoscibili?</summary><div>Le macchine di Turing sono numerabili (descritte da stringhe), i linguaggi su \(\Sigma\) sono in biiezione con \(\mathcal P(\Sigma^*)\), non numerabile. Ci sono più linguaggi che macchine.</div></details>
+<details><summary>Descrivi lo schema generale della diagonalizzazione.</summary><div>Si suppone un elenco completo, si costruisce un oggetto che differisce dall'\(i\)-esimo elemento nel punto \(i\), si verifica che l'oggetto è del tipo elencato e si ottiene la contraddizione.</div></details>
+</section>

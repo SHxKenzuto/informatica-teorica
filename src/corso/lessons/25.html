@@ -1,0 +1,155 @@
+<!--{"n":25,"mod":"D","title":"NP e NP-completezza","sipser":"§7.3–7.5 (PDF p. 285–322)","dsw":"§15.2–15.4 (PDF p. 462–483)","time":"4 ore","lead":"Molti problemi importanti hanno soluzioni difficili da trovare ma facili da verificare. La classe NP raccoglie questi problemi, e la domanda P = NP chiede se trovare sia davvero più difficile che verificare. È il più famoso problema aperto dell'informatica."}-->
+
+<h2>Trovare contro verificare</h2>
+<p>Considera un Sudoku: risolverlo può richiedere molto tempo, ma se qualcuno ti dà una griglia compilata, controllare che sia corretta è immediato. Lo stesso per un cammino che visita tutte le città, per un'assegnazione di turni che rispetta tutti i vincoli, per la fattorizzazione di un numero. Per moltissimi problemi conosciamo solo algoritmi esponenziali per <b>trovare</b> una soluzione, ma abbiamo algoritmi polinomiali per <b>verificarla</b>.</p>
+
+<h2>La classe NP</h2>
+<div class="def"><span class="k">Definizione · verificatore</span>
+<p>Un <b>verificatore</b> per un linguaggio \(A\) è un algoritmo \(V\) tale che
+\[A = \{w : \text{esiste una stringa } c \text{ per cui } V \text{ accetta } \langle w, c\rangle\}.\]
+\(c\) si chiama <b>certificato</b> (o prova, o testimone). \(V\) è un verificatore <b>polinomiale</b> se lavora in tempo polinomiale nella lunghezza di \(w\) (quindi in particolare il certificato utile ha lunghezza polinomiale).</p>
+</div>
+<div class="def"><span class="k">Definizione · NP</span>
+<p>NP è la classe dei linguaggi che hanno un verificatore polinomiale.</p>
+</div>
+<p>Il nome viene dalla caratterizzazione equivalente: <b>N</b>ondeterministic <b>P</b>olynomial time.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Un linguaggio è in NP se e solo se è deciso da una macchina di Turing <b>non deterministica</b> in tempo polinomiale. Cioè \(\mathrm{NP} = \bigcup_k \mathrm{NTIME}(n^k)\).</p>
+</div>
+<div class="proof"><span class="k">Idea</span>
+<p>(⇒) La macchina non deterministica «indovina» un certificato \(c\) di lunghezza polinomiale (un ramo per ogni possibile \(c\)) e poi esegue il verificatore. (⇐) Il certificato è la sequenza di scelte non deterministiche fatte dal ramo accettante; il verificatore simula quel ramo.</p>
+</div>
+<p>Vale \(\mathrm{P} \subseteq \mathrm{NP}\): un problema decidibile in tempo polinomiale ha un verificatore che ignora il certificato. Ed \(\mathrm{NP} \subseteq \mathrm{EXPTIME}\): si provano tutti i certificati possibili, che sono esponenzialmente molti.</p>
+
+<h2>Esempi di problemi in NP</h2>
+<div class="example"><span class="k">CLIQUE</span>
+<p>Una \(k\)-<b>clique</b> in un grafo non orientato è un insieme di \(k\) nodi a due a due collegati. \(\mathrm{CLIQUE} = \{\langle G, k\rangle : G \text{ contiene una } k\text{-clique}\}\).</p>
+<p>Certificato: i \(k\) nodi. Verifica: per ogni coppia di nodi del certificato si controlla che ci sia l'arco, \(O(k^2)\) controlli. Trovarla a forza bruta richiede di provare \(\binom{m}{k}\) sottoinsiemi, esponenziale quando \(k\) cresce con \(m\).</p>
+</div>
+<div data-w="clique"></div>
+<div class="example"><span class="k">Altri problemi in NP</span>
+<ul>
+<li><b>HAMPATH</b>: esiste un cammino che passa per tutti i nodi esattamente una volta? Certificato: il cammino.</li>
+<li><b>SUBSET-SUM</b>: dati numeri \(x_1, \dots, x_k\) e un obiettivo \(t\), esiste un sottoinsieme con somma \(t\)? Certificato: il sottoinsieme.</li>
+<li><b>SAT</b>: una formula booleana \(\varphi\) è soddisfacibile? Certificato: l'assegnazione di verità.</li>
+<li><b>COMPOSITES</b>: \(x\) è composto? Certificato: un divisore non banale.</li>
+<li><b>VERTEX-COVER</b>, <b>3-COLORING</b>, <b>TSP</b> nella versione decisionale…</li>
+</ul>
+</div>
+<div class="remark"><span class="k">L'asimmetria di NP</span>
+<p>Il certificato prova che la risposta è <b>sì</b>. Per la risposta no non c'è, in generale, un certificato breve: come dimostri in poco spazio che un grafo <i>non</i> ha cammini hamiltoniani? La classe dei complementi dei problemi NP si chiama coNP, e non si sa se NP = coNP.</p>
+</div>
+
+<h2>P = NP?</h2>
+<div data-w="pnp"></div>
+<p>Non si sa se \(\mathrm{P} = \mathrm{NP}\). Quasi tutti gli esperti credono di no: sarebbe sorprendente che la ricerca (indovinare un certificato) si potesse sempre sostituire con un calcolo diretto. Ma nessuno l'ha dimostrato. È uno dei sette «problemi del millennio» del Clay Institute. Se fosse \(\mathrm{P} = \mathrm{NP}\), molti problemi di ottimizzazione diventerebbero facili e la crittografia a chiave pubblica attuale sarebbe insicura.</p>
+
+<h2>Riduzioni polinomiali e NP-completezza</h2>
+<div class="def"><span class="k">Definizione · riducibilità in tempo polinomiale</span>
+<p>\(A \le_P B\) se esiste una funzione \(f\) calcolabile in tempo polinomiale tale che per ogni \(w\): \(w \in A \iff f(w) \in B\).</p>
+</div>
+<p>È la riduzione della lezione 22 con in più un vincolo di efficienza. Come allora: <b>se \(A \le_P B\) e \(B \in \mathrm{P}\), allora \(A \in \mathrm{P}\)</b> (si calcola \(f(w)\) in tempo polinomiale, poi si decide \(f(w) \in B\) in tempo polinomiale nella lunghezza di \(f(w)\), che è polinomiale in \(|w|\)).</p>
+<div class="def"><span class="k">Definizione · NP-completo</span>
+<p>\(B\) è <b>NP-completo</b> se</p>
+<ol>
+<li>\(B \in \mathrm{NP}\), e</li>
+<li>per ogni \(A \in \mathrm{NP}\) vale \(A \le_P B\) (\(B\) è <b>NP-difficile</b>).</li>
+</ol>
+</div>
+<div class="thm"><span class="k">Teorema</span>
+<p>Se un problema NP-completo è in P, allora \(\mathrm{P} = \mathrm{NP}\). Se \(B\) è NP-completo, \(B \le_P C\) e \(C \in \mathrm{NP}\), allora \(C\) è NP-completo.</p>
+</div>
+<p>I problemi NP-completi sono i «più difficili» di NP: risolverne uno in tempo polinomiale li risolverebbe tutti. Il secondo punto è il metodo per dimostrare nuove NP-completezze: basta ridurre a \(C\) <b>un</b> problema NP-completo già noto.</p>
+
+<h2>Il teorema di Cook–Levin</h2>
+<p>Per usare il metodo serve un primo problema NP-completo, dimostrato direttamente.</p>
+<div class="def"><span class="k">Definizione · SAT</span>
+<p>Una formula booleana usa variabili, \(\wedge, \vee, \neg\) e parentesi. È <b>soddisfacibile</b> se esiste un'assegnazione di verità che la rende vera. \(\mathrm{SAT} = \{\langle\varphi\rangle : \varphi \text{ è soddisfacibile}\}\).</p>
+</div>
+<div class="thm"><span class="k">Teorema (Cook 1971, Levin 1973)</span>
+<p>SAT è NP-completo.</p>
+</div>
+<div data-w="cook"></div>
+<p>Nota la somiglianza con la riduzione al PCP della lezione 23: in entrambi i casi una computazione viene descritta come un oggetto statico (un match, una tabella) e la correttezza della computazione diventa un insieme di vincoli <b>locali</b> (tessere, finestre 2×3). La differenza è che qui la computazione ha lunghezza polinomiale, quindi l'oggetto costruito ha dimensione polinomiale.</p>
+
+<h3>3SAT</h3>
+<p>Una formula è in <b>forma normale congiuntiva</b> (CNF) se è un AND di <b>clausole</b>, ognuna un OR di letterali (variabili o negazioni). È in <b>3CNF</b> se ogni clausola ha esattamente 3 letterali. 3SAT è SAT ristretto a formule in 3CNF.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>3SAT è NP-completo.</p>
+</div>
+<p>(La formula di Cook–Levin si può scrivere in CNF; poi ogni clausola lunga \((a_1 \vee a_2 \vee \cdots \vee a_\ell)\) si spezza in clausole da 3 con variabili nuove: \((a_1 \vee a_2 \vee z_1) \wedge (\bar z_1 \vee a_3 \vee z_2) \wedge \cdots\).) 3SAT è il punto di partenza più comodo per le riduzioni.</p>
+
+<h2>Una riduzione completa: 3SAT \(\le_P\) CLIQUE</h2>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Sia \(\varphi = C_1 \wedge \cdots \wedge C_k\) in 3CNF. Costruiamo un grafo \(G\):</p>
+<ul>
+<li>per ogni clausola, un gruppo di 3 nodi, uno per letterale (\(3k\) nodi in tutto);</li>
+<li>un arco tra ogni coppia di nodi, <b>tranne</b> tra nodi dello stesso gruppo e tra due nodi che sono uno la negazione dell'altro (\(x\) e \(\bar x\)).</li>
+</ul>
+<p>La riduzione restituisce \(\langle G, k\rangle\), in tempo polinomiale.</p>
+<p><b>Se \(\varphi\) è soddisfacibile</b>: un'assegnazione che la soddisfa rende vero almeno un letterale per clausola. Scegliendo un letterale vero per gruppo si ottengono \(k\) nodi in gruppi diversi, a due a due compatibili (non possono essere \(x\) e \(\bar x\), entrambi veri): una \(k\)-clique.</p>
+<p><b>Se \(G\) ha una \(k\)-clique</b>: i suoi nodi stanno in gruppi diversi (dentro un gruppo non ci sono archi), quindi uno per gruppo. Non contengono letterali opposti. Assegnando vero a quei letterali (e il resto a caso) si soddisfa ogni clausola.</p>
+<p>Quindi \(\varphi \in \mathrm{3SAT} \iff \langle G, k\rangle \in \mathrm{CLIQUE}\). Siccome CLIQUE \(\in\) NP, CLIQUE è NP-completo.</p>
+</div>
+
+<h3>La famiglia dei problemi NP-completi</h3>
+<p>Con catene di riduzioni si dimostra NP-completo un numero enorme di problemi (Karp, 1972, ne elencò 21; oggi sono migliaia): SAT → 3SAT → CLIQUE, INDEPENDENT-SET, VERTEX-COVER; 3SAT → HAMPATH → UHAMPATH → TSP; 3SAT → SUBSET-SUM → KNAPSACK; 3SAT → 3-COLORING. Quando incontri un problema nuovo e difficile, la prima domanda pratica è: «è NP-completo?». Se sì, conviene cercare approssimazioni, euristiche o casi particolari, invece di un algoritmo esatto efficiente.</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Ridurre nel verso sbagliato: per mostrare che \(C\) è NP-difficile si riduce un NP-completo noto <b>a</b> \(C\).</li>
+<li>Dimenticare di dimostrare che \(C \in \mathrm{NP}\).</li>
+<li>Usare una riduzione esponenziale (es. che enumera tutte le assegnazioni).</li>
+<li>Dire che NP significa «non polinomiale»: significa polinomiale non deterministico, e include P.</li>
+<li>Nella verifica della riduzione, dimostrare solo una delle due direzioni del «se e solo se».</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>NP = verificatori polinomiali = MdT non deterministiche polinomiali. \(\mathrm{P} \subseteq \mathrm{NP}\).</li>
+<li>\(A \le_P B\) con \(f\) polinomiale. NP-completo = in NP + tutti si riducono a lui.</li>
+<li>Cook–Levin: SAT NP-completo (tableau della computazione + formula polinomiale).</li>
+<li>Nuove NP-completezze: \(C \in \mathrm{NP}\) + riduzione da un NP-completo noto (es. 3SAT \(\le_P\) CLIQUE).</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Mostra che SUBSET-SUM e HAMPATH sono in NP descrivendo certificato e verificatore.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>SUBSET-SUM: certificato = sottoinsieme (al più \(k\) indici); il verificatore controlla che siano elementi distinti della lista e che la somma sia \(t\): tempo polinomiale nella lunghezza binaria. HAMPATH: certificato = sequenza di nodi; si controlla che ogni nodo compaia esattamente una volta, che inizi in \(s\), finisca in \(t\) e che nodi consecutivi siano collegati.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che INDEPENDENT-SET (esiste un insieme di \(k\) nodi a due a due <b>non</b> collegati?) è NP-completo riducendo CLIQUE.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>In NP: certificato i \(k\) nodi. Riduzione: \(\langle G, k\rangle \mapsto \langle \overline G, k\rangle\), dove \(\overline G\) è il grafo complementare (stessi nodi, archi esattamente dove \(G\) non li ha). Un insieme è una clique in \(G\) se e solo se è indipendente in \(\overline G\). Costruire \(\overline G\) costa \(O(m^2)\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che VERTEX-COVER (esistono \(k\) nodi che toccano ogni arco?) è NP-completo riducendo INDEPENDENT-SET.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(S\) è indipendente se e solo se \(V \setminus S\) è una copertura: ogni arco ha al più un estremo in \(S\), quindi almeno uno in \(V \setminus S\). Riduzione: \(\langle G, k\rangle \mapsto \langle G, |V| - k\rangle\). VERTEX-COVER è in NP (certificato: i nodi della copertura).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Costruisci il grafo della riduzione 3SAT \(\le_P\) CLIQUE per \(\varphi = (x \vee y \vee \bar z) \wedge (\bar x \vee \bar y \vee z)\) e trova una 2-clique.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Due gruppi: \(\{x, y, \bar z\}\) e \(\{\bar x, \bar y, z\}\). Archi tra gruppi, tranne \(x\)–\(\bar x\), \(y\)–\(\bar y\), \(\bar z\)–\(z\). Una 2-clique: \(x\) (gruppo 1) e \(\bar y\) (gruppo 2). Assegnazione: \(x = 1\), \(y = 0\), \(z\) qualsiasi: entrambe le clausole sono vere.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Mostra che se \(\mathrm{P} = \mathrm{NP}\) allora esiste un algoritmo polinomiale che non solo decide se una formula è soddisfacibile, ma <b>trova</b> un'assegnazione che la soddisfa.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Auto-riducibilità: si decide se \(\varphi\) è soddisfacibile. Se sì, si prova \(\varphi[x_1 = 1]\): se è soddisfacibile si fissa \(x_1 = 1\), altrimenti \(x_1 = 0\) (allora \(\varphi[x_1 = 0]\) deve esserlo). Si ripete per ogni variabile. Sono \(n + 1\) chiamate al decisore polinomiale.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci NP con i verificatori e con le macchine non deterministiche. Perché sono equivalenti?</summary><div>Verificatore polinomiale con certificato; oppure \(\bigcup_k \mathrm{NTIME}(n^k)\). La MdT non deterministica indovina il certificato e verifica; il certificato è la sequenza di scelte del ramo accettante.</div></details>
+<details><summary>Cosa significa NP-completo? Perché è importante?</summary><div>In NP e ogni problema di NP vi si riduce in tempo polinomiale. Se uno solo fosse in P, sarebbe P = NP.</div></details>
+<details><summary>Enuncia e schematizza la dimostrazione del teorema di Cook–Levin.</summary><div>SAT è NP-completo. È in NP (certificato = assegnazione). Per \(A \in \mathrm{NP}\) con NTM in tempo \(n^k\): tableau \(n^k \times n^k\) delle configurazioni, variabili \(x_{i,j,s}\), formula \(\varphi_{cell} \wedge \varphi_{start} \wedge \varphi_{move} \wedge \varphi_{accept}\) di dimensione \(O(n^{2k})\).</div></details>
+<details><summary>Come dimostri che CLIQUE è NP-completo?</summary><div>CLIQUE ∈ NP; 3SAT \(\le_P\) CLIQUE: 3 nodi per clausola, archi tra letterali compatibili di clausole diverse, \(k\) = numero di clausole.</div></details>
+</section>

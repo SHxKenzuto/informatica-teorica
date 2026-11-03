@@ -1,0 +1,169 @@
+<!--{"n":5,"mod":"A","title":"Non determinismo e da NFA a DFA","sipser":"§1.2 (PDF p. 68–84)","dsw":"§9.2–9.3 (PDF p. 261–268)","time":"3 ore","lead":"Un automa non deterministico può avere più mosse possibili, nessuna mossa, o muoversi senza leggere. Sembra più potente di un DFA; non lo è, ma è molto più comodo da progettare."}-->
+
+<h2>Che cosa cambia</h2>
+<p>In un DFA ogni stato ha <b>esattamente una</b> freccia per ogni simbolo. Un automa <b>non deterministico</b> (NFA) rilassa questa regola in tre modi:</p>
+<ul>
+<li>da uno stato possono uscire <b>più frecce</b> con lo stesso simbolo;</li>
+<li>possono mancare frecce: se non c'è mossa, quel ramo di computazione <b>muore</b>;</li>
+<li>possono esserci <b>\(\varepsilon\)-transizioni</b>, che cambiano stato senza leggere input.</li>
+</ul>
+<p>Cosa significa allora «accettare»? La regola è <b>esistenziale</b>: l'NFA accetta \(w\) se <b>esiste almeno un modo</b> di fare le scelte che consuma tutta \(w\) e termina in uno stato finale. I rami che si bloccano o finiscono in stati non finali non contano.</p>
+
+<h2>Due modi di pensarlo</h2>
+<p><b>L'automa che indovina.</b> Immagina che, a ogni scelta, l'automa «indovini» sempre la mossa giusta, se ne esiste una. Questo punto di vista rende facilissimo progettare: per «contiene 11 oppure 101» l'automa legge tranquillo e a un certo punto <i>indovina</i> che lì inizia l'occorrenza giusta.</p>
+<p><b>L'automa che si clona.</b> A ogni scelta l'automa si duplica in tante copie quante sono le possibilità; le copie procedono in parallelo; le copie senza mosse spariscono. Alla fine si accetta se almeno una copia è in uno stato finale. Questo punto di vista è quello che porta alla simulazione con un DFA: basta tenere traccia dell'<b>insieme</b> degli stati in cui si trova almeno una copia.</p>
+
+<h2>Definizione formale</h2>
+<div class="def"><span class="k">Definizione · NFA</span>
+<p>Un NFA è una quintupla \(N = (Q, \Sigma, \delta, q_0, F)\) dove \(Q, \Sigma, q_0, F\) sono come per un DFA e
+\[\delta : Q \times \Sigma_\varepsilon \to \mathcal{P}(Q), \qquad \Sigma_\varepsilon = \Sigma \cup \{\varepsilon\}.\]
+\(\delta(q, a)\) è l'<b>insieme</b> (eventualmente vuoto) degli stati raggiungibili da \(q\) leggendo \(a\); \(\delta(q, \varepsilon)\) quello raggiungibile senza leggere.</p>
+</div>
+<div class="def"><span class="k">Definizione · accettazione</span>
+<p>\(N\) accetta \(w\) se si può scrivere \(w = y_1 y_2 \cdots y_m\) con ogni \(y_i \in \Sigma_\varepsilon\) (cioè inserendo delle \(\varepsilon\) tra i simboli) ed esistono stati \(r_0, \dots, r_m\) tali che \(r_0 = q_0\), \(r_{i+1} \in \delta(r_i, y_{i+1})\) e \(r_m \in F\).</p>
+</div>
+<p>Ogni DFA è un NFA (in cui ogni \(\delta(q,a)\) è un singoletto e non ci sono \(\varepsilon\)-mosse). Quindi gli NFA riconoscono <i>almeno</i> i linguaggi regolari. Il teorema centrale della lezione dice che non riconoscono niente di più.</p>
+
+<h2>Esempi</h2>
+<h3>Contiene 11 oppure 101</h3>
+<p>L'automa resta in \(p_0\) leggendo qualunque cosa; quando legge un 1 può «scommettere» che lì inizia l'occorrenza e andare in \(p_1\). Da \(p_1\) può leggere 0 (caso 101) o fare una \(\varepsilon\)-mossa (caso 11) verso \(p_2\), da cui un 1 porta allo stato finale \(p_3\), che accetta tutto il resto.</p>
+<div data-w="nfa-cont"></div>
+<p>Osserva nel simulatore che l'insieme degli stati attivi cresce e si restringe: è proprio l'insieme che userà la costruzione per sottoinsiemi.</p>
+
+<h3>Lunghezza multipla di 2 o di 3</h3>
+<p>Su \(\Sigma = \{0\}\), l'automa sceglie all'inizio, con una \(\varepsilon\)-mossa, se verificare «multiplo di 2» (ciclo di lunghezza 2) o «multiplo di 3» (ciclo di lunghezza 3). È l'esempio 1.33 del Sipser e mostra come le \(\varepsilon\)-mosse permettano di comporre automi: l'NFA è l'«unione» di due DFA.</p>
+<div data-w="nfa-23"></div>
+
+<h2>La \(\varepsilon\)-chiusura</h2>
+<div class="def"><span class="k">Definizione · \(\varepsilon\)-chiusura</span>
+<p>Per \(R \subseteq Q\), \(E(R)\) è l'insieme degli stati raggiungibili da stati di \(R\) usando <b>zero o più</b> \(\varepsilon\)-transizioni. In particolare \(R \subseteq E(R)\).</p>
+</div>
+<p>Si calcola con una visita: si parte da \(R\) e si aggiungono ripetutamente gli stati raggiungibili con una \(\varepsilon\)-mossa da stati già presenti, finché l'insieme non cambia più. Con la chiusura, un passo della simulazione «a insiemi» su un simbolo \(a\) è:
+\[R \;\longmapsto\; E\Big(\bigcup_{q \in R} \delta(q, a)\Big).\]
+Si parte da \(E(\{q_0\})\), non da \(\{q_0\}\): l'automa può muoversi con \(\varepsilon\) prima di leggere il primo simbolo.</p>
+
+<h2>Equivalenza tra NFA e DFA</h2>
+<div class="thm"><span class="k">Teorema (Rabin–Scott, 1959)</span>
+<p>Per ogni NFA \(N\) esiste un DFA \(M\) con \(L(M) = L(N)\). Di conseguenza un linguaggio è regolare se e solo se è riconosciuto da un NFA.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione (costruzione per sottoinsiemi)</span>
+<p>Sia \(N = (Q, \Sigma, \delta, q_0, F)\). Costruiamo \(M = (Q', \Sigma, \delta', q_0', F')\):</p>
+<ul>
+<li>\(Q' = \mathcal{P}(Q)\): ogni stato di \(M\) è un insieme di stati di \(N\);</li>
+<li>\(q_0' = E(\{q_0\})\);</li>
+<li>\(\delta'(R, a) = E\big(\bigcup_{q \in R} \delta(q, a)\big)\) per \(R \subseteq Q\), \(a \in \Sigma\);</li>
+<li>\(F' = \{R \subseteq Q : R \cap F \neq \emptyset\}\): \(M\) accetta se almeno una copia di \(N\) è in uno stato finale.</li>
+</ul>
+<p>\(M\) è deterministico perché \(\delta'(R,a)\) è un unico insieme. Si dimostra per induzione su \(|w|\) l'invariante
+\[\hat\delta'(q_0', w) = \{q \in Q : \text{esiste un ramo di } N \text{ che legge } w \text{ e termina in } q\}.\]
+La base è la definizione di \(q_0'\); il passo è la definizione di \(\delta'\). Allora \(M\) accetta \(w\) \(\iff\) quell'insieme contiene uno stato finale \(\iff\) \(N\) accetta \(w\).</p>
+</div>
+
+<h3>La costruzione in pratica</h3>
+<p>Non si costruiscono tutti i \(2^{|Q|}\) sottoinsiemi: si parte da \(E(\{q_0\})\) e si aggiungono solo gli insiemi che compaiono effettivamente come risultato di qualche transizione. Si procede con una tabella:</p>
+<ol>
+<li>la prima riga è lo stato iniziale \(E(\{q_0\})\);</li>
+<li>per ogni riga e ogni simbolo si calcola l'insieme d'arrivo;</li>
+<li>ogni insieme nuovo che compare nelle colonne diventa una nuova riga;</li>
+<li>si termina quando non compaiono insiemi nuovi; sono finali le righe che contengono uno stato finale di \(N\).</li>
+</ol>
+<p>Esempio: NFA per «il penultimo simbolo è 1». Costruisci la tabella una riga alla volta e guarda il DFA che ne risulta.</p>
+<div data-w="subset-pen"></div>
+
+<div class="example"><span class="k">Esempio svolto a mano · NFA con \(\varepsilon\)</span>
+<p>Per l'NFA «multiplo di 2 o di 3» (stati \(s, a_0, a_1, b_0, b_1, b_2\)):</p>
+<ul>
+<li>\(q_0' = E(\{s\}) = \{s, a_0, b_0\}\), finale (contiene \(a_0\));</li>
+<li>da \(\{s,a_0,b_0\}\) con 0: \(\{a_1, b_1\}\), non finale;</li>
+<li>da \(\{a_1,b_1\}\) con 0: \(\{a_0, b_2\}\), finale;</li>
+<li>da \(\{a_0, b_2\}\) con 0: \(\{a_1, b_0\}\), finale;</li>
+<li>da \(\{a_1, b_0\}\) con 0: \(\{a_0, b_1\}\), finale;</li>
+<li>da \(\{a_0, b_1\}\) con 0: \(\{a_1, b_2\}\), non finale;</li>
+<li>da \(\{a_1, b_2\}\) con 0: \(\{a_0, b_0\}\), finale;</li>
+<li>da \(\{a_0, b_0\}\) con 0: \(\{a_1, b_1\}\), già visto.</li>
+</ul>
+<p>Il DFA ha 7 stati e accetta le lunghezze 0, 2, 3, 4, 6, 8, 9, … cioè i multipli di 2 o di 3. È un ciclo di lunghezza 6 = mcm(2,3), più lo stato iniziale.</p>
+</div>
+
+<h2>Il prezzo: l'esplosione degli stati</h2>
+<p>Il DFA può avere fino a \(2^n\) stati se l'NFA ne ha \(n\), e in alcuni casi servono davvero tutti.</p>
+<div class="thm"><span class="k">Proposizione</span>
+<p>Sia \(L_k = \{w \in \{0,1\}^* : \text{il } k\text{-esimo simbolo dalla fine è } 1\}\). \(L_k\) ha un NFA con \(k+1\) stati, ma ogni DFA per \(L_k\) ha almeno \(2^k\) stati.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>L'NFA indovina la posizione: cappio su \(q_0\), poi \(q_0 \xrightarrow{1} q_1 \xrightarrow{0,1} \cdots \xrightarrow{0,1} q_k\) finale.</p>
+<p>Per il DFA: consideriamo le \(2^k\) stringhe di lunghezza \(k\). Se due di esse, \(x \neq y\), portassero il DFA nello stesso stato, prendiamo una posizione \(i\) in cui differiscono, diciamo \(x_i = 1\), \(y_i = 0\). Allora \(x0^{i-1}\) e \(y0^{i-1}\) porterebbero ancora nello stesso stato, ma il \(k\)-esimo simbolo dalla fine è \(x_i = 1\) nella prima e \(y_i = 0\) nella seconda: una va accettata e l'altra no. Quindi le \(2^k\) stringhe portano in stati tutti diversi.</p>
+</div>
+
+<div class="remark"><span class="k">Perché usare gli NFA, allora?</span>
+<p>Perché sono <b>più compatti e più facili da progettare</b>, e perché le costruzioni sulle operazioni (unione, concatenazione, stella) e la traduzione delle espressioni regolari vengono naturali con le \(\varepsilon\)-mosse. L'equivalenza garantisce che quando serve un DFA (per complementare, per minimizzare, per implementare) si può sempre ottenerlo.</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Partire dallo stato \(\{q_0\}\) invece che da \(E(\{q_0\})\).</li>
+<li>Dimenticare la \(\varepsilon\)-chiusura dopo ogni passo, oppure applicarla <i>prima</i> di leggere il simbolo (va applicata dopo).</li>
+<li>Dimenticare lo stato \(\emptyset\): se compare, è uno stato pozzo del DFA e va disegnato con i suoi cappi.</li>
+<li>Marcare come finali solo gli insiemi <i>contenuti</i> in \(F\): basta che l'intersezione con \(F\) sia non vuota.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>NFA: \(\delta : Q \times \Sigma_\varepsilon \to \mathcal P(Q)\); accetta se <b>esiste</b> un ramo accettante.</li>
+<li>Costruzione per sottoinsiemi: stati = insiemi, iniziale \(E(\{q_0\})\), \(\delta'(R,a) = E(\bigcup \delta(q,a))\), finali = insiemi che intersecano \(F\).</li>
+<li>NFA e DFA riconoscono la stessa classe: i linguaggi regolari.</li>
+<li>Il DFA può essere esponenzialmente più grande, e a volte deve esserlo.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Progetta un NFA con 4 stati per le stringhe su \(\{a,b\}\) che terminano con \(abb\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(q_0\) con cappio \(a, b\); \(q_0 \xrightarrow{a} q_1 \xrightarrow{b} q_2 \xrightarrow{b} q_3\), \(q_3\) finale e senza transizioni uscenti. L'automa «indovina» quando inizia il suffisso finale.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Applica la costruzione per sottoinsiemi all'NFA dell'esercizio precedente.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\{q_0\} \xrightarrow{a} \{q_0,q_1\}\), \(\{q_0\} \xrightarrow{b} \{q_0\}\);
+\(\{q_0,q_1\} \xrightarrow{a} \{q_0,q_1\}\), \(\xrightarrow{b} \{q_0,q_2\}\);
+\(\{q_0,q_2\} \xrightarrow{a} \{q_0,q_1\}\), \(\xrightarrow{b} \{q_0,q_3\}\);
+\(\{q_0,q_3\} \xrightarrow{a} \{q_0,q_1\}\), \(\xrightarrow{b} \{q_0\}\).
+Quattro stati, finale \(\{q_0,q_3\}\). È lo stesso DFA che avresti progettato direttamente ricordando «quanta parte di \(abb\) ho visto in fondo».</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Calcola la \(\varepsilon\)-chiusura di ogni stato e poi il DFA equivalente per l'NFA con stati \(1, 2, 3\), iniziale 1, finale 2, transizioni \(1 \xrightarrow{\varepsilon} 3\), \(1 \xrightarrow{b} 2\), \(2 \xrightarrow{a} 2\), \(2 \xrightarrow{a,b} 3\), \(3 \xrightarrow{a} 1\) (esempio 1.41 del Sipser).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(E(\{1\}) = \{1,3\}\), \(E(\{2\}) = \{2\}\), \(E(\{3\}) = \{3\}\).</p>
+<p>Stato iniziale \(\{1,3\}\). \(\{1,3\} \xrightarrow{a} E(\{1\}) = \{1,3\}\); \(\{1,3\} \xrightarrow{b} \{2\}\).
+\(\{2\} \xrightarrow{a} \{2,3\}\); \(\{2\} \xrightarrow{b} \{3\}\).
+\(\{2,3\} \xrightarrow{a} \{1,2,3\}\); \(\{2,3\} \xrightarrow{b} \{3\}\).
+\(\{3\} \xrightarrow{a} \{1,3\}\); \(\{3\} \xrightarrow{b} \emptyset\).
+\(\{1,2,3\} \xrightarrow{a} \{1,2,3\}\); \(\{1,2,3\} \xrightarrow{b} \{2,3\}\).
+\(\emptyset\) va in sé stesso.</p>
+<p>Finali: gli insiemi che contengono 2, cioè \(\{2\}, \{2,3\}, \{1,2,3\}\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che ogni NFA può essere trasformato in un NFA equivalente con un solo stato finale. Vale lo stesso per i DFA?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Si aggiunge un nuovo stato \(f\), unico finale, con \(\varepsilon\)-mosse da tutti i vecchi stati finali (che smettono di essere finali). Per i DFA no: il linguaggio \(\{\varepsilon, a\}\) su \(\{a\}\) richiede che sia \(q_0\) sia \(\delta(q_0, a)\) siano finali, e i due stati devono essere diversi (altrimenti si accetterebbe anche \(aa\)).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Sia \(L\) regolare. Dimostra che \(\mathrm{rev}(L) = \{w^R : w \in L\}\) è regolare.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Dato un DFA per \(L\), si costruisce un NFA invertendo tutte le frecce, rendendo finale il vecchio stato iniziale, e aggiungendo un nuovo stato iniziale con \(\varepsilon\)-mosse verso tutti i vecchi stati finali. Un cammino che legge \(w\) dal vecchio iniziale a un finale diventa un cammino che legge \(w^R\) al contrario. Il risultato in generale è non deterministico, ed è proprio qui che gli NFA sono comodi.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci un NFA e la sua nozione di accettazione.</summary><div>\((Q, \Sigma, \delta, q_0, F)\) con \(\delta : Q \times \Sigma_\varepsilon \to \mathcal P(Q)\). Accetta \(w\) se esiste un ramo di computazione che consuma tutta \(w\) (con eventuali \(\varepsilon\)-mosse) e termina in uno stato di \(F\).</div></details>
+<details><summary>Descrivi la costruzione per sottoinsiemi, incluse le \(\varepsilon\)-mosse.</summary><div>Stati = sottoinsiemi di \(Q\); iniziale \(E(\{q_0\})\); \(\delta'(R, a) = E(\bigcup_{q \in R}\delta(q,a))\); finali gli \(R\) con \(R \cap F \neq \emptyset\). Invariante: \(\hat\delta'(q_0', w)\) è l'insieme degli stati raggiungibili da \(N\) leggendo \(w\).</div></details>
+<details><summary>Il non determinismo aumenta il potere degli automi finiti?</summary><div>No, solo la compattezza: NFA e DFA riconoscono gli stessi linguaggi. Il DFA può però essere esponenzialmente più grande (esempio: \(k\)-esimo simbolo dalla fine).</div></details>
+<details><summary>Perché lo stato \(\emptyset\) può comparire nel DFA? Cosa rappresenta?</summary><div>Quando tutte le copie dell'NFA sono morte. È uno stato pozzo non finale.</div></details>
+</section>

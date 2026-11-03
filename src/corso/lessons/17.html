@@ -1,0 +1,170 @@
+<!--{"n":17,"mod":"C","title":"Predicati, minimalizzazione e funzioni parziali ricorsive","dsw":"§3.5–3.7 (PDF p. 68–78)","time":"3 ore","lead":"Gli strumenti per scrivere comodamente funzioni primitive ricorsive (predicati, definizioni per casi, quantificatori limitati) e l'operazione che porta oltre: la minimalizzazione non limitata, che produce funzioni parziali e cattura esattamente tutte le funzioni calcolabili."}-->
+
+<h2>Predicati primitivi ricorsivi</h2>
+<p>Ricorda la convenzione di DSW: un <b>predicato</b> è una funzione totale a valori in \(\{0, 1\}\). Un predicato è primitivo ricorsivo se lo è come funzione.</p>
+<div class="example"><span class="k">Predicati di base</span>
+<ul>
+<li>\(x = y\): vale \(\alpha(|x - y|)\).</li>
+<li>\(x \le y\): vale \(\alpha(x \mathbin{\dot-} y)\).</li>
+<li>\(x < y\): vale \(\alpha(s(x) \mathbin{\dot-} y)\), oppure \(\neg(y \le x)\).</li>
+</ul>
+</div>
+<div class="thm"><span class="k">Teorema · connettivi logici</span>
+<p>Se \(P\) e \(Q\) sono predicati in una classe PRC, lo sono anche \(\neg P\), \(P \wedge Q\), \(P \vee Q\).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>\(\neg P = \alpha(P)\); \(P \wedge Q = P \cdot Q\); \(P \vee Q = \neg(\neg P \wedge \neg Q)\).</p>
+</div>
+
+<h3>Definizione per casi</h3>
+<div class="thm"><span class="k">Teorema</span>
+<p>Se \(g, h\) sono funzioni e \(P\) un predicato di una classe PRC, anche
+\[f(\vec x) = \begin{cases} g(\vec x) & \text{se } P(\vec x) \\ h(\vec x) & \text{altrimenti}\end{cases}\]
+sta nella classe. Più in generale vale con \(k\) casi disgiunti.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>\(f(\vec x) = g(\vec x) \cdot P(\vec x) + h(\vec x) \cdot \alpha(P(\vec x))\): uno dei due addendi vale sempre 0.</p>
+</div>
+<p>Questa è l'<code>if</code> delle funzioni primitive ricorsive. Funziona perché \(g\) e \(h\) sono totali: si calcolano entrambe e se ne «spegne» una moltiplicando per 0.</p>
+
+<h2>Operazioni iterate e quantificatori limitati</h2>
+<div class="thm"><span class="k">Teorema · somme e prodotti limitati</span>
+<p>Se \(f(t, \vec x)\) sta in una classe PRC, ci stanno anche
+\[g(y, \vec x) = \sum_{t=0}^{y} f(t, \vec x) \qquad\text{e}\qquad h(y, \vec x) = \prod_{t=0}^{y} f(t, \vec x).\]</p>
+</div>
+<p>(Ricorsione primitiva su \(y\), con passo «somma il termine successivo» o «moltiplica per il termine successivo».)</p>
+
+<div class="thm"><span class="k">Teorema · quantificatori limitati</span>
+<p>Se \(P(t, \vec x)\) è un predicato in una classe PRC, ci stanno anche
+\[(\forall t)_{\le y}\, P(t, \vec x) \qquad\text{e}\qquad (\exists t)_{\le y}\, P(t, \vec x).\]</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>\((\forall t)_{\le y} P(t, \vec x) = \prod_{t=0}^{y} P(t, \vec x)\): il prodotto vale 1 se e solo se tutti i fattori valgono 1.<br>
+\((\exists t)_{\le y} P(t, \vec x) = \mathrm{sg}\big(\sum_{t=0}^{y} P(t, \vec x)\big)\): la somma è positiva se e solo se almeno un termine vale 1.</p>
+</div>
+<p>Il limite \(y\) è essenziale: un quantificatore non limitato «per ogni \(t\)» richiederebbe infiniti controlli. È lo stesso confine tra un ciclo <code>for</code> e una ricerca senza fine.</p>
+
+<div class="example"><span class="k">Esempi</span>
+<ul>
+<li>\(y \mid x\) («\(y\) divide \(x\)»): \((\exists t)_{\le x}\,(y \cdot t = x)\).</li>
+<li>\(\mathrm{Prime}(x)\): \(x > 1 \wedge (\forall t)_{\le x}\,\big(t = 1 \vee t = x \vee \neg(t \mid x)\big)\).</li>
+<li>\(\mathrm{Pari}(x)\): \(2 \mid x\).</li>
+</ul>
+</div>
+
+<h2>Minimalizzazione limitata</h2>
+<div class="def"><span class="k">Definizione</span>
+<p>Dato un predicato \(P(t, \vec x)\), la <b>minimalizzazione limitata</b>
+\[\min_{t \le y} P(t, \vec x)\]
+vale il <b>più piccolo</b> \(t \le y\) per cui \(P(t, \vec x)\) è vero, e vale <b>0</b> se non ne esiste nessuno.</p>
+</div>
+<div class="thm"><span class="k">Teorema</span>
+<p>Se \(P\) sta in una classe PRC, anche \(\min_{t \le y} P(t, \vec x)\) ci sta.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione (idea)</span>
+<p>Si osserva che \(\prod_{u=0}^{t} \alpha(P(u, \vec x))\) vale 1 finché \(P\) è falso per tutti gli \(u \le t\), e 0 da quando diventa vero. Sommando questi valori per \(t = 0, \dots, y\) si contano proprio i \(t\) prima del primo testimone:
+\[g(y, \vec x) = \sum_{t=0}^{y} \prod_{u=0}^{t} \alpha(P(u, \vec x)).\]
+Se esiste un testimone \(\le y\), \(g\) è il minimo. Se non esiste, \(g = y + 1\), e si corregge con un caso: \(\min_{t\le y} P = g\) se \((\exists t)_{\le y} P\), altrimenti 0.</p>
+</div>
+
+<div class="example"><span class="k">Esempi</span>
+<ul>
+<li>\(\lfloor x / y \rfloor = \min_{t \le x}\,\big((t + 1) \cdot y > x\big)\) (con la convenzione \(\lfloor x/0 \rfloor = 0\)).</li>
+<li>\(R(x, y)\) = resto di \(x\) diviso \(y\) \(= x \mathbin{\dot-} y \cdot \lfloor x/y \rfloor\).</li>
+<li>\(\lfloor \sqrt{x} \rfloor = \min_{t \le x}\,\big((t+1)^2 > x\big)\).</li>
+<li>\(p_n\) = \(n\)-esimo primo: \(p_0 = 0\), \(p_{n+1} = \min_{t \le p_n! + 1}\,\big(\mathrm{Prime}(t) \wedge t > p_n\big)\). Il limite \(p_n! + 1\) funziona perché \(p_n! + 1\) ha un fattore primo maggiore di \(p_n\) (argomento di Euclide).</li>
+</ul>
+</div>
+<p>La morale: con predicati, casi, quantificatori e minimalizzazione <b>limitati</b> si scrivono quasi tutte le funzioni aritmetiche che usi normalmente, e restano primitive ricorsive (totali). La lezione 18 userà questi strumenti per le codifiche di Gödel.</p>
+
+<h2>Minimalizzazione non limitata</h2>
+<div class="def"><span class="k">Definizione · operatore \(\mu\)</span>
+<p>Dato un predicato \(P(t, \vec x)\),
+\[\mu t\, P(t, \vec x) = \text{il più piccolo } t \text{ tale che } P(t, \vec x) \text{ è vero},\]
+ed è <b>indefinito</b> se un tale \(t\) non esiste.</p>
+</div>
+<p>Il calcolo è una ricerca: si prova \(t = 0, 1, 2, \dots\) finché si trova un testimone. In S:</p>
+<p>\([A]\ \mathrm{IF}\ P(Y, X_1, \dots, X_n)\ \mathrm{GOTO}\ E\)<br>
+\(\phantom{[A]}\ Y \leftarrow Y + 1\)<br>
+\(\phantom{[A]}\ \mathrm{GOTO}\ A\)</p>
+<p>Se un testimone esiste, il programma lo trova (il primo) e si ferma. Se non esiste, cerca per sempre. Per questo \(\mu\) produce funzioni <b>parziali</b>, anche partendo da predicati primitivi ricorsivi.</p>
+<div data-w="minimal"></div>
+<div class="thm"><span class="k">Teorema</span>
+<p>Se \(P(t, \vec x)\) è un predicato calcolabile, allora \(\mu t\, P(t, \vec x)\) è parzialmente calcolabile.</p>
+</div>
+
+<h2>Le funzioni parziali ricorsive</h2>
+<div class="def"><span class="k">Definizione · funzioni parziali ricorsive</span>
+<p>La classe delle funzioni <b>parziali ricorsive</b> è la più piccola classe che contiene le funzioni iniziali ed è chiusa per composizione, ricorsione primitiva e minimalizzazione non limitata. Le funzioni parziali ricorsive totali si chiamano <b>ricorsive</b>.</p>
+</div>
+<div class="thm"><span class="k">Teorema (Kleene)</span>
+<p>Una funzione è parziale ricorsiva se e solo se è parzialmente calcolabile (in S). Una funzione è ricorsiva se e solo se è calcolabile.</p>
+</div>
+<div class="proof"><span class="k">Idea della dimostrazione</span>
+<p>(\(\Rightarrow\)) Ogni costruzione si programma in S: le iniziali, la composizione, la ricorsione primitiva (ciclo di lunghezza nota) e \(\mu\) (ciclo di ricerca).</p>
+<p>(\(\Leftarrow\)) È la direzione profonda, che DSW completa nel capitolo 4 dopo aver introdotto le codifiche. Si codifica lo stato di un programma (valori delle variabili e istruzione corrente) con un numero di Gödel. Il passaggio da uno stato al successivo è una funzione primitiva ricorsiva, e così lo stato dopo \(t\) passi, \(\mathrm{SNAP}(x, y, t)\). «Il programma \(y\) su input \(x\) si è fermato entro \(t\) passi» è un predicato primitivo ricorsivo \(\mathrm{STP}(x, y, t)\). Allora il risultato è
+\[\Psi_y(x) = \text{valore di } Y \text{ in } \mathrm{SNAP}\big(x, y, \mu t\, \mathrm{STP}(x, y, t)\big),\]
+una sola applicazione di \(\mu\) a funzioni primitive ricorsive. È il <b>teorema di forma normale di Kleene</b>: ogni funzione parzialmente calcolabile si scrive come \(f(x) = U(\mu t\, T(x, t))\) con \(U\) e \(T\) primitivi ricorsivi.</p>
+</div>
+
+<div class="remark"><span class="k">Il quadro complessivo</span>
+<p>\[\text{primitive ricorsive} \subsetneq \text{ricorsive (= calcolabili totali)} \subsetneq \text{parziali ricorsive (= parzialmente calcolabili)}.\]
+La prima inclusione è stretta per Ackermann/diagonalizzazione, la seconda perché esistono funzioni parzialmente calcolabili non totali. In termini di programmazione: i cicli <code>for</code> con limite noto danno le primitive ricorsive; aggiungendo il <code>while</code> (una sola ricerca illimitata basta!) si ottiene tutto ciò che è calcolabile.</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dimenticare la convenzione della minimalizzazione limitata (0 se non c'è testimone): cambia il valore della funzione.</li>
+<li>Applicare \(\mu\) e sostenere che il risultato è primitivo ricorsivo: con \(\mu\) non limitato non lo è in generale.</li>
+<li>Usare quantificatori non limitati (\(\forall t\) senza limite) in una definizione che deve essere primitiva ricorsiva.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Predicati p.r. chiusi per \(\neg, \wedge, \vee\); definizioni per casi; somme, prodotti e quantificatori limitati.</li>
+<li>\(\min_{t \le y}\) resta p.r. (vale 0 se non trova).</li>
+<li>\(\mu t\) non limitato: ricerca che può non terminare, produce funzioni parziali.</li>
+<li>Parziali ricorsive = parzialmente calcolabili (forma normale di Kleene).</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che il predicato \(\mathrm{Quadrato}(x)\) («\(x\) è un quadrato perfetto») è primitivo ricorsivo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\mathrm{Quadrato}(x) \iff (\exists t)_{\le x}\,(t \cdot t = x)\): quantificatore limitato su un predicato p.r. (uguaglianza composta con il prodotto).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Esprimi \(\lfloor \log_2 x \rfloor\) (per \(x \ge 1\), e 0 per \(x = 0\)) con la minimalizzazione limitata.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\lfloor \log_2 x \rfloor = \min_{t \le x}\,(2^{t+1} > x)\). Per \(x = 0\) il primo testimone è \(t = 0\), coerente con la convenzione richiesta.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(\mathrm{mcd}(x, y)\) è primitivo ricorsivo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\mathrm{mcd}(x, y)\) è il più grande \(t \le x + y\) che divide entrambi. Il «più grande» si ottiene dal «più piccolo» cambiando variabile: \(\mathrm{mcd}(x,y) = (x+y) \mathbin{\dot-} \min_{u \le x+y}\,\big(((x+y) \mathbin{\dot-} u) \mid x \wedge ((x+y) \mathbin{\dot-} u) \mid y\big)\). (Con la convenzione \(0 \mid 0\) vera, \(\mathrm{mcd}(0,0) = 0\).)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Qual è il dominio della funzione \(f(x) = \mu t\,(t \cdot t = x)\)? E di \(g(x) = \mu t\,(t \cdot x = 0)\)?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(f\) è definita esattamente sui quadrati perfetti, dove vale \(\sqrt x\). \(g(x) = 0\) per ogni \(x\), perché \(t = 0\) è sempre un testimone: è totale anche se definita con \(\mu\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Sia \(f\) calcolabile, totale e <b>biiettiva</b> su \(\mathbb N\). Dimostra che anche l'inversa \(f^{-1}\) è calcolabile. Perché serve la \(\mu\) non limitata?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(f^{-1}(y) = \mu x\,(f(x) = y)\). Siccome \(f\) è suriettiva il testimone esiste sempre, quindi \(f^{-1}\) è totale; siccome è iniettiva è unico. Non si sa a priori un limite su \(x\) in funzione di \(y\) (se \(f\) non è p.r. o cresce in modo irregolare), quindi serve una ricerca illimitata.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Che differenza c'è tra minimalizzazione limitata e non limitata?</summary><div>La limitata cerca \(t \le y\) e vale 0 se non trova: è una somma/prodotto limitato, resta primitiva ricorsiva. La non limitata cerca senza limite e può non terminare: produce funzioni parziali.</div></details>
+<details><summary>Mostra che \(x \mid y\) e \(\mathrm{Prime}(x)\) sono primitivi ricorsivi.</summary><div>\(x \mid y \iff (\exists t)_{\le y}(x\cdot t = y)\); \(\mathrm{Prime}(x) \iff x > 1 \wedge (\forall t)_{\le x}(t = 1 \vee t = x \vee \neg(t \mid x))\).</div></details>
+<details><summary>Definisci le funzioni parziali ricorsive. Che relazione hanno con le parzialmente calcolabili?</summary><div>La più piccola classe con le iniziali chiusa per composizione, ricorsione primitiva e \(\mu\). Coincidono con le parzialmente calcolabili (forma normale di Kleene).</div></details>
+<details><summary>Enuncia il teorema di forma normale.</summary><div>Ogni funzione parzialmente calcolabile si scrive \(f(x) = U(\mu t\, T(x, t))\) con \(U, T\) primitive ricorsive: basta una sola minimalizzazione non limitata.</div></details>
+</section>

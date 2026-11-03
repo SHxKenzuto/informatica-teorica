@@ -1,0 +1,128 @@
+<!--{"n":14,"mod":"B","title":"La gerarchia di Chomsky","sipser":"§5.1 «Linear bounded automata» (PDF p. 211)","dsw":"cap. 11 (PDF p. 346–363), §7.5 (PDF p. 205)","time":"2–3 ore","lead":"Quattro tipi di grammatiche, quattro modelli di macchina, ognuno strettamente più potente del precedente. È la mappa che tiene insieme la prima metà del corso e la collega alla seconda."}-->
+
+<h2>Grammatiche in generale</h2>
+<p>Finora le regole avevano una sola variabile a sinistra. Togliendo questa restrizione si ottengono grammatiche più potenti. Noam Chomsky (1956) classificò le grammatiche in quattro tipi in base alla forma delle regole.</p>
+<div class="def"><span class="k">Definizione · grammatica (di tipo 0)</span>
+<p>Una grammatica è \(G = (V, \Sigma, R, S)\) come prima, ma le regole hanno la forma \(\alpha \to \beta\) con \(\alpha, \beta \in (V \cup \Sigma)^*\) e \(\alpha\) contenente almeno una variabile. Un passo di derivazione sostituisce un'occorrenza di \(\alpha\) con \(\beta\): \(u\alpha v \Rightarrow u\beta v\).</p>
+</div>
+
+<h2>I quattro tipi</h2>
+<div class="tblwrap"><table class="data">
+<tr><th>Tipo</th><th>Forma delle regole</th><th>Linguaggi</th><th>Riconoscitore</th></tr>
+<tr><td>0</td><td>\(\alpha \to \beta\), nessuna restrizione</td><td>ricorsivamente enumerabili</td><td>macchina di Turing</td></tr>
+<tr><td>1</td><td>\(\alpha A \beta \to \alpha \gamma \beta\), \(\gamma \neq \varepsilon\) (equiv.: \(|\alpha| \le |\beta|\))</td><td>dipendenti dal contesto (CS)</td><td>automa lineare limitato (LBA)</td></tr>
+<tr><td>2</td><td>\(A \to \gamma\)</td><td>context-free</td><td>automa a pila (non det.)</td></tr>
+<tr><td>3</td><td>\(A \to aB\), \(A \to a\), \(A \to \varepsilon\)</td><td>regolari</td><td>automa finito</td></tr>
+</table></div>
+<p>Per i tipi 1 si ammette in più \(S \to \varepsilon\) se \(S\) non compare a destra, per poter generare \(\varepsilon\).</p>
+<div data-w="chomsky"></div>
+
+<h2>Grammatiche dipendenti dal contesto</h2>
+<p>In una regola \(\alpha A\beta \to \alpha\gamma\beta\) la variabile \(A\) si riscrive in \(\gamma\) <b>solo se</b> si trova nel contesto \(\alpha \ldots \beta\). Una formulazione equivalente, più comoda per scrivere esempi, sono le grammatiche <b>monotone</b> (o non contrattive): ogni regola \(u \to v\) ha \(|u| \le |v|\). Le due definizioni generano gli stessi linguaggi.</p>
+<p>La proprietà chiave delle grammatiche monotone: <b>le forme sentenziali non si accorciano mai</b> durante una derivazione. È ciò che rende decidibile l'appartenenza (vedi sotto).</p>
+
+<div class="example"><span class="k">Esempio · \(\{a^nb^nc^n : n \ge 1\}\)</span>
+<p>Grammatica monotona:</p>
+<p>\(S \to aSBC \mid aBC\)<br>
+\(CB \to BC\)<br>
+\(aB \to ab, \quad bB \to bb, \quad bC \to bc, \quad cC \to cc\)</p>
+<p>Le prime regole generano \(a^n(BC)^n\). La regola \(CB \to BC\) <b>riordina</b> le variabili fino a ottenere \(a^nB^nC^n\) (è proprio ciò che una grammatica CF non può fare). Le ultime trasformano le variabili in terminali solo nel contesto giusto (una \(B\) diventa \(b\) solo dopo una \(a\) o una \(b\)).</p>
+<p>Derivazione di \(aabbcc\):
+\[S \Rightarrow aSBC \Rightarrow aaBCBC \Rightarrow aaBBCC \Rightarrow aabBCC \Rightarrow aabbCC \Rightarrow aabbcC \Rightarrow aabbcc.\]</p>
+</div>
+
+<h3>Automi lineari limitati</h3>
+<div class="def"><span class="k">Definizione · LBA</span>
+<p>Un <b>automa lineare limitato</b> è una macchina di Turing (non deterministica) che non può spostare la testina oltre la porzione di nastro occupata dall'input. In pratica l'input è racchiuso tra due marcatori \(\langle\) e \(\rangle\) che la macchina non può oltrepassare né cancellare.</p>
+</div>
+<p>Il nome viene dal fatto che la memoria disponibile è <b>lineare</b> nella lunghezza dell'input (con un alfabeto di nastro più ricco si può comprimere un fattore costante). I linguaggi dipendenti dal contesto sono esattamente quelli riconosciuti dagli LBA.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Il problema dell'appartenenza per i linguaggi dipendenti dal contesto è decidibile: data una grammatica monotona \(G\) e una stringa \(w\), si può decidere se \(w \in L(G)\).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>In una derivazione monotona di \(w\) tutte le forme sentenziali hanno lunghezza al più \(|w|\). Le stringhe su \(V \cup \Sigma\) di lunghezza al più \(|w|\) sono in numero finito, \(N\). Una derivazione minima non ripete forme sentenziali, quindi ha al più \(N\) passi. Basta esplorare (ad esempio in ampiezza) tutte le forme sentenziali raggiungibili da \(S\) di lunghezza \(\le |w|\): sono finite, e \(w\) è tra queste se e solo se \(w \in L(G)\).</p>
+</div>
+<p>Allo stesso modo, un LBA su un input di lunghezza \(n\) ha un numero finito di configurazioni (\(|Q| \cdot n \cdot |\Gamma|^n\)): si può decidere se accetta. Il Sipser usa proprio questo conteggio per mostrare che \(A_{\mathrm{LBA}}\) è decidibile (Teorema 5.9), mentre il problema «\(L(M) = \emptyset\)?» per un LBA è indecidibile (Teorema 5.10).</p>
+
+<h2>Grammatiche di tipo 0</h2>
+<div class="thm"><span class="k">Teorema</span>
+<p>Un linguaggio è generato da una grammatica di tipo 0 se e solo se è ricorsivamente enumerabile (riconosciuto da una macchina di Turing).</p>
+</div>
+<p><b>Grammatica → macchina.</b> Una macchina di Turing non deterministica può simulare le derivazioni: scrive \(S\) su un nastro, sceglie una regola e una posizione, riscrive, e confronta con l'input. Se \(w \in L(G)\) qualche ramo lo trova; altrimenti la macchina può non terminare.</p>
+<p><b>Macchina → grammatica.</b> DSW (§7.1–7.5) lo mostra con i <b>processi di Semi-Thue</b>: le configurazioni di una macchina si scrivono come stringhe e ogni transizione diventa una regola di riscrittura locale. Rovesciando le regole si ottiene una grammatica che, partendo dalla configurazione accettante, «torna indietro» fino alla configurazione iniziale con l'input \(w\).</p>
+<p>Conseguenza: per le grammatiche di tipo 0 il problema dell'appartenenza è <b>indecidibile</b> (equivale al problema della fermata, lezione 19).</p>
+
+<h2>Le inclusioni sono strette</h2>
+<div class="thm"><span class="k">Teorema</span>
+<p>\(\text{Regolari} \subsetneq \text{CF} \subsetneq \text{CS} \subsetneq \text{Decidibili} \subsetneq \text{R.E.}\)</p>
+</div>
+<ul>
+<li>\(\{0^n1^n\}\) è CF ma non regolare (pumping regolare).</li>
+<li>\(\{a^nb^nc^n\}\) è CS ma non CF (pumping CF; la grammatica monotona sopra).</li>
+<li>Esistono linguaggi decidibili non CS: si elencano le grammatiche monotone \(G_0, G_1, \dots\) e le stringhe \(w_0, w_1, \dots\); il linguaggio \(\{w_i : w_i \notin L(G_i)\}\) è decidibile (l'appartenenza a CS è decidibile) ma differisce da ogni \(L(G_i)\): è ancora una <b>diagonalizzazione</b>.</li>
+<li>Il problema della fermata è r.e. ma non decidibile (lezioni 19 e 21).</li>
+</ul>
+<p>Nota che i linguaggi <b>decidibili</b> (ricorsivi) non corrispondono a nessun tipo di grammatica: sono una classe definita dalle macchine (quelle che si fermano sempre).</p>
+
+<h2>Quadro riassuntivo delle proprietà</h2>
+<div class="tblwrap"><table class="data">
+<tr><th></th><th>Regolari</th><th>CF</th><th>CS</th><th>Decidibili</th><th>R.E.</th></tr>
+<tr><td>Unione</td><td>sì</td><td>sì</td><td>sì</td><td>sì</td><td>sì</td></tr>
+<tr><td>Intersezione</td><td>sì</td><td>no</td><td>sì</td><td>sì</td><td>sì</td></tr>
+<tr><td>Complemento</td><td>sì</td><td>no</td><td>sì*</td><td>sì</td><td>no</td></tr>
+<tr><td>Concatenazione, stella</td><td>sì</td><td>sì</td><td>sì</td><td>sì</td><td>sì</td></tr>
+<tr><td>\(w \in L\)?</td><td>decidibile</td><td>decidibile</td><td>decidibile</td><td>decidibile</td><td>indecidibile</td></tr>
+<tr><td>\(L = \emptyset\)?</td><td>decidibile</td><td>decidibile</td><td>indecidibile</td><td>indecidibile</td><td>indecidibile</td></tr>
+<tr><td>\(L_1 = L_2\)?</td><td>decidibile</td><td>indecidibile</td><td>indecidibile</td><td>indecidibile</td><td>indecidibile</td></tr>
+</table></div>
+<p class="small">* Teorema di Immerman–Szelepcsényi (1987): risultato profondo, basta conoscerlo.</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dire che i decidibili sono il tipo 1: il tipo 1 (CS) è strettamente contenuto nei decidibili.</li>
+<li>Confondere «automa lineare limitato» con «macchina che lavora in tempo lineare»: il limite è sullo <b>spazio</b>.</li>
+<li>Pensare che le grammatiche di tipo 3 possano avere regole \(A \to Ba\) mescolate a \(A \to aB\): mescolando lineari a destra e a sinistra si esce dai regolari.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Tipo 3 ↔ automi finiti; tipo 2 ↔ PDA; tipo 1 ↔ LBA; tipo 0 ↔ macchine di Turing.</li>
+<li>Monotone: le forme sentenziali non si accorciano, quindi l'appartenenza è decidibile.</li>
+<li>Inclusioni strette, con testimoni \(0^n1^n\), \(a^nb^nc^n\), una diagonale, HALT.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Classifica le regole: \(S \to aSb\); \(AB \to BA\); \(A \to aB\); \(aA \to \varepsilon\); \(A \to Ba\). A quale tipo (il più restrittivo possibile) appartiene ciascuna?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(S \to aSb\): tipo 2. \(AB \to BA\): monotona (lunghezze uguali), tipo 1. \(A \to aB\): tipo 3. \(aA \to \varepsilon\): accorcia, tipo 0. \(A \to Ba\): tipo 2 (è lineare a sinistra: da sola andrebbe bene per una grammatica lineare a sinistra, ma non mescolata con regole lineari a destra).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Scrivi una grammatica monotona per \(\{a^nb^{2n}c^n : n \ge 1\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Come per \(a^nb^nc^n\) ma ogni \(a\) produce due \(B\): \(S \to aSBBC \mid aBBC\), \(CB \to BC\), \(aB \to ab\), \(bB \to bb\), \(bC \to bc\), \(cC \to cc\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Scrivi la derivazione di \(aaabbbccc\) con la grammatica monotona per \(\{a^nb^nc^n\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(S \Rightarrow aSBC \Rightarrow aaSBCBC \Rightarrow aaaBCBCBC\). Riordino con \(CB \to BC\): \(aaaBBCCBC \Rightarrow aaaBBCBCC \Rightarrow aaaBBBCCC\). Poi \(aaabBBCCC \Rightarrow aaabbBCCC \Rightarrow aaabbbCCC \Rightarrow aaabbbcCC \Rightarrow aaabbbccC \Rightarrow aaabbbccc\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Spiega perché, se le grammatiche di tipo 0 generano gli r.e., l'appartenenza per esse non può essere decidibile, mentre per le monotone lo è.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Se fosse decidibile per il tipo 0, ogni linguaggio r.e. sarebbe decidibile, contro l'esistenza di HALT. La differenza con le monotone: con regole che accorciano, una derivazione di \(w\) può passare per forme sentenziali lunghissime prima di accorciarsi, quindi lo spazio da esplorare non è limitato e la ricerca non ha un punto in cui fermarsi con risposta «no».</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Descrivi la gerarchia di Chomsky: forme delle regole e riconoscitori.</summary><div>Tipo 3: \(A \to aB \mid a \mid \varepsilon\), automi finiti. Tipo 2: \(A \to \gamma\), PDA. Tipo 1: \(\alpha A\beta \to \alpha\gamma\beta\) (monotone), LBA. Tipo 0: illimitate, macchine di Turing.</div></details>
+<details><summary>Cos'è un automa lineare limitato?</summary><div>Una macchina di Turing (non deterministica) che non esce dalla porzione di nastro occupata dall'input. Riconosce esattamente i linguaggi dipendenti dal contesto.</div></details>
+<details><summary>Perché l'appartenenza è decidibile per le grammatiche monotone?</summary><div>Le forme sentenziali non si accorciano: tutte quelle utili hanno lunghezza \(\le |w|\), sono in numero finito, e si possono esplorare tutte.</div></details>
+<details><summary>Dai un linguaggio per ogni livello che non sta nel livello inferiore.</summary><div>\(0^n1^n\) (CF non regolare), \(a^nb^nc^n\) (CS non CF), una diagonale sulle grammatiche monotone (decidibile non CS), HALT (r.e. non decidibile).</div></details>
+</section>

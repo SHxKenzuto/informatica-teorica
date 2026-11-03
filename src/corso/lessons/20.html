@@ -1,0 +1,171 @@
+<!--{"n":20,"mod":"C","title":"Macchine di Turing e tesi di Church–Turing","sipser":"cap. 3 (PDF p. 158–185)","dsw":"cap. 5 §4–6, cap. 6 (PDF p. 148–187)","time":"3–4 ore","lead":"Il modello di calcolo di Turing: un automa finito con un nastro infinito su cui può leggere, scrivere e muoversi in entrambe le direzioni. È il riferimento per tutta la teoria della calcolabilità e della complessità."}-->
+
+<h2>L'idea di Turing</h2>
+<p>Nel 1936 Alan Turing cercava di catturare che cosa fa un essere umano che calcola con carta e penna: guarda un simbolo alla volta, ha in mente un numero finito di «stati mentali», scrive o cancella un simbolo, sposta l'attenzione a sinistra o a destra. La sua macchina formalizza esattamente questo. Rispetto agli automi finiti e a pila ha due differenze decisive:</p>
+<ul>
+<li>può <b>scrivere</b> sul nastro, e il nastro è <b>illimitato</b>;</li>
+<li>la testina si muove in <b>entrambe le direzioni</b>, quindi può rileggere l'input quante volte vuole.</li>
+</ul>
+<p>Una conseguenza importante: una macchina di Turing può <b>non fermarsi mai</b>, cosa impossibile per un automa finito (che si ferma alla fine dell'input).</p>
+
+<h2>Definizione</h2>
+<div class="def"><span class="k">Definizione · macchina di Turing (Sipser)</span>
+<p>Una macchina di Turing è una settupla \(M = (Q, \Sigma, \Gamma, \delta, q_0, q_{\mathrm{accept}}, q_{\mathrm{reject}})\) dove</p>
+<ul>
+<li>\(Q\) è l'insieme finito degli stati;</li>
+<li>\(\Sigma\) è l'alfabeto di input, che non contiene il simbolo blank \(\sqcup\);</li>
+<li>\(\Gamma \supseteq \Sigma \cup \{\sqcup\}\) è l'alfabeto del nastro;</li>
+<li>\(\delta : Q \times \Gamma \to Q \times \Gamma \times \{L, R\}\) è la funzione di transizione;</li>
+<li>\(q_0\) è lo stato iniziale, \(q_{\mathrm{accept}}\) e \(q_{\mathrm{reject}}\) (distinti) gli stati di arresto.</li>
+</ul>
+</div>
+<p>\(\delta(q, a) = (r, b, L)\) significa: nello stato \(q\), leggendo \(a\) sotto la testina, scrivi \(b\), sposta la testina a sinistra e vai nello stato \(r\). All'inizio il nastro contiene l'input \(w\) nelle prime celle, il resto è blank, la testina è sulla prima cella e lo stato è \(q_0\). Se la testina è sulla prima cella e deve andare a sinistra, resta ferma. La macchina si ferma appena entra in \(q_{\mathrm{accept}}\) o \(q_{\mathrm{reject}}\).</p>
+
+<h3>Configurazioni</h3>
+<div class="def"><span class="k">Definizione · configurazione</span>
+<p>Una configurazione si scrive \(u\,q\,v\) con \(u, v \in \Gamma^*\), \(q \in Q\): il nastro contiene \(uv\) (seguito da blank), lo stato è \(q\), la testina è sul primo simbolo di \(v\).</p>
+<p>Passo di computazione (\(a, b, c \in \Gamma\)):</p>
+<ul>
+<li>\(ua\,q_i\,bv \;\vdash\; u\,q_j\,acv\) se \(\delta(q_i, b) = (q_j, c, L)\);</li>
+<li>\(ua\,q_i\,bv \;\vdash\; uac\,q_j\,v\) se \(\delta(q_i, b) = (q_j, c, R)\).</li>
+</ul>
+<p>La configurazione iniziale è \(q_0w\); quelle di accettazione e rifiuto contengono \(q_{\mathrm{accept}}\) e \(q_{\mathrm{reject}}\).</p>
+</div>
+<p>Le configurazioni sono importanti: nelle prove di indecidibilità (PCP, lezione 23) e nel teorema di Cook–Levin (lezione 25) le computazioni vengono rappresentate proprio come sequenze di configurazioni scritte come stringhe.</p>
+
+<h3>Riconoscere e decidere</h3>
+<p>Su un input \(w\) una macchina può <b>accettare</b>, <b>rifiutare</b> oppure <b>andare in loop</b> (non fermarsi mai).</p>
+<div class="def"><span class="k">Definizione</span>
+<ul>
+<li>\(M\) <b>riconosce</b> \(L\) se \(L = \{w : M \text{ accetta } w\}\). Sulle stringhe fuori da \(L\), \(M\) può rifiutare o andare in loop. \(L\) è <b>Turing-riconoscibile</b> (= ricorsivamente enumerabile).</li>
+<li>\(M\) <b>decide</b> \(L\) se la riconosce e in più si ferma su <b>ogni</b> input (è un <b>decisore</b>). \(L\) è <b>decidibile</b> (= ricorsivo).</li>
+</ul>
+</div>
+
+<h2>Esempi</h2>
+<div class="example"><span class="k">Esempio 1 · decisore per \(\{0^n1^n\}\)</span>
+<p>Strategia «a zig-zag»: marca il primo 0 con X, vai a destra fino al primo 1 e marcalo con Y, torna indietro fino alla X, spostati a destra e ripeti. Quando non trovi più 0, controlla che a destra ci siano solo Y e poi blank.</p>
+<ul>
+<li>\(q_0\): se legge 0, scrive X e va in \(q_1\); se legge Y, va in \(q_3\) (fase di controllo); se legge blank, accetta (stringa vuota).</li>
+<li>\(q_1\): scorre a destra su 0 e Y; al primo 1 scrive Y e va in \(q_2\) andando a sinistra.</li>
+<li>\(q_2\): scorre a sinistra su 0 e Y; alla X torna in \(q_0\) spostandosi a destra.</li>
+<li>\(q_3\): scorre a destra sulle Y; al blank accetta.</li>
+<li>Ogni combinazione non prevista porta in \(q_{\mathrm{reject}}\).</li>
+</ul>
+</div>
+<div data-w="tm-0n1n"></div>
+<p>Nota il costo: per ogni 0 la testina attraversa tutta la stringa, quindi circa \(n^2\) passi. Ci tornerà utile nella lezione 24.</p>
+
+<div class="example"><span class="k">Esempio 2 · \(\{0^{2^n} : n \ge 0\}\) (Sipser, esempio 3.7)</span>
+<p>A ogni passata la macchina cancella (barra con x) uno 0 sì e uno no, dimezzandone il numero. Se in una passata trova un solo 0, accetta; se trova un numero dispari maggiore di 1 di zeri, rifiuta. Il primo 0 viene sostituito con blank per riconoscere l'inizio del nastro al ritorno.</p>
+</div>
+<div data-w="tm-pow2"></div>
+
+<div class="example"><span class="k">Esempio 3 · una macchina che calcola: incremento binario</span>
+<p>Una macchina di Turing può anche <b>calcolare funzioni</b>: il risultato è il contenuto del nastro quando si ferma. Per sommare 1 a un numero binario si va in fondo al numero, poi si torna indietro trasformando gli 1 in 0 finché si trova uno 0 (o un blank), che diventa 1.</p>
+</div>
+<div data-w="tm-inc"></div>
+<p>(Questa macchina usa la mossa S = «resta fermo», che si simula con R seguito da L.)</p>
+
+<h2>Varianti equivalenti</h2>
+<p>Il modello è <b>robusto</b>: modifiche ragionevoli non cambiano la classe dei linguaggi riconosciuti. Questa robustezza è il primo indizio che la definizione cattura qualcosa di fondamentale.</p>
+
+<h3>Macchine multinastro</h3>
+<p>Una macchina con \(k\) nastri e \(k\) testine indipendenti: \(\delta : Q \times \Gamma^k \to Q \times \Gamma^k \times \{L, R, S\}^k\).</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Ogni macchina multinastro ha una macchina a un nastro equivalente.</p>
+</div>
+<div class="proof"><span class="k">Idea</span>
+<p>Si scrivono i \(k\) nastri uno dopo l'altro separati da #, marcando la posizione di ogni testina con un simbolo «puntato» (\(\dot a\)). Per simulare un passo la macchina scorre tutto il nastro per leggere i simboli puntati, poi lo riscorre per aggiornarli. Se un nastro deve allungarsi, si sposta a destra tutto quello che segue. Se la macchina multinastro fa \(t\) passi, la simulazione ne fa \(O(t^2)\).</p>
+</div>
+
+<h3>Macchine non deterministiche</h3>
+<p>\(\delta : Q \times \Gamma \to \mathcal P(Q \times \Gamma \times \{L, R\})\): ogni configurazione può avere più successori. La macchina accetta se <b>qualche</b> ramo dell'albero di computazione accetta.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Ogni macchina di Turing non deterministica ha una macchina deterministica equivalente.</p>
+</div>
+<div class="proof"><span class="k">Idea</span>
+<p>La macchina deterministica esplora l'albero delle computazioni <b>in ampiezza</b> (breadth-first). Usa tre nastri: uno con l'input (mai modificato), uno di simulazione, uno con l'«indirizzo» del ramo corrente (una stringa di scelte, elencate in ordine shortlex). Per ogni indirizzo ricopia l'input e simula quel ramo. Se un ramo accetta, accetta.</p>
+<p>Perché in ampiezza e non in profondità? Perché un ramo infinito bloccherebbe una visita in profondità, impedendo di trovare un ramo accettante che sta altrove. Il prezzo è un rallentamento <b>esponenziale</b>: se ogni configurazione ha al più \(b\) successori e il ramo accettante ha lunghezza \(t\), si esplorano fino a \(b^t\) rami.</p>
+</div>
+
+<h3>Enumeratori</h3>
+<p>Un <b>enumeratore</b> è una macchina con una stampante: parte con il nastro vuoto e stampa stringhe, possibilmente all'infinito. Il linguaggio enumerato è l'insieme delle stringhe stampate. Un linguaggio è Turing-riconoscibile se e solo se qualche enumeratore lo enumera (lezione 21).</p>
+
+<h3>Equivalenza con il linguaggio S</h3>
+<p>DSW (cap. 5–6) dimostra che le macchine di Turing calcolano esattamente le funzioni parzialmente calcolabili in S: un programma S si simula con una macchina (le variabili scritte in unario sul nastro), e una macchina si simula con un programma S (il contenuto del nastro codificato come numero, la transizione come funzione primitiva ricorsiva). DSW passa anche per un modello intermedio, i <b>programmi di Post–Turing</b>, scritti come programmi con istruzioni «sposta a destra», «scrivi», «se leggi \(a\) salta a».</p>
+<div data-w="models"></div>
+
+<h2>La tesi di Church–Turing</h2>
+<div class="def"><span class="k">Tesi di Church–Turing</span>
+<p>Le funzioni calcolabili da un algoritmo, nel senso intuitivo, sono esattamente quelle calcolabili da una macchina di Turing (equivalentemente: da un programma S, dalle funzioni parziali ricorsive, dal λ-calcolo).</p>
+</div>
+<p>Non è un teorema e non si può dimostrare: collega un concetto <b>informale</b> («algoritmo») a uno <b>formale</b>. È però sostenuta da prove molto forti:</p>
+<ul>
+<li>tutti i modelli proposti (Turing, Church, Kleene, Post, Markov, i linguaggi di programmazione, i computer reali con memoria illimitata) si sono rivelati <b>equivalenti</b>;</li>
+<li>l'analisi di Turing di che cosa può fare un calcolatore umano è convincente;</li>
+<li>in 90 anni nessuno ha trovato un procedimento effettivo che non sia simulabile da una macchina di Turing.</li>
+</ul>
+<p>Nella pratica la tesi permette di descrivere le macchine ad <b>alto livello</b> («la macchina, su input \(\langle G\rangle\), marca le variabili che generano stringhe terminali…») senza scrivere ogni transizione, con la certezza che la descrizione si può tradurre in una macchina. Il Sipser distingue tre livelli di descrizione: formale (la \(\delta\) completa), implementativo (come si muove la testina), ad alto livello (l'algoritmo). Allo scritto, salvo richiesta esplicita, basta l'alto livello.</p>
+
+<div class="remark"><span class="k">Codifiche</span>
+<p>Le macchine operano su stringhe. Per dare in input oggetti diversi (un grafo, una grammatica, un'altra macchina) si usa una codifica, scritta \(\langle O\rangle\). Come per i numeri di Gödel, il dettaglio della codifica non conta, purché sia ragionevole e decodificabile da una macchina. In particolare \(\langle M\rangle\), la codifica di una macchina, permette di dare macchine in input ad altre macchine: c'è una <b>macchina di Turing universale</b>, analoga al programma universale della lezione 19.</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Confondere «riconoscibile» con «decidibile»: un riconoscitore può non fermarsi sulle stringhe rifiutate.</li>
+<li>Simulare il non determinismo con una visita in profondità: un ramo infinito blocca la ricerca.</li>
+<li>Presentare la tesi di Church–Turing come un teorema dimostrato.</li>
+<li>Dimenticare, nelle descrizioni ad alto livello, di dire che cosa succede quando la macchina deve rifiutare (deve fermarsi, se si vuole un decisore).</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>TM = \((Q, \Sigma, \Gamma, \delta, q_0, q_{acc}, q_{rej})\), \(\delta : Q \times \Gamma \to Q \times \Gamma \times \{L, R\}\). Configurazioni \(u\,q\,v\).</li>
+<li>Riconosce: accetta esattamente \(L\). Decide: in più si ferma sempre.</li>
+<li>Multinastro, non deterministiche, enumeratori, programmi S: tutti equivalenti.</li>
+<li>Tesi di Church–Turing: algoritmo = macchina di Turing. Non dimostrabile, universalmente accettata.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Scrivi la sequenza di configurazioni del decisore per \(\{0^n1^n\}\) su input \(01\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(q_0\,01 \vdash X\,q_1\,1 \vdash q_2\,XY \vdash X\,q_0\,Y \vdash XY\,q_3 \sqcup \vdash XY\sqcup\,q_a\). Accetta.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Descrivi ad alto livello una macchina di Turing che decide \(\{w\#w : w \in \{0,1\}^*\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Ripeti: marca il primo simbolo non marcato a sinistra del #, ricordalo nello stato, vai al primo simbolo non marcato a destra del #, confrontalo (se diverso rifiuta), marcalo, torna indietro. Quando a sinistra non restano simboli non marcati, controlla che anche a destra non ne restino: se sì accetta, altrimenti rifiuta. (Se non c'è esattamente un #, rifiuta all'inizio.) È l'esempio 3.9 del Sipser.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Mostra che una macchina di Turing con nastro infinito in entrambe le direzioni è equivalente a quella standard.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Una direzione è ovvia (la standard è un caso particolare, con un marcatore a sinistra). Per l'altra si «piega» il nastro: si usa una macchina a due nastri, uno per la parte destra e uno per la parte sinistra letta al contrario, oppure un solo nastro con simboli-coppia (cella \(i\), cella \(-i\)) e uno stato che ricorda su quale metà si trova la testina.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Una macchina di Turing che non può scrivere (solo leggere e muoversi) è più potente di un DFA?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>No: riconosce solo linguaggi regolari (sono gli «automi a due vie», equivalenti ai DFA; teorema di Rabin–Scott/Shepherdson). La potenza delle macchine di Turing viene dalla possibilità di scrivere.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Mostra che un automa con <b>due pile</b> è equivalente a una macchina di Turing.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Una pila contiene la parte del nastro a sinistra della testina (cima = cella immediatamente a sinistra), l'altra la parte dalla testina in poi (cima = cella sotto la testina). Muovere la testina a destra = togliere dalla seconda pila e mettere sulla prima; a sinistra, viceversa; scrivere = sostituire la cima della seconda. All'inizio si copia l'input sulla seconda pila (passando per la prima per invertirne l'ordine). Viceversa, una TM simula facilmente due pile. Ecco perché il prodotto di due PDA non si può fare: darebbe potenza Turing.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci macchina di Turing, configurazione e passo di computazione.</summary><div>Settupla con \(\delta : Q \times \Gamma \to Q \times \Gamma \times \{L,R\}\). Configurazione \(u\,q\,v\). \(ua\,q_i\,bv \vdash u\,q_j\,acv\) se \(\delta(q_i,b) = (q_j,c,L)\); \(\vdash uac\,q_j\,v\) se la mossa è R.</div></details>
+<details><summary>Che differenza c'è tra riconoscere e decidere un linguaggio?</summary><div>Un riconoscitore accetta esattamente le stringhe di \(L\) ma può non fermarsi sulle altre; un decisore si ferma sempre.</div></details>
+<details><summary>Come si simula una MdT non deterministica con una deterministica? Perché in ampiezza?</summary><div>Visita in ampiezza dell'albero delle computazioni con un nastro di indirizzi; in profondità un ramo infinito bloccherebbe la ricerca. Costo esponenziale.</div></details>
+<details><summary>Cos'è la tesi di Church–Turing e perché non è un teorema?</summary><div>Afferma che le funzioni calcolabili da un algoritmo sono quelle calcolabili da una MdT. Non si dimostra perché «algoritmo» è un concetto informale; è sostenuta dall'equivalenza di tutti i modelli.</div></details>
+</section>

@@ -1,0 +1,152 @@
+<!--{"n":9,"mod":"B","title":"Grammatiche context-free","sipser":"§2.1 (PDF p. 120–130)","dsw":"§10.1–10.2 (PDF p. 288–304)","time":"3 ore","lead":"Le grammatiche generano stringhe riscrivendo simboli. Quelle context-free descrivono strutture annidate (parentesi, blocchi, espressioni) che gli automi finiti non possono gestire, e sono la base della sintassi dei linguaggi di programmazione."}-->
+
+<h2>Dal riconoscere al generare</h2>
+<p>Un automa è un dispositivo che <b>riconosce</b>: riceve una stringa e dice sì o no. Una grammatica è un dispositivo che <b>genera</b>: parte da un simbolo iniziale e applica regole di riscrittura finché ottiene una stringa. Il linguaggio della grammatica è l'insieme di tutte le stringhe che si possono generare.</p>
+<p>Lo hai già visto nella documentazione di qualunque linguaggio: la sintassi di Java è descritta con regole come <code>Statement → if ( Expression ) Statement else Statement</code>. È una grammatica context-free. Il parser del compilatore fa il percorso inverso: data una stringa (il codice), ricostruisce come la grammatica l'avrebbe generata.</p>
+
+<h2>Definizione</h2>
+<div class="def"><span class="k">Definizione · grammatica context-free (CFG)</span>
+<p>Una grammatica context-free è una quadrupla \(G = (V, \Sigma, R, S)\) dove</p>
+<ul>
+<li>\(V\) è un insieme finito di <b>variabili</b> (o simboli non terminali);</li>
+<li>\(\Sigma\) è un insieme finito di <b>terminali</b>, disgiunto da \(V\);</li>
+<li>\(R\) è un insieme finito di <b>regole</b> (produzioni) della forma \(A \to w\), con \(A \in V\) e \(w \in (V \cup \Sigma)^*\);</li>
+<li>\(S \in V\) è la <b>variabile iniziale</b>.</li>
+</ul>
+</div>
+<p>Per convenzione le variabili sono lettere maiuscole e i terminali minuscole o cifre. Più regole con lo stesso lato sinistro si abbreviano con la barra: \(A \to 0A1 \mid \varepsilon\) sta per le due regole \(A \to 0A1\) e \(A \to \varepsilon\).</p>
+<p><b>Perché «context-free»?</b> Perché il lato sinistro è una sola variabile: \(A\) si può riscrivere con \(w\) qualunque cosa ci sia intorno ad \(A\), indipendentemente dal <i>contesto</i>. Nella lezione 14 vedremo le grammatiche dipendenti dal contesto, in cui le regole hanno la forma \(\alpha A\beta \to \alpha\gamma\beta\).</p>
+
+<div class="def"><span class="k">Definizione · derivazione e linguaggio generato</span>
+<p>Se \(A \to w\) è una regola, si scrive \(uAv \Rightarrow uwv\) (« \(uAv\) <b>produce</b> \(uwv\) in un passo»). Si scrive \(u \Rightarrow^* v\) se \(v\) si ottiene da \(u\) con zero o più passi. Le stringhe di \((V \cup \Sigma)^*\) derivabili da \(S\) si chiamano <b>forme sentenziali</b>. Il linguaggio generato è
+\[L(G) = \{w \in \Sigma^* : S \Rightarrow^* w\}.\]
+Un linguaggio è <b>context-free</b> (CF) se è generato da qualche CFG.</p>
+</div>
+
+<h2>Primi esempi</h2>
+<div class="example"><span class="k">Esempio · \(\{a^nb^n : n \ge 0\}\)</span>
+<p>\(S \to aSb \mid \varepsilon\). La derivazione di \(aaabbb\) è
+\[S \Rightarrow aSb \Rightarrow aaSbb \Rightarrow aaaSbbb \Rightarrow aaabbb.\]
+Ogni applicazione di \(S \to aSb\) aggiunge una \(a\) a sinistra e una \(b\) a destra «in modo accoppiato»: è esattamente il tipo di vincolo che un automa finito non può imporre.</p>
+</div>
+<div data-w="cfg-anbn"></div>
+
+<div class="example"><span class="k">Esempio · parentesi bilanciate</span>
+<p>\(S \to (S) \mid SS \mid \varepsilon\). Una stringa bilanciata è vuota, oppure è una coppia di parentesi che racchiude una stringa bilanciata, oppure è la concatenazione di due stringhe bilanciate.</p>
+</div>
+<div data-w="cfg-par"></div>
+
+<div class="example"><span class="k">Esempio · palindromi su \(\{a, b\}\)</span>
+<p>\(S \to aSa \mid bSb \mid a \mid b \mid \varepsilon\). Le regole \(aSa\) e \(bSb\) costruiscono la stringa dall'esterno verso l'interno, aggiungendo lo stesso simbolo ai due estremi.</p>
+</div>
+
+<div class="example"><span class="k">Esempio · stesso numero di \(a\) e di \(b\)</span>
+<p>\(S \to aSbS \mid bSaS \mid \varepsilon\). Correttezza (idea): ogni stringa non vuota con lo stesso numero di \(a\) e \(b\) che inizia con \(a\) si spezza come \(a\,x\,b\,y\) dove \(b\) è la prima posizione in cui il conteggio torna in pari; \(x\) e \(y\) sono a loro volta bilanciate.</p>
+</div>
+<div data-w="cfg-eq"></div>
+
+<h2>Progettare una grammatica</h2>
+<p>Non c'è un algoritmo, ma ci sono strategie ricorrenti (Sipser, §2.1 «Designing context-free grammars»):</p>
+<ol>
+<li><b>Scomponi in unioni.</b> Se \(L = L_1 \cup L_2\), scrivi grammatiche con iniziali \(S_1\), \(S_2\) e aggiungi \(S \to S_1 \mid S_2\). Esempio: \(\{a^nb^n\} \cup \{b^na^n\}\).</li>
+<li><b>Accoppia simboli lontani</b> con regole «a panino»: \(S \to xSy\) genera \(x^n \dots y^n\). Esempio: \(\{a^ib^jc^k : i = j + k\}\): \(S \to aSc \mid T\), \(T \to aTb \mid \varepsilon\) (prima si accoppiano le \(a\) esterne con le \(c\), poi le restanti con le \(b\)).</li>
+<li><b>Linguaggi regolari</b>: trasforma il DFA in grammatica (vedi sotto).</li>
+<li><b>Strutture ricorsive</b> (espressioni, blocchi annidati): una variabile per ogni «categoria sintattica».</li>
+</ol>
+
+<h2>Alberi sintattici</h2>
+<p>Una derivazione dice in che ordine sono state applicate le regole; spesso però l'ordine non interessa, conta solo <b>quale regola</b> è stata usata per espandere <b>ogni</b> variabile. Questa informazione è un <b>albero sintattico</b> (parse tree):</p>
+<ul>
+<li>la radice è etichettata \(S\);</li>
+<li>ogni nodo interno è una variabile \(A\), e i suoi figli, da sinistra a destra, sono i simboli di \(w\) per qualche regola \(A \to w\) (un figlio \(\varepsilon\) se \(w = \varepsilon\));</li>
+<li>le foglie lette da sinistra a destra formano la stringa generata (il <b>prodotto</b> dell'albero).</li>
+</ul>
+<p>Molte derivazioni diverse corrispondono allo stesso albero: differiscono solo per l'ordine in cui si espandono variabili «indipendenti». Per avere una corrispondenza uno a uno si fissa un ordine: la <b>derivazione sinistra</b> espande sempre la variabile più a sinistra. Ogni albero corrisponde a esattamente una derivazione sinistra. Il simulatore sopra costruisce proprio derivazioni sinistre.</p>
+
+<h2>Ambiguità</h2>
+<div class="def"><span class="k">Definizione · grammatica ambigua</span>
+<p>Una grammatica \(G\) è <b>ambigua</b> se esiste una stringa \(w \in L(G)\) che ha <b>due alberi sintattici distinti</b> (equivalentemente, due derivazioni sinistre distinte).</p>
+</div>
+<p>L'ambiguità è un problema reale: l'albero sintattico è il «significato» della stringa. Con la grammatica \(E \to E + E \mid E * E \mid (E) \mid a\) la stringa \(a + a * a\) ha due alberi: uno corrisponde a \(a + (a * a)\), l'altro a \((a + a) * a\). Un compilatore che usasse questa grammatica non saprebbe quale calcolo fare. Prova: deriva \(a+a*a\) partendo una volta da \(E \to E+E\) e una volta da \(E \to E*E\).</p>
+<div data-w="cfg-amb"></div>
+<p>La soluzione è <b>stratificare</b> le precedenze con più variabili:
+\[E \to E + T \mid T, \qquad T \to T * F \mid F, \qquad F \to (E) \mid a.\]
+Ora un'espressione è una somma di termini, un termine è un prodotto di fattori: \(*\) lega più forte di \(+\), e entrambi associano a sinistra. Questa grammatica genera lo stesso linguaggio e non è ambigua.</p>
+<div class="remark"><span class="k">Ambiguità inerente</span>
+<p>A volte non si può rimediare: un linguaggio CF è <b>inerentemente ambiguo</b> se <i>ogni</i> grammatica che lo genera è ambigua. Esempio: \(\{a^ib^jc^k : i = j \text{ oppure } j = k\}\). Le stringhe \(a^nb^nc^n\) stanno in entrambe le parti e in qualunque grammatica avranno due alberi. Inoltre, decidere se una grammatica è ambigua è <b>indecidibile</b> (lezione 23).</p>
+</div>
+
+<h2>Linguaggi regolari e grammatiche</h2>
+<div class="thm"><span class="k">Teorema</span>
+<p>Ogni linguaggio regolare è context-free.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Sia \(M = (Q, \Sigma, \delta, q_0, F)\) un DFA con \(Q = \{q_0, \dots, q_k\}\). Introduciamo una variabile \(R_i\) per ogni stato \(q_i\), con iniziale \(R_0\), e le regole</p>
+<ul>
+<li>\(R_i \to aR_j\) per ogni transizione \(\delta(q_i, a) = q_j\);</li>
+<li>\(R_i \to \varepsilon\) per ogni \(q_i \in F\).</li>
+</ul>
+<p>Una derivazione \(R_0 \Rightarrow a_1R_{i_1} \Rightarrow a_1a_2R_{i_2} \Rightarrow \cdots\) simula passo per passo la computazione dell'automa: la forma sentenziale contiene sempre la parte letta seguita dalla variabile dello stato corrente. Si può terminare con \(\varepsilon\) solo in uno stato finale.</p>
+</div>
+<p>Le grammatiche ottenute hanno tutte le regole della forma \(A \to aB\), \(A \to a\) o \(A \to \varepsilon\): si chiamano <b>lineari a destra</b> o <b>regolari</b> (tipo 3 di Chomsky). Vale anche il viceversa: ogni grammatica lineare a destra genera un linguaggio regolare (variabili = stati di un NFA, \(A \to aB\) = transizione). DSW lo dimostra nel §10.2.</p>
+<p>L'inclusione è <b>stretta</b>: \(\{a^nb^n\}\) è CF ma non regolare.</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dimenticare il caso base (\(\varepsilon\) o la stringa minima) e ottenere una grammatica che non termina mai.</li>
+<li>Generare troppo: dopo aver scritto la grammatica, prova a derivare qualche stringa «sbagliata» per controllare che sia impossibile.</li>
+<li>Confondere derivazione e albero: l'ambiguità riguarda gli <b>alberi</b> (o le derivazioni sinistre), non le derivazioni qualsiasi.</li>
+<li>Dire che un <b>linguaggio</b> è ambiguo quando è la <b>grammatica</b> a esserlo.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>CFG = \((V, \Sigma, R, S)\), regole \(A \to w\). \(L(G) = \{w \in \Sigma^* : S \Rightarrow^* w\}\).</li>
+<li>Albero sintattico = struttura della derivazione; derivazioni sinistre ↔ alberi.</li>
+<li>Ambigua = qualche stringa ha due alberi. Si rimedia stratificando, salvo ambiguità inerente.</li>
+<li>Regolari ⊊ CF; le grammatiche lineari a destra generano esattamente i regolari.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Scrivi grammatiche per: (a) \(\{a^nb^{2n} : n \ge 0\}\); (b) \(\{w \in \{a,b\}^* : w \text{ ha lunghezza dispari}\}\); (c) \(\{a^ib^j : i \ge j\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) \(S \to aSbb \mid \varepsilon\). (b) \(S \to aaS \mid abS \mid baS \mid bbS \mid a \mid b\), oppure \(S \to XXS \mid X\), \(X \to a \mid b\). (c) \(S \to aSb \mid aS \mid \varepsilon\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Data \(S \to aSb \mid SS \mid \varepsilon\), scrivi una derivazione sinistra e l'albero sintattico di \(aabbab\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(S \Rightarrow SS \Rightarrow aSbS \Rightarrow aaSbbS \Rightarrow aabbS \Rightarrow aabbaSb \Rightarrow aabbab\). L'albero ha radice \(S\) con due figli \(S\): il primo genera \(aabb\) (due livelli di \(aSb\)), il secondo genera \(ab\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Scrivi una grammatica per \(\{a^ib^jc^k : i = j \text{ oppure } j = k\}\) e mostra che è ambigua.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(S \to S_1 \mid S_2\); \(S_1 \to XC\), \(X \to aXb \mid \varepsilon\), \(C \to cC \mid \varepsilon\) (caso \(i = j\)); \(S_2 \to AY\), \(A \to aA \mid \varepsilon\), \(Y \to bYc \mid \varepsilon\) (caso \(j = k\)). La stringa \(abc\) ha un albero che passa per \(S_1\) e uno che passa per \(S_2\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Trasforma in grammatica il DFA della lezione 3 per «termina con 01» e deriva \(1101\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(R_0 \to 0R_1 \mid 1R_0\), \(R_1 \to 0R_1 \mid 1R_2\), \(R_2 \to 0R_1 \mid 1R_0 \mid \varepsilon\). Derivazione: \(R_0 \Rightarrow 1R_0 \Rightarrow 11R_0 \Rightarrow 110R_1 \Rightarrow 1101R_2 \Rightarrow 1101\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Scrivi una grammatica per il complemento di \(\{a^nb^n : n \ge 0\}\) su \(\{a,b\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Il complemento contiene le stringhe che non sono della forma \(a^*b^*\) (cioè contengono \(ba\)) e quelle \(a^ib^j\) con \(i \neq j\).</p>
+<p>\(S \to T \mid U\). Stringhe con \(ba\): \(T \to X\,ba\,X\), \(X \to aX \mid bX \mid \varepsilon\). Stringhe \(a^ib^j\), \(i \neq j\): \(U \to aUb \mid A \mid B\), \(A \to aA \mid a\), \(B \to bB \mid b\) (dopo aver accoppiato, resta almeno una \(a\) o almeno una \(b\) in più).</p>
+<p>Curiosità: il complemento di un CF non è sempre CF (lezione 13), ma in questo caso lo è.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci grammatica context-free, derivazione e linguaggio generato.</summary><div>\((V, \Sigma, R, S)\) con regole \(A \to w\); \(uAv \Rightarrow uwv\) se \(A \to w \in R\); \(L(G) = \{w \in \Sigma^* : S \Rightarrow^* w\}\).</div></details>
+<details><summary>Perché si chiamano «context-free»?</summary><div>Perché il lato sinistro di ogni regola è una sola variabile: la riscrittura non dipende dal contesto in cui la variabile si trova.</div></details>
+<details><summary>Cos'è una grammatica ambigua? Esempio e rimedio.</summary><div>Una stringa con due alberi sintattici. \(E \to E+E \mid E*E \mid a\) con \(a+a*a\). Rimedio: stratificare (\(E \to E+T \mid T\), \(T \to T*F \mid F\), \(F \to (E) \mid a\)).</div></details>
+<details><summary>Dimostra che i regolari sono context-free.</summary><div>Dal DFA: variabile \(R_i\) per stato, \(R_i \to aR_j\) se \(\delta(q_i,a) = q_j\), \(R_i \to \varepsilon\) se \(q_i\) finale, iniziale \(R_0\).</div></details>
+</section>

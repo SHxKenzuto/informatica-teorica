@@ -1,0 +1,258 @@
+<!--{"n":1,"mod":"0","title":"Insiemi, funzioni, stringhe e dimostrazioni","sipser":"cap. 0, §0.2–0.4 (PDF p. 22–45)","dsw":"cap. 1 (PDF p. 20–33)","time":"2–3 ore","lead":"Il vocabolario e gli attrezzi di tutto il corso. Ogni definizione che incontri qui tornerà decine di volte: all'orale una definizione imprecisa costa più di un esercizio sbagliato."}-->
+
+<h2>Perché si parte da qui</h2>
+<p>L'informatica teorica studia <b>cosa si può calcolare</b>, <b>con quali risorse</b> e <b>con quali modelli di macchina</b>. Per farlo in modo rigoroso dobbiamo descrivere problemi, macchine e calcoli con oggetti matematici precisi: insiemi, funzioni, stringhe, linguaggi. Non serve matematica avanzata, ma serve <b>precisione</b>: la differenza tra «una stringa» e «un insieme di stringhe», o tra una funzione totale e una parziale, è spesso proprio il punto della domanda d'esame.</p>
+<p>In questa lezione rivediamo le nozioni di base e, soprattutto, le tre tecniche di dimostrazione che userai in tutto il corso: costruzione, assurdo, induzione.</p>
+
+<h2>Insiemi</h2>
+<p>Un <b>insieme</b> è una collezione di oggetti, detti <b>elementi</b>, in cui non contano né l'ordine né le ripetizioni: \(\{1,2,3\} = \{3,1,2\} = \{1,1,2,3\}\). Si scrive \(a \in A\) per «\(a\) appartiene ad \(A\)» e \(a \notin A\) altrimenti.</p>
+<p>Un insieme si può descrivere <b>per elencazione</b>, \(\{0, 2, 4, 6\}\), oppure <b>per proprietà</b>: \(\{n \in \mathbb{N} : n \text{ è pari}\}\). In DSW, e in questo corso, \(\mathbb{N} = \{0, 1, 2, \dots\}\) contiene lo zero.</p>
+
+<div class="def"><span class="k">Definizione · inclusione e uguaglianza</span>
+<p>\(A \subseteq B\) (\(A\) è sottoinsieme di \(B\)) se ogni elemento di \(A\) è anche elemento di \(B\). \(A \subsetneq B\) se in più \(A \neq B\). Due insiemi sono uguali, \(A = B\), se e solo se \(A \subseteq B\) e \(B \subseteq A\).</p>
+</div>
+<p>L'ultima frase è anche il <b>metodo</b> per dimostrare che due insiemi sono uguali: si prende un elemento generico del primo e si mostra che sta nel secondo, poi viceversa. Lo userai per dimostrare, per esempio, che un automa riconosce esattamente un certo linguaggio: ogni stringa accettata sta nel linguaggio <i>e</i> ogni stringa del linguaggio è accettata.</p>
+
+<h3>Operazioni</h3>
+<ul>
+<li><b>Unione</b> \(A \cup B = \{x : x \in A \text{ oppure } x \in B\}\).</li>
+<li><b>Intersezione</b> \(A \cap B = \{x : x \in A \text{ e } x \in B\}\).</li>
+<li><b>Differenza</b> \(A \setminus B = \{x \in A : x \notin B\}\) (nel Sipser si scrive anche \(A - B\)).</li>
+<li><b>Complemento</b> \(\overline{A} = U \setminus A\), dove \(U\) è l'universo di riferimento (per i linguaggi sarà \(\Sigma^*\)).</li>
+<li><b>Insieme vuoto</b> \(\emptyset\): non ha elementi ed è sottoinsieme di ogni insieme.</li>
+</ul>
+<p>Valgono le <b>leggi di De Morgan</b>: \(\overline{A \cup B} = \overline{A} \cap \overline{B}\) e \(\overline{A \cap B} = \overline{A} \cup \overline{B}\). Le useremo per esempio per dire: «se una classe di linguaggi è chiusa per unione e complemento, allora è chiusa anche per intersezione».</p>
+
+<div class="def"><span class="k">Definizione · insieme delle parti e prodotto cartesiano</span>
+<p>L'<b>insieme delle parti</b> \(\mathcal{P}(A)\) è l'insieme di tutti i sottoinsiemi di \(A\). Se \(A\) ha \(n\) elementi, \(\mathcal{P}(A)\) ne ha \(2^n\).</p>
+<p>Il <b>prodotto cartesiano</b> \(A \times B = \{(a,b) : a \in A,\ b \in B\}\) è l'insieme delle <b>coppie ordinate</b>. Più in generale \(A_1 \times \dots \times A_k\) è l'insieme delle \(k\)-uple, e \(A^k = A \times \dots \times A\).</p>
+</div>
+
+<div class="example"><span class="k">Esempio</span>
+<p>Con \(A = \{0, 1\}\): \(\mathcal{P}(A) = \{\emptyset, \{0\}, \{1\}, \{0,1\}\}\), che ha \(2^2 = 4\) elementi. \(A \times A = \{(0,0), (0,1), (1,0), (1,1)\}\).</p>
+<p>Perché \(|\mathcal{P}(A)| = 2^n\)? Un sottoinsieme si costruisce decidendo, per ciascuno degli \(n\) elementi, se prenderlo o no: \(n\) scelte binarie indipendenti, quindi \(2^n\) possibilità.</p>
+</div>
+
+<div class="warn"><span class="k">Trappole classiche</span>
+<ul>
+<li>\(\emptyset \neq \{\emptyset\}\): il primo ha zero elementi, il secondo ne ha uno (che è l'insieme vuoto).</li>
+<li>In una coppia l'ordine conta: \((1,2) \neq (2,1)\), mentre \(\{1,2\} = \{2,1\}\).</li>
+<li>Gli stati di un NFA trasformato in DFA saranno elementi di \(\mathcal{P}(Q)\): insiemi di stati. \(\emptyset\) sarà uno stato legittimo.</li>
+</ul>
+</div>
+
+<h2>Relazioni</h2>
+<p>Una <b>relazione binaria</b> su \(A\) è un sottoinsieme \(R \subseteq A \times A\); si scrive \(x\,R\,y\) per \((x,y) \in R\). Le proprietà importanti sono:</p>
+<ul>
+<li><b>riflessiva</b>: \(x\,R\,x\) per ogni \(x \in A\);</li>
+<li><b>simmetrica</b>: \(x\,R\,y \Rightarrow y\,R\,x\);</li>
+<li><b>transitiva</b>: \(x\,R\,y\) e \(y\,R\,z \Rightarrow x\,R\,z\).</li>
+</ul>
+<div class="def"><span class="k">Definizione · relazione di equivalenza</span>
+<p>Una relazione riflessiva, simmetrica e transitiva. La <b>classe di equivalenza</b> di \(x\) è \([x] = \{y : x\,R\,y\}\). Le classi sono a due a due disgiunte e la loro unione è \(A\): l'equivalenza <b>partiziona</b> l'insieme.</p>
+</div>
+<div class="example"><span class="k">Esempio · congruenza modulo 3</span>
+<p>Su \(\mathbb{N}\), \(x \equiv y \pmod 3\) se \(x\) e \(y\) danno lo stesso resto nella divisione per 3. È di equivalenza, con tre classi: \([0] = \{0,3,6,\dots\}\), \([1] = \{1,4,7,\dots\}\), \([2] = \{2,5,8,\dots\}\).</p>
+<p>Invece \(x\,R\,y \iff |x - y| \le 1\) è riflessiva e simmetrica ma non transitiva: \(0\,R\,1\), \(1\,R\,2\) ma non \(0\,R\,2\).</p>
+</div>
+<p>Le relazioni di equivalenza torneranno nella lezione 8: il teorema di Myhill–Nerode dice che un linguaggio è regolare se e solo se una certa equivalenza tra stringhe ha un numero finito di classi, e le classi sono esattamente gli stati del DFA minimo.</p>
+
+<h2>Funzioni totali e parziali</h2>
+<div class="def"><span class="k">Definizione · funzione</span>
+<p>Una funzione \(f : A \to B\) associa a ogni elemento del <b>dominio</b> \(A\) un unico elemento del <b>codominio</b> \(B\). L'<b>immagine</b> è \(f(A) = \{f(a) : a \in A\}\).</p>
+<ul>
+<li><b>iniettiva</b>: \(a \neq a' \Rightarrow f(a) \neq f(a')\);</li>
+<li><b>suriettiva</b>: per ogni \(b \in B\) esiste \(a\) con \(f(a) = b\);</li>
+<li><b>biiettiva</b> (corrispondenza biunivoca): iniettiva e suriettiva. Allora esiste l'inversa \(f^{-1}\).</li>
+</ul>
+</div>
+
+<div class="def"><span class="k">Definizione · funzione parziale</span>
+<p>Una funzione <b>parziale</b> da \(A\) a \(B\) è definita solo su un sottoinsieme di \(A\). Si scrive \(f(x)\!\downarrow\) se \(f\) è definita in \(x\) e \(f(x)\!\uparrow\) se non lo è. Una funzione definita ovunque si dice <b>totale</b>.</p>
+</div>
+<p>Questo concetto è il cuore della seconda metà del corso. Un programma, su un certo input, può <b>non terminare</b>. La funzione che il programma calcola è allora <b>indefinita</b> su quell'input. Per questo il programma del corso parla di funzioni «calcolabili» (totali) e «parzialmente calcolabili» (possibilmente parziali).</p>
+
+<div class="example"><span class="k">Esempi su \(\mathbb{N}\)</span>
+<ul>
+<li>\(f(n) = 2n\): totale, iniettiva, non suriettiva (i dispari non sono raggiunti).</li>
+<li>\(g(n) = \lfloor n/2 \rfloor\): totale, suriettiva, non iniettiva (\(g(4) = g(5) = 2\)).</li>
+<li>\(h(n) = n - 1\): <b>parziale</b>, perché \(h(0)\!\uparrow\) (il risultato \(-1\) non è in \(\mathbb{N}\)).</li>
+<li>La <b>sottrazione troncata</b> di DSW, \(x \mathbin{\dot-} y = x - y\) se \(x \ge y\), altrimenti \(0\): totale. Il predecessore troncato \(n \mathbin{\dot-} 1\) è la versione totale di \(h\).</li>
+</ul>
+</div>
+
+<div class="def"><span class="k">Definizione · predicato (convenzione DSW)</span>
+<p>Un <b>predicato</b> su \(\mathbb{N}^n\) è una funzione <b>totale</b> \(P : \mathbb{N}^n \to \{0, 1\}\), dove 1 significa VERO e 0 significa FALSO. Per esempio \(\mathrm{Pari}(x) = 1\) se \(x\) è pari, 0 altrimenti.</p>
+</div>
+
+<h2>Alfabeti, stringhe e linguaggi</h2>
+<div class="def"><span class="k">Definizione · alfabeto e stringa</span>
+<p>Un <b>alfabeto</b> \(\Sigma\) è un insieme <b>finito e non vuoto</b> di simboli, per esempio \(\Sigma = \{0,1\}\) o \(\Sigma = \{a, b, c\}\). Una <b>stringa</b> (o parola) su \(\Sigma\) è una sequenza finita di simboli di \(\Sigma\). La <b>lunghezza</b> \(|w|\) è il numero di simboli. La <b>stringa vuota</b> \(\varepsilon\) ha lunghezza 0.</p>
+</div>
+<ul>
+<li><b>Concatenazione</b>: se \(x = a_1 \dots a_m\) e \(y = b_1 \dots b_n\), allora \(xy = a_1 \dots a_m b_1 \dots b_n\). È associativa, non commutativa, e \(\varepsilon\) è l'elemento neutro: \(\varepsilon w = w \varepsilon = w\).</li>
+<li><b>Potenza</b>: \(w^0 = \varepsilon\), \(w^{k+1} = w^k w\). Per esempio \((ab)^3 = ababab\).</li>
+<li><b>Prefisso, suffisso, sottostringa</b>: \(x\) è prefisso di \(w\) se \(w = xy\) per qualche \(y\); suffisso se \(w = yx\); sottostringa se \(w = uxv\).</li>
+<li><b>Inversa</b> \(w^R\), definita per ricorsione: \(\varepsilon^R = \varepsilon\) e \((wa)^R = a\,w^R\) per \(a \in \Sigma\). Una stringa è <b>palindroma</b> se \(w = w^R\).</li>
+<li>\(\#_a(w)\) indica il numero di occorrenze del simbolo \(a\) in \(w\).</li>
+</ul>
+
+<div class="def"><span class="k">Definizione · \(\Sigma^*\) e linguaggio</span>
+<p>\(\Sigma^*\) è l'insieme di <b>tutte</b> le stringhe su \(\Sigma\), compresa \(\varepsilon\); \(\Sigma^+ = \Sigma^* \setminus \{\varepsilon\}\). Un <b>linguaggio</b> su \(\Sigma\) è un qualunque sottoinsieme \(L \subseteq \Sigma^*\), finito o infinito.</p>
+</div>
+<p>Un linguaggio è il modo formale di descrivere un <b>problema di decisione</b>: «questo numero è primo?» diventa «la stringa che lo rappresenta appartiene al linguaggio dei primi?». Ogni domanda sì/no sugli input diventa una domanda di appartenenza a un linguaggio. Per questo in tutto il corso «riconoscere un linguaggio» e «risolvere un problema» sono la stessa cosa.</p>
+
+<h3>Operazioni sui linguaggi</h3>
+<p>Oltre alle operazioni insiemistiche (\(\cup, \cap, \setminus\), complemento rispetto a \(\Sigma^*\)) si usano:</p>
+<ul>
+<li><b>Concatenazione</b>: \(L_1 L_2 = \{xy : x \in L_1,\ y \in L_2\}\).</li>
+<li><b>Potenza</b>: \(L^0 = \{\varepsilon\}\), \(L^{k+1} = L^k L\).</li>
+<li><b>Stella di Kleene</b>: \(L^* = \bigcup_{k \ge 0} L^k = \{x_1 x_2 \cdots x_k : k \ge 0,\ x_i \in L\}\). Contiene sempre \(\varepsilon\) (il caso \(k = 0\)).</li>
+<li>\(L^+ = L L^* = \bigcup_{k \ge 1} L^k\).</li>
+</ul>
+
+<div class="example"><span class="k">Esempio</span>
+<p>Con \(L_1 = \{\varepsilon, a\}\) e \(L_2 = \{b, ab\}\):</p>
+<p>\(L_1 L_2 = \{b, ab, ab, aab\} = \{b, ab, aab\}\) (la ripetizione conta una volta sola).</p>
+<p>\(L_2 L_1 = \{b, ba, ab, aba\}\), diverso da \(L_1 L_2\): la concatenazione non è commutativa.</p>
+<p>\(L_1^* = \{a\}^* = \{\varepsilon, a, aa, aaa, \dots\}\).</p>
+</div>
+
+<div data-w="langops"></div>
+
+<div class="warn"><span class="k">Le tre trappole che compaiono allo scritto</span>
+<ul>
+<li>\(L\,\emptyset = \emptyset\,L = \emptyset\): per formare \(xy\) serve una \(y \in \emptyset\), che non esiste.</li>
+<li>\(L\,\{\varepsilon\} = L\): attaccare la stringa vuota non cambia nulla.</li>
+<li>\(\emptyset^* = \{\varepsilon\}\), perché \(L^0 = \{\varepsilon\}\) per qualunque \(L\).</li>
+</ul>
+<p>In breve: \(\emptyset\) è lo «zero» della concatenazione, \(\{\varepsilon\}\) è l'«uno».</p>
+</div>
+
+<h3>Ordinamento per lunghezza (shortlex)</h3>
+<p>Fissato un ordine sui simboli di \(\Sigma\), le stringhe si ordinano <b>prima per lunghezza</b> e, a parità di lunghezza, <b>alfabeticamente</b>: per \(\Sigma = \{0,1\}\) si ottiene \(\varepsilon, 0, 1, 00, 01, 10, 11, 000, \dots\). È il modo di <b>elencare</b> \(\Sigma^*\) in una successione in cui ogni stringa compare in una posizione finita (l'ordine alfabetico puro non funzionerebbe: \(0, 00, 000, \dots\) non arriverebbe mai a \(1\)). Questo elenco è la base degli enumeratori e del dovetailing (lezione 21).</p>
+
+<h2>Tecniche di dimostrazione</h2>
+<p>Una dimostrazione è un argomento che convince <b>chiunque</b> conosca le definizioni, senza bisogno di «fidarsi». Allo scritto non serve un formalismo eccessivo, ma ogni passaggio deve essere giustificato da una definizione o da un risultato già noto.</p>
+
+<h3>Dimostrazione per costruzione</h3>
+<p>Per dimostrare che un oggetto esiste, lo si <b>costruisce</b> esplicitamente e si verifica che ha le proprietà richieste. Quasi tutte le dimostrazioni sugli automi sono di questo tipo: «i linguaggi regolari sono chiusi per unione» si dimostra costruendo, a partire da due automi, un automa per l'unione.</p>
+
+<h3>Dimostrazione per assurdo</h3>
+<p>Si suppone che la tesi sia <b>falsa</b> e si deduce una contraddizione. È la tecnica del pumping lemma e di tutte le prove di indecidibilità.</p>
+<div class="thm"><span class="k">Proposizione</span>
+<p>Non esiste \(w \in \{0,1\}^*\) tale che \(0w = w1\).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Supponiamo per assurdo che una tale \(w\) esista. Contiamo gli zeri dei due lati: \(\#_0(0w) = \#_0(w) + 1\), mentre \(\#_0(w1) = \#_0(w)\). Due stringhe uguali hanno lo stesso numero di zeri, quindi \(\#_0(w) + 1 = \#_0(w)\), cioè \(1 = 0\). Contraddizione.</p>
+</div>
+
+<div class="thm"><span class="k">Proposizione (classico)</span>
+<p>\(\sqrt{2}\) non è razionale.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Per assurdo \(\sqrt 2 = m/n\) con la frazione ridotta ai minimi termini. Allora \(m^2 = 2n^2\), quindi \(m^2\) è pari e quindi \(m\) è pari: \(m = 2k\). Sostituendo, \(4k^2 = 2n^2\), cioè \(n^2 = 2k^2\), quindi anche \(n\) è pari. Ma allora \(m\) e \(n\) hanno il fattore comune 2, contro l'ipotesi che la frazione fosse ridotta.</p>
+</div>
+
+<h3>Dimostrazione per induzione</h3>
+<p>Per dimostrare che una proprietà \(P(n)\) vale per ogni \(n \in \mathbb{N}\):</p>
+<ol>
+<li><b>Base</b>: si dimostra \(P(0)\) (o \(P(1)\), dipende da dove si parte).</li>
+<li><b>Passo induttivo</b>: si suppone \(P(n)\) vera (<b>ipotesi induttiva</b>) e si dimostra \(P(n+1)\).</li>
+</ol>
+<p>Nell'<b>induzione forte</b> nel passo si può supporre vera \(P(k)\) per <i>tutti</i> i \(k \le n\). Sulle stringhe si fa di solito induzione sulla <b>lunghezza</b>, o equivalentemente sulla struttura: caso \(\varepsilon\) e caso \(wa\).</p>
+
+<div class="thm"><span class="k">Proposizione</span>
+<p>Per ogni \(u, v \in \Sigma^*\) vale \((uv)^R = v^R u^R\).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Fissiamo \(u\) e procediamo per induzione su \(|v|\), usando la definizione ricorsiva \(\varepsilon^R = \varepsilon\), \((wa)^R = a\,w^R\).</p>
+<p><b>Base</b>, \(v = \varepsilon\): \((u\varepsilon)^R = u^R = \varepsilon\, u^R = \varepsilon^R u^R\).</p>
+<p><b>Passo</b>: sia \(v = wa\) con \(a \in \Sigma\), e supponiamo \((uw)^R = w^R u^R\). Allora
+\[(u\,wa)^R = ((uw)a)^R = a\,(uw)^R = a\,w^R u^R = (wa)^R u^R = v^R u^R,\]
+dove il secondo e il quarto passaggio usano la definizione di \(^R\) e il terzo l'ipotesi induttiva.</p>
+</div>
+
+<div class="thm"><span class="k">Proposizione</span>
+<p>Se \(|\Sigma| = k\), il numero di stringhe di lunghezza esattamente \(n\) è \(k^n\).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Induzione su \(n\). Base: c'è una sola stringa di lunghezza 0, cioè \(\varepsilon\), e \(k^0 = 1\). Passo: ogni stringa di lunghezza \(n+1\) si scrive in modo unico come \(wa\) con \(|w| = n\) e \(a \in \Sigma\); per ipotesi induttiva ci sono \(k^n\) scelte per \(w\) e \(k\) per \(a\), quindi \(k^n \cdot k = k^{n+1}\).</p>
+</div>
+
+<div class="remark"><span class="k">Lo schema da ricordare</span>
+<p><b>Definizione ricorsiva → dimostrazione per induzione sulla stessa struttura.</b> Funziona per le stringhe (caso \(\varepsilon\), caso \(wa\)), per le espressioni regolari (lezione 7), per gli alberi sintattici (lezione 9) e per le funzioni primitive ricorsive (lezione 16).</p>
+</div>
+
+<h3>Errori frequenti nelle dimostrazioni</h3>
+<ul>
+<li><b>Dimostrare un esempio invece del caso generale</b>: «per \(w = 0110\) funziona» non dimostra niente per tutte le \(w\).</li>
+<li><b>Usare la tesi nel passo induttivo</b>: si può usare solo l'ipotesi induttiva, sul caso più piccolo.</li>
+<li><b>Dimenticare la base</b>, oppure partire da una base sbagliata (\(n = 1\) quando l'enunciato vale da \(n = 0\)).</li>
+<li><b>Nell'assurdo, non dire dove sta la contraddizione</b>: va scritta esplicitamente.</li>
+</ul>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Uguaglianza di insiemi = doppia inclusione. \(|\mathcal P(A)| = 2^{|A|}\).</li>
+<li>Le relazioni di equivalenza partizionano l'insieme in classi.</li>
+<li>Funzioni parziali: \(f(x)\!\uparrow\) quando non è definita; sono il modello dei programmi che non terminano.</li>
+<li>Linguaggio = insieme di stringhe = problema di decisione. \(L\emptyset = \emptyset\), \(L\{\varepsilon\} = L\), \(\emptyset^* = \{\varepsilon\}\).</li>
+<li>Tre tecniche: costruzione, assurdo, induzione.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Siano \(A = \{1,2,3\}\) e \(B = \{2,4\}\). Calcola \(A \cup B\), \(A \cap B\), \(A \setminus B\), \(A \times B\) e \(\mathcal P(B)\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(A \cup B = \{1,2,3,4\}\); \(A \cap B = \{2\}\); \(A \setminus B = \{1,3\}\).</p>
+<p>\(A \times B = \{(1,2),(1,4),(2,2),(2,4),(3,2),(3,4)\}\): 6 coppie, cioè \(3 \cdot 2\).</p>
+<p>\(\mathcal P(B) = \{\emptyset, \{2\}, \{4\}, \{2,4\}\}\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Siano \(L_1 = \{\varepsilon, a\}\) e \(L_2 = \{b, ab\}\). Calcola \(L_1^2\), \(L_2^2\) ed elenca le stringhe di \(L_2^*\) di lunghezza al più 3.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(L_1^2 = \{\varepsilon, a, aa\}\) (da \(\varepsilon\varepsilon, \varepsilon a, a\varepsilon, aa\)).</p>
+<p>\(L_2^2 = \{bb, bab, abb, abab\}\).</p>
+<p>\(L_2^*\) fino a lunghezza 3: \(\varepsilon, b, ab, bb, abb, bab, bbb\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Vero o falso? Dimostra o trova un controesempio: per ogni coppia di linguaggi, \((L_1 \cup L_2)^* = L_1^* \cup L_2^*\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Falso. Con \(L_1 = \{a\}\) e \(L_2 = \{b\}\): \(ab \in (L_1 \cup L_2)^*\) (concatenazione di \(a\) e \(b\)), ma \(ab \notin \{a\}^* \cup \{b\}^*\), perché le stringhe di quest'ultimo contengono un solo tipo di lettera.</p>
+<p>Vale però sempre l'inclusione \(L_1^* \cup L_2^* \subseteq (L_1 \cup L_2)^*\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che per ogni linguaggio \(L\) vale \((L^*)^* = L^*\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\supseteq\): ogni insieme \(M\) è contenuto in \(M^*\) (prendi \(k = 1\)), quindi \(L^* \subseteq (L^*)^*\).</p>
+<p>\(\subseteq\): sia \(w \in (L^*)^*\). Allora \(w = y_1 \cdots y_k\) con ogni \(y_i \in L^*\), e ogni \(y_i\) è a sua volta concatenazione di stringhe di \(L\). Quindi \(w\) è una concatenazione (finita) di stringhe di \(L\), cioè \(w \in L^*\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra per induzione che se \(|\Sigma| = k \ge 2\) il numero di stringhe di lunghezza <b>al più</b> \(n\) è \(\dfrac{k^{n+1} - 1}{k - 1}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Base \(n = 0\): c'è solo \(\varepsilon\), e \((k - 1)/(k - 1) = 1\).</p>
+<p>Passo: le stringhe di lunghezza al più \(n+1\) sono quelle di lunghezza al più \(n\) più quelle di lunghezza esattamente \(n+1\), che sono \(k^{n+1}\). Per ipotesi induttiva il totale è
+\[\frac{k^{n+1} - 1}{k - 1} + k^{n+1} = \frac{k^{n+1} - 1 + k^{n+2} - k^{n+1}}{k-1} = \frac{k^{n+2} - 1}{k - 1}.\]</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Esiste \(w \in \{a,b\}^*\) tale che \(ab\,w = w\,ba\)? Se sì, descrivi tutte le soluzioni.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Sì: \(w = a\) funziona (\(aba = aba\)). Anche \(w = aba\): \(ababa = ababa\). In generale le soluzioni sono \(w = a(ba)^n\) per \(n \ge 0\).</p>
+<p>Idea: \(w = \varepsilon\) non va bene (\(ab \neq ba\)). Se \(|w| \le 2\) si verifica a mano che l'unica soluzione è \(a\). Se \(|w| \ge 3\), confrontando i primi due simboli dei due lati \(w\) deve iniziare con \(ab\): \(w = ab\,w'\). Sostituendo, \(ab\,ab\,w' = ab\,w'\,ba\), cioè \(ab\,w' = w'\,ba\): la stessa equazione con una stringa più corta di 2. Per induzione sulla lunghezza le soluzioni sono \(a, aba, ababa, \dots\), cioè \(a(ba)^n\).</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Che differenza c'è tra \(\varepsilon\), \(\emptyset\) e \(\{\varepsilon\}\)?</summary><div>\(\varepsilon\) è una stringa (di lunghezza 0); \(\emptyset\) è il linguaggio che non contiene stringhe; \(\{\varepsilon\}\) è il linguaggio che contiene solo la stringa vuota. Infatti \(L\emptyset = \emptyset\) ma \(L\{\varepsilon\} = L\).</div></details>
+<details><summary>Cos'è una funzione parziale e perché è importante in questo corso?</summary><div>Una funzione definita solo su una parte del dominio. I programmi possono non terminare: la funzione che calcolano è indefinita su quegli input. Le funzioni parzialmente calcolabili sono l'oggetto centrale della teoria della calcolabilità.</div></details>
+<details><summary>Perché un linguaggio rappresenta un problema?</summary><div>Ogni problema di decisione (risposta sì/no) si codifica come l'insieme delle stringhe che codificano le istanze con risposta sì. Risolvere il problema equivale a decidere l'appartenenza a quel linguaggio.</div></details>
+<details><summary>Come è strutturata una dimostrazione per induzione su stringhe?</summary><div>Si definisce l'oggetto ricorsivamente (caso \(\varepsilon\), caso \(wa\)), si dimostra la tesi per \(\varepsilon\) e poi, assumendola per \(w\), la si dimostra per \(wa\).</div></details>
+</section>

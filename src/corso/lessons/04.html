@@ -1,0 +1,139 @@
+<!--{"n":4,"mod":"A","title":"Macchine sequenziali (Mealy e Moore)","sipser":"Problemi 1.24–1.25 (trasduttori)","dsw":"non trattate: questa lezione è la fonte principale","time":"2 ore","lead":"Automi che non si limitano a dire sì o no: per ogni simbolo letto producono un simbolo in uscita. Sono nel programma della Federico II («automi finiti e macchine sequenziali») ma quasi assenti dai due libri, quindi qui le trattiamo per intero."}-->
+
+<h2>Da riconoscitori a trasduttori</h2>
+<p>Un DFA è un <b>riconoscitore</b>: legge tutto l'input e alla fine dà una sola risposta. Molti dispositivi reali invece <b>trasformano</b> un flusso di simboli in un altro flusso, simbolo per simbolo: un circuito che segnala quando arriva una certa sequenza di bit, un sommatore seriale, un controllore di semaforo che a ogni impulso di clock decide quali luci accendere. Questi dispositivi si chiamano <b>macchine sequenziali</b> o <b>trasduttori a stati finiti</b>.</p>
+<p>Il nome «sequenziale» viene dall'elettronica digitale: una rete sequenziale è un circuito con memoria (flip-flop), in contrasto con una rete combinatoria la cui uscita dipende solo dall'ingresso corrente. Ci sono due modelli classici, che differiscono per il punto in cui si «attacca» l'uscita.</p>
+
+<h2>Macchina di Mealy</h2>
+<div class="def"><span class="k">Definizione · macchina di Mealy</span>
+<p>Una macchina di Mealy è una sestupla \(M = (Q, \Sigma, \Delta, \delta, \lambda, q_0)\) dove</p>
+<ul>
+<li>\(Q\) è un insieme finito di stati, \(q_0\) lo stato iniziale;</li>
+<li>\(\Sigma\) è l'alfabeto di input, \(\Delta\) l'alfabeto di <b>output</b>;</li>
+<li>\(\delta : Q \times \Sigma \to Q\) è la funzione di transizione;</li>
+<li>\(\lambda : Q \times \Sigma \to \Delta\) è la <b>funzione di uscita</b>.</li>
+</ul>
+<p>Leggendo \(a_1 a_2 \cdots a_n\) a partire da \(q_0\) la macchina attraversa gli stati \(r_0 = q_0, r_{i+1} = \delta(r_i, a_{i+1})\) e produce l'uscita \(\lambda(r_0, a_1)\,\lambda(r_1, a_2) \cdots \lambda(r_{n-1}, a_n)\): <b>una stringa di \(n\) simboli</b>.</p>
+</div>
+<p>Nei diagrammi ogni arco si etichetta \(a/b\): «leggo \(a\), scrivo \(b\)». L'uscita dipende quindi dallo <b>stato e dal simbolo letto</b>. Non ci sono stati finali: la macchina non accetta né rifiuta, traduce.</p>
+<p>La macchina calcola una funzione \(f_M : \Sigma^* \to \Delta^*\) che <b>conserva la lunghezza</b> e che è <b>sequenziale</b>: il \(k\)-esimo simbolo d'uscita dipende solo dai primi \(k\) simboli d'ingresso. In particolare, se \(x\) è prefisso di \(y\) allora \(f_M(x)\) è prefisso di \(f_M(y)\).</p>
+
+<h3>Esempio 1: rilevatore di 11</h3>
+<p>Vogliamo scrivere 1 ogni volta che gli ultimi due simboli letti sono 11, altrimenti 0. Basta ricordare se l'ultimo simbolo letto è 1: stato \(A\) («l'ultimo non è 1», anche all'inizio) e stato \(B\) («l'ultimo è 1»). Da \(B\) leggendo 1 si completa la coppia: si scrive 1.</p>
+<div data-w="mealy-11"></div>
+<p>Su \(0111011\) l'uscita è \(0011001\): le posizioni 3, 4 e 7 chiudono una coppia di 1 consecutivi.</p>
+
+<h3>Esempio 2: rilevatore di 101 con sovrapposizioni</h3>
+<p>Ora la sequenza da cercare è \(101\), e vogliamo contare anche le occorrenze sovrapposte (in \(10101\) ce ne sono due). Gli stati ricordano il più lungo suffisso del prefisso letto che è anche un prefisso di \(101\):</p>
+<ul>
+<li>\(S_0\): nessun progresso; \(S_1\): ho visto «1»; \(S_2\): ho visto «10».</li>
+<li>Da \(S_2\) leggendo 1 la sequenza è completa: si scrive 1. Il nuovo stato è \(S_1\), perché l'ultimo «1» può essere l'inizio di una nuova occorrenza. È qui che si gestisce la sovrapposizione.</li>
+<li>Da \(S_2\) leggendo 0 si ottiene «100»: nessun suffisso utile, si torna a \(S_0\).</li>
+<li>Da \(S_1\) leggendo 1 si resta in \(S_1\) («11»: l'ultimo 1 è ancora un inizio).</li>
+</ul>
+<div data-w="mealy-101"></div>
+<p>È lo stesso ragionamento che si usa per progettare un DFA che riconosce «termina con 101»: la macchina di Mealy segnala in ogni istante se il prefisso letto finora sta in quel linguaggio.</p>
+
+<h3>Esempio 3: parità progressiva</h3>
+<p>A ogni passo la macchina scrive la parità del numero di 1 letti fino a quel momento (0 = pari, 1 = dispari). Due stati, \(P\) e \(D\).</p>
+<div data-w="mealy-par"></div>
+
+<h2>Macchina di Moore</h2>
+<div class="def"><span class="k">Definizione · macchina di Moore</span>
+<p>Una macchina di Moore è \(M = (Q, \Sigma, \Delta, \delta, \lambda, q_0)\) come sopra, ma con \(\lambda : Q \to \Delta\): l'uscita dipende <b>solo dallo stato</b>. Leggendo \(a_1 \cdots a_n\) produce \(\lambda(r_0)\,\lambda(r_1) \cdots \lambda(r_n)\): <b>\(n+1\) simboli</b>, perché c'è anche l'uscita dello stato iniziale, prima di leggere qualunque cosa.</p>
+</div>
+<p>Nei diagrammi l'uscita si scrive dentro lo stato, come «\(q/b\)». In elettronica la differenza è importante: in una Moore l'uscita cambia solo quando cambia lo stato (sincrona col clock), in una Mealy può cambiare appena cambia l'ingresso.</p>
+
+<div class="example"><span class="k">Esempio · il rilevatore di 11 come Moore</span>
+<p>Servono tre stati: \(A/0\) («l'ultimo non è 1»), \(B/0\) («l'ultimo è 1 ma non il penultimo»), \(C/1\) («gli ultimi due sono 11»). Transizioni: con 0 si va sempre in \(A\); con 1 da \(A\) si va in \(B\), da \(B\) in \(C\), da \(C\) in \(C\).</p>
+<p>Su \(0111011\) l'uscita è \(0\,0011001\): il primo 0 è l'uscita di \(A\) prima di leggere, il resto coincide con l'uscita della Mealy.</p>
+<p>Nota che la Moore ha bisogno di uno stato in più: l'informazione «ho appena completato 11», che nella Mealy stava sull'arco, ora deve stare in uno stato.</p>
+</div>
+
+<h2>Equivalenza tra Mealy e Moore</h2>
+<p>Siccome una Moore produce un simbolo in più, l'equivalenza si intende <b>a meno del primo simbolo</b>: \(M\) Moore e \(M'\) Mealy sono equivalenti se per ogni input \(w\) vale \(f_M(w) = \lambda(q_0)\, f_{M'}(w)\).</p>
+
+<div class="thm"><span class="k">Teorema</span>
+<p>Per ogni macchina di Moore esiste una macchina di Mealy equivalente con lo stesso numero di stati, e per ogni macchina di Mealy esiste una macchina di Moore equivalente con al più \(|Q| \cdot |\Delta|\) stati (più eventualmente uno stato iniziale).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p><b>Da Moore a Mealy.</b> Si tengono gli stessi stati e la stessa \(\delta\), e si sposta l'uscita dallo stato d'arrivo all'arco: \(\lambda'(q, a) = \lambda(\delta(q, a))\). Leggendo \(a_{i+1}\) da \(r_i\) la Mealy scrive \(\lambda(r_{i+1})\), cioè esattamente l'\((i+2)\)-esimo simbolo della Moore.</p>
+<p><b>Da Mealy a Moore.</b> Gli stati diventano coppie \((q, b) \in Q \times \Delta\): «sono in \(q\) e l'ultima uscita prodotta è \(b\)». Si pone
+\[\delta'((q,b), a) = (\delta(q,a),\ \lambda(q,a)), \qquad \lambda'((q,b)) = b.\]
+Come stato iniziale si prende \((q_0, b_0)\) con \(b_0 \in \Delta\) qualsiasi: produrrà il primo simbolo «di scarto». Per induzione sul numero di passi, dopo aver letto \(a_1 \cdots a_i\) la Moore è in \((r_i, \lambda(r_{i-1}, a_i))\) e quindi emette lo stesso simbolo della Mealy.</p>
+</div>
+<p>Nella pratica si costruiscono solo le coppie raggiungibili: per il rilevatore di 11 si ottengono proprio i tre stati dell'esempio sopra (\((A,0)\), \((B,0)\), \((B,1)\), cioè \(A\), \(B\), \(C\)).</p>
+
+<h2>Relazione con i DFA</h2>
+<ul>
+<li>Un DFA \((Q, \Sigma, \delta, q_0, F)\) <b>è</b> una macchina di Moore con \(\Delta = \{0, 1\}\) e \(\lambda(q) = 1\) se e solo se \(q \in F\). Leggendo \(w\) l'uscita dice, prefisso per prefisso, se il prefisso letto sta in \(L\); l'ultimo simbolo è la risposta del DFA su \(w\).</li>
+<li>Viceversa, per ogni Mealy e ogni simbolo \(b\), l'insieme delle stringhe la cui <b>ultima</b> uscita è \(b\) è un linguaggio regolare: basta un DFA che simula la macchina e ricorda l'ultima uscita.</li>
+<li>Come per i DFA, una macchina sequenziale ha memoria finita: non può, per esempio, scrivere 1 quando il numero di 0 letti finora è uguale al numero di 1 (servirebbe un contatore illimitato).</li>
+</ul>
+
+<h2>Un esempio classico: il sommatore seriale</h2>
+<p>Due numeri binari si sommano bit per bit partendo dal meno significativo. L'input è una sequenza di coppie di bit \((x_i, y_i)\), quindi \(\Sigma = \{00, 01, 10, 11\}\), l'output è il bit di somma. L'unica cosa da ricordare è il <b>riporto</b>: due stati, \(R_0\) e \(R_1\).</p>
+<div class="tblwrap"><table class="data">
+<tr><th>stato</th><th>00</th><th>01</th><th>10</th><th>11</th></tr>
+<tr><td>\(R_0\) (riporto 0)</td><td>\(R_0\) / 0</td><td>\(R_0\) / 1</td><td>\(R_0\) / 1</td><td>\(R_1\) / 0</td></tr>
+<tr><td>\(R_1\) (riporto 1)</td><td>\(R_0\) / 1</td><td>\(R_1\) / 0</td><td>\(R_1\) / 0</td><td>\(R_1\) / 1</td></tr>
+</table></div>
+<p>Per sommare \(6 = 110\) e \(3 = 011\) si danno in input dal bit meno significativo le coppie \(01, 11, 10\), poi \(00\) per far uscire l'ultimo riporto: uscita \(1, 0, 0, 1\), cioè \(1001 = 9\) letto al contrario.</p>
+<p>La moltiplicazione invece <b>non</b> si può fare con una macchina sequenziale: richiederebbe di ricordare una quantità di informazione che cresce con la lunghezza dei numeri.</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dimenticare che la Moore emette un simbolo prima di leggere: le uscite sono \(n+1\), non \(n\).</li>
+<li>Nella conversione Mealy → Moore, scrivere l'uscita dello stato di <i>partenza</i> invece di quella dell'arco che porta nello stato.</li>
+<li>Nei rilevatori di sequenza, tornare sempre allo stato iniziale dopo una rilevazione: così si perdono le occorrenze sovrapposte.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Mealy: \(\lambda : Q \times \Sigma \to \Delta\), uscita sugli archi, \(n\) simboli in uscita.</li>
+<li>Moore: \(\lambda : Q \to \Delta\), uscita sugli stati, \(n + 1\) simboli in uscita.</li>
+<li>Moore → Mealy: \(\lambda'(q,a) = \lambda(\delta(q,a))\), stessi stati. Mealy → Moore: stati \((q, b)\), fino a \(|Q|\cdot|\Delta|\).</li>
+<li>Un DFA è una Moore con uscita 1 negli stati finali.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Progetta una macchina di Mealy su \(\Sigma = \Delta = \{0,1\}\) che complementa ogni bit (scrive 1 quando legge 0 e viceversa). Quanti stati servono?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Uno solo: un cappio con etichette \(0/1\) e \(1/0\). L'uscita dipende solo dal simbolo corrente, non serve memoria.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Progetta una Mealy che scrive in ogni istante il simbolo letto al passo precedente (un «ritardo» di un passo), scrivendo 0 al primo passo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Due stati \(Z\) («l'ultimo letto è 0», anche iniziale) e \(U\) («l'ultimo letto è 1»). Da qualunque stato, leggendo \(a\) si va nello stato che ricorda \(a\) e si scrive il simbolo ricordato dallo stato di partenza: \(Z \xrightarrow{0/0} Z\), \(Z \xrightarrow{1/0} U\), \(U \xrightarrow{0/1} Z\), \(U \xrightarrow{1/1} U\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Trasforma in una macchina di Moore la Mealy della parità progressiva (stati \(P\), \(D\)).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Coppie raggiungibili: \((P, 0)\) iniziale, \((D, 1)\), \((P,0)\) di nuovo… In questo caso l'uscita prodotta entrando in uno stato è sempre la stessa (si entra in \(P\) sempre scrivendo 0, in \(D\) sempre scrivendo 1), quindi bastano due stati: \(P/0\) e \(D/1\), con le stesse transizioni. È il caso fortunato in cui la Mealy è «già una Moore».</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Progetta una Mealy che legge un numero binario dal bit più significativo e, in ogni istante, scrive 1 se il prefisso letto è divisibile per 3 e 0 altrimenti.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Stessi stati del DFA della lezione 3 (\(r_0, r_1, r_2\), resto modulo 3). Sull'arco \(r_i \xrightarrow{b} r_j\) con \(j = (2i + b) \bmod 3\) si scrive 1 se \(j = 0\), altrimenti 0. Su \(110\) (6) l'uscita è \(0, 1, 1\): 1 non è multiplo, 3 sì, 6 sì.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che nessuna macchina sequenziale su \(\{0,1\}\) può scrivere 1 esattamente quando il prefisso letto contiene tanti 0 quanti 1.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Se una tale macchina con \(k\) stati esistesse, il linguaggio delle stringhe con ultima uscita 1, cioè \(\{w : \#_0(w) = \#_1(w)\}\) (con \(w \neq \varepsilon\)), sarebbe regolare. Ma questo linguaggio non è regolare (lezione 8). Più direttamente: dopo \(0^i\) per \(i = 0, \dots, k\) la macchina è in \(k+1\) stati, quindi due coincidono, \(0^i\) e \(0^j\) con \(i \neq j\); allora dopo \(0^i 1^i\) e \(0^j 1^i\) è nello stesso stato e scrive lo stesso simbolo, ma il primo prefisso è bilanciato e il secondo no.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Che differenza c'è tra una macchina di Mealy e una di Moore?</summary><div>In Mealy l'uscita è associata alle transizioni, \(\lambda : Q \times \Sigma \to \Delta\); in Moore agli stati, \(\lambda : Q \to \Delta\). Su \(n\) simboli una Mealy produce \(n\) uscite, una Moore \(n+1\).</div></details>
+<details><summary>Come trasformi una Moore in una Mealy?</summary><div>Stessi stati e transizioni, \(\lambda'(q, a) = \lambda(\delta(q,a))\).</div></details>
+<details><summary>Come trasformi una Mealy in una Moore? Quanti stati servono?</summary><div>Stati \((q,b)\) con \(b\) ultima uscita: \(\delta'((q,b),a) = (\delta(q,a), \lambda(q,a))\), \(\lambda'((q,b)) = b\). Al più \(|Q| \cdot |\Delta|\) stati.</div></details>
+<details><summary>Che relazione c'è tra un DFA e una macchina di Moore?</summary><div>Un DFA è una Moore con \(\Delta = \{0,1\}\) e uscita 1 negli stati finali; l'ultima uscita è la risposta del DFA.</div></details>
+</section>

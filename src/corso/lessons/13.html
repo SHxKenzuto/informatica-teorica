@@ -1,0 +1,144 @@
+<!--{"n":13,"mod":"B","title":"Pumping lemma per i CF e proprietà di chiusura","sipser":"§2.3 (PDF p. 144–150)","dsw":"§10.4–10.5 (PDF p. 306–320)","time":"3–4 ore","lead":"Anche le grammatiche hanno un limite: un albero sintattico abbastanza alto ripete una variabile, e quella ripetizione si può pompare. Con questo strumento si dimostra che un linguaggio non è context-free."}-->
+
+<h2>L'intuizione</h2>
+<p>Per gli automi finiti la ripetizione era uno <b>stato</b> lungo il cammino. Per le grammatiche è una <b>variabile</b> lungo un ramo dell'albero sintattico. Se una stringa è molto lunga, il suo albero è alto; un ramo lungo contiene più nodi di quante siano le variabili; quindi qualche variabile \(R\) compare due volte sullo stesso ramo.</p>
+<p>Ma allora il sottoalbero radicato nella \(R\) più alta si può sostituire con quello della \(R\) più bassa (si «sgonfia») o viceversa (si «gonfia» ripetendo il pezzo intermedio). Il pezzo che si ripete produce due parti della stringa, una a sinistra e una a destra della \(R\) più bassa: per questo nei CF si pompano <b>due</b> pezzi contemporaneamente.</p>
+
+<h2>L'enunciato</h2>
+<div class="thm"><span class="k">Pumping lemma per i linguaggi context-free</span>
+<p>Se \(L\) è context-free, esiste \(p \ge 1\) tale che ogni \(s \in L\) con \(|s| \ge p\) si può scrivere \(s = uvxyz\) con</p>
+<ol>
+<li>\(uv^ixy^iz \in L\) per ogni \(i \ge 0\);</li>
+<li>\(|vy| \ge 1\) (almeno uno tra \(v\) e \(y\) non è vuoto);</li>
+<li>\(|vxy| \le p\).</li>
+</ol>
+</div>
+
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Sia \(G\) una grammatica per \(L\), \(b \ge 2\) il numero massimo di simboli nel lato destro di una regola. Un albero di altezza \(h\) ha al più \(b^h\) foglie. Poniamo \(p = b^{|V| + 1}\).</p>
+<p>Sia \(s \in L\) con \(|s| \ge p\) e scegliamo un albero sintattico per \(s\) con il <b>minimo numero di nodi</b>. Poiché ha almeno \(b^{|V|+1}\) foglie, la sua altezza è almeno \(|V| + 1\). Il cammino più lungo dalla radice a una foglia ha almeno \(|V| + 2\) nodi, di cui uno solo (la foglia) è terminale: almeno \(|V| + 1\) variabili. Per il principio dei cassetti una variabile \(R\) si ripete tra le ultime \(|V| + 1\) variabili del cammino.</p>
+<p>Chiamiamo \(T_1\) il sottoalbero della \(R\) più alta e \(T_2\) quello della \(R\) più bassa. Il prodotto di \(T_2\) è \(x\); quello di \(T_1\) è \(vxy\); tutta la stringa è \(uvxyz\).</p>
+<ul>
+<li><b>Condizione 1</b>: sostituendo \(T_2\) al posto di \(T_1\) si ottiene un albero valido per \(uxz\) (\(i = 0\)); sostituendo \(T_1\) al posto di \(T_2\), ripetutamente, si ottengono alberi per \(uv^ixy^iz\).</li>
+<li><b>Condizione 2</b>: se \(v\) e \(y\) fossero entrambe vuote, l'albero per \(uxz\) (con \(T_2\) al posto di \(T_1\)) genererebbe \(s\) con meno nodi, contro la minimalità.</li>
+<li><b>Condizione 3</b>: abbiamo scelto la ripetizione tra le ultime \(|V| + 1\) variabili del cammino più lungo, quindi \(T_1\) ha altezza al più \(|V| + 1\) e il suo prodotto \(vxy\) ha al più \(b^{|V|+1} = p\) simboli.</li>
+</ul>
+</div>
+
+<h2>Come si usa</h2>
+<p>Lo schema è lo stesso del caso regolare, con una differenza importante: la scomposizione \(uvxyz\) può stare <b>ovunque</b> nella stringa (il vincolo \(|vxy| \le p\) dice quanto è larga la finestra, non dove sta). Quindi di solito bisogna <b>ragionare per casi</b> sulla posizione della finestra \(vxy\).</p>
+<ol>
+<li>L'avversario sceglie \(p\).</li>
+<li>Tu scegli \(s \in L\), \(|s| \ge p\).</li>
+<li>L'avversario sceglie \(uvxyz\) con \(|vxy| \le p\), \(|vy| \ge 1\): consideri tutti i casi.</li>
+<li>Per ogni caso scegli \(i\) con \(uv^ixy^iz \notin L\).</li>
+</ol>
+<div data-w="pump-cf"></div>
+
+<h2>Esempi svolti</h2>
+<div class="example"><span class="k">Esempio 1 · \(L = \{a^nb^nc^n : n \ge 0\}\)</span>
+<p>Sia \(s = a^pb^pc^p\). Sia \(s = uvxyz\) con \(|vxy| \le p\) e \(|vy| \ge 1\). Due casi:</p>
+<ul>
+<li><b>\(v\) e \(y\) contengono ciascuna un solo tipo di simbolo.</b> Poiché \(|vxy| \le p\), la finestra non può toccare sia le \(a\) sia le \(c\) (tra loro ci sono \(p\) \(b\)). Quindi almeno uno dei tre simboli non compare in \(v\) né in \(y\). Con \(i = 2\) il numero di quel simbolo resta \(p\), mentre almeno un altro cresce (perché \(|vy| \ge 1\)): i tre conteggi non sono più uguali.</li>
+<li><b>\(v\) oppure \(y\) contiene due tipi di simbolo.</b> Con \(i = 2\), \(v^2\) o \(y^2\) contiene un \(b\) prima di un \(a\), o un \(c\) prima di un \(b\): la stringa non è più della forma \(a^*b^*c^*\).</li>
+</ul>
+<p>In ogni caso \(uv^2xy^2z \notin L\).</p>
+</div>
+
+<div class="example"><span class="k">Esempio 2 · \(L = \{ww : w \in \{0,1\}^*\}\)</span>
+<p>La scelta di \(s\) qui è delicata. La stringa \(0^p1\,0^p1\), che funzionava per i regolari, <b>non</b> va bene: l'avversario sceglie \(u = 0^{p-1}\), \(v = 0\), \(x = 1\), \(y = 0\), \(z = 0^{p-1}1\), e ottiene \(uv^ixy^iz = 0^{p-1+i}1\,0^{p-1+i}1\), che è sempre della forma \(ww\). Serve una stringa in cui la finestra \(vxy\) non possa «toccare» contemporaneamente le parti corrispondenti delle due metà.</p>
+<p>Scegliamo \(s = 0^p1^p0^p1^p\). Casi sulla posizione di \(vxy\) (larga al più \(p\)):</p>
+<ul>
+<li>\(vxy\) sta nella prima metà: con \(i = 0\) la stringa si accorcia e il punto di metà si sposta a sinistra; la seconda metà inizia allora con un 1 mentre la prima inizia con 0. Non è \(ww\).</li>
+<li>\(vxy\) sta nella seconda metà: simmetrico (la prima metà finisce con 0, la seconda con 1).</li>
+<li>\(vxy\) è a cavallo del centro: è contenuta in \(1^p0^p\). Con \(i = 0\) si ottiene \(0^p1^j0^k1^p\) con \(j < p\) oppure \(k < p\), che non è \(ww\).</li>
+</ul>
+</div>
+<div class="remark"><span class="k">Morale</span>
+<p>\(\{ww\}\) non è CF, mentre \(\{ww^R\}\) lo è. La pila confronta «a specchio», non «in parallelo». Ed è per questo che i linguaggi di programmazione non possono esprimere con la sola grammatica vincoli come «ogni variabile usata è dichiarata»: si controllano in una fase successiva (analisi semantica).</p>
+</div>
+
+<div class="example"><span class="k">Esempio 3 · \(L = \{a^ib^jc^k : 0 \le i \le j \le k\}\)</span>
+<p>\(s = a^pb^pc^p\). Se \(vxy\) non contiene \(a\): togliendo (\(i = 0\)) si diminuiscono \(b\) o \(c\); se diminuiscono le \(b\), allora \(a^p\) supera le \(b\); se diminuiscono solo le \(c\), le \(b\) superano le \(c\). Se \(vxy\) contiene \(a\): non contiene \(c\) (la finestra è troppo corta); pompando su (\(i = 2\)) crescono le \(a\) (e forse le \(b\)) ma non le \(c\), che vengono superate. In ogni caso si esce da \(L\). (Esempio 2.37 del Sipser.)</p>
+</div>
+
+<h2>Proprietà di chiusura dei CF</h2>
+<div class="thm"><span class="k">Teorema</span>
+<p>I linguaggi context-free sono chiusi per unione, concatenazione, stella di Kleene e intersezione con un linguaggio regolare. Non sono chiusi per intersezione né per complemento.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Siano \(G_1, G_2\) grammatiche con variabili iniziali \(S_1, S_2\) e variabili disgiunte; \(S\) è una variabile nuova.</p>
+<ul>
+<li><b>Unione</b>: \(S \to S_1 \mid S_2\).</li>
+<li><b>Concatenazione</b>: \(S \to S_1S_2\).</li>
+<li><b>Stella</b>: \(S \to S_1S \mid \varepsilon\).</li>
+<li><b>Intersezione con un regolare</b>: prodotto tra un PDA e un DFA (lezione 12).</li>
+<li><b>Intersezione: no.</b> \(L_1 = \{a^nb^nc^m\}\) e \(L_2 = \{a^mb^nc^n\}\) sono CF (concatenazioni di \(\{a^nb^n\}\) e \(c^*\), e simile), ma \(L_1 \cap L_2 = \{a^nb^nc^n\}\) non lo è.</li>
+<li><b>Complemento: no.</b> Se lo fossero, per De Morgan \(L_1 \cap L_2 = \overline{\overline{L_1} \cup \overline{L_2}}\) sarebbe CF per ogni coppia di CF, contro il punto precedente.</li>
+</ul>
+</div>
+<p>Il motivo intuitivo del fallimento dell'intersezione: il prodotto di due PDA richiederebbe <b>due pile</b>, e un automa con due pile è potente quanto una macchina di Turing.</p>
+
+<h3>Usare le chiusure</h3>
+<div class="example"><span class="k">Esempio</span>
+<p>\(L = \{w \in \{a,b,c\}^* : \#_a(w) = \#_b(w) = \#_c(w)\}\) non è CF: se lo fosse, lo sarebbe \(L \cap a^*b^*c^* = \{a^nb^nc^n\}\).</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Considerare solo il caso in cui \(vxy\) sta all'inizio della stringa: nei CF la finestra può essere ovunque.</li>
+<li>Dimenticare il caso in cui \(v\) o \(y\) mescolano due simboli diversi.</li>
+<li>Pompare solo \(v\) o solo \(y\): si pompano entrambi con lo stesso esponente.</li>
+<li>Dire che i CF sono chiusi per intersezione «perché i regolari lo sono»: per i CF vale solo l'intersezione con un regolare.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Pumping CF: \(s = uvxyz\), \(|vy| \ge 1\), \(|vxy| \le p\), \(uv^ixy^iz \in L\).</li>
+<li>Viene dalla ripetizione di una variabile su un ramo lungo dell'albero sintattico.</li>
+<li>Non CF: \(a^nb^nc^n\), \(ww\), \(a^ib^jc^k\) con \(i \le j \le k\).</li>
+<li>CF chiusi per \(\cup\), concatenazione, \(^*\), \(\cap\) con regolari; non per \(\cap\) e complemento.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che \(\{a^nb^nc^n\}\) e \(\{a^nb^n\}\) si comportano in modo diverso nel gioco del pumping: trova, per \(\{a^nb^n\}\), una scomposizione di \(a^pb^p\) che resiste a ogni \(i\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(v = a\), \(x = \varepsilon\), \(y = b\), a cavallo del centro: \(uv^ixy^iz = a^{p-1+i}b^{p-1+i} \in L\) per ogni \(i\). È la ripetizione della regola \(S \to aSb\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(L = \{a^{n^2} : n \ge 0\}\) non è CF.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(s = a^{p^2}\). \(1 \le |vy| \le p\). Con \(i = 2\): \(p^2 < p^2 + |vy| \le p^2 + p < (p+1)^2\). Non è un quadrato.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(L = \{a^ib^jc^id^j : i, j \ge 0\}\) non è CF.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(s = a^pb^pc^pd^p\). \(vxy\) è larga al più \(p\), quindi tocca al più due blocchi consecutivi. Se \(v\) o \(y\) mescola due simboli, \(i = 2\) rompe l'ordine. Altrimenti si pompano al più due blocchi adiacenti: \(a\) e \(b\), oppure \(b\) e \(c\), oppure \(c\) e \(d\), o uno solo. In ogni caso uno dei vincoli \(\#a = \#c\) o \(\#b = \#d\) viene violato, perché i blocchi accoppiati (\(a\) con \(c\), \(b\) con \(d\)) non sono adiacenti e non possono crescere insieme.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che i CF sono chiusi per l'operazione \(\mathrm{rev}(L) = \{w^R : w \in L\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Si rovescia il lato destro di ogni regola: \(A \to w\) diventa \(A \to w^R\). Per induzione sulla lunghezza delle derivazioni, \(A \Rightarrow^* x\) nella vecchia grammatica se e solo se \(A \Rightarrow^* x^R\) nella nuova.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Sia \(L = \{w \in \{a,b\}^* : \#_a(w) = 2\,\#_b(w)\}\). È CF? E \(L' = \{w \in \{a,b,c\}^* : \#_a(w) = \#_b(w) \text{ e } \#_b(w) = \#_c(w)\}\)?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(L\) è CF: un PDA tiene in pila l'eccesso con segno (ogni \(a\) vale \(+1\), ogni \(b\) vale \(-2\)), come nel PDA per «stesso numero di 0 e 1» della lezione 11.</p>
+<p>\(L'\) non è CF: \(L' \cap a^*b^*c^* = \{a^nb^nc^n\}\).</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Enuncia il pumping lemma per i CF e spiega da dove viene.</summary><div>\(\exists p\ \forall s \in L, |s| \ge p\ \exists uvxyz\): \(|vy| \ge 1\), \(|vxy| \le p\), \(\forall i\ uv^ixy^iz \in L\). Viene da un albero sintattico alto: sul cammino più lungo una variabile si ripete; il pezzo tra le due occorrenze si può ripetere o togliere.</div></details>
+<details><summary>Dimostra che \(\{a^nb^nc^n\}\) non è CF.</summary><div>\(s = a^pb^pc^p\); \(vxy\) tocca al più due tipi di simbolo; se \(v\) o \(y\) mescolano simboli, \(i = 2\) rompe l'ordine; altrimenti un simbolo resta a \(p\) mentre un altro cresce.</div></details>
+<details><summary>I CF sono chiusi per intersezione? E per complemento?</summary><div>No: \(\{a^nb^nc^m\} \cap \{a^mb^nc^n\} = \{a^nb^nc^n\}\). Non per complemento, altrimenti per De Morgan lo sarebbero per intersezione. Sono però chiusi per intersezione con un regolare.</div></details>
+<details><summary>Perché \(\{ww^R\}\) è CF e \(\{ww\}\) no?</summary><div>La pila confronta in ordine inverso; per \(ww\) servirebbe confrontare nello stesso ordine. Formalmente: pumping lemma con \(s = 0^p1^p0^p1^p\).</div></details>
+</section>

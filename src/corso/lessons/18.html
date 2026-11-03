@@ -1,0 +1,135 @@
+<!--{"n":18,"mod":"C","title":"Funzioni di accoppiamento e numeri di Gödel","dsw":"§3.8 (PDF p. 78), §4.1 (PDF p. 84)","time":"2–3 ore","lead":"Codificare coppie, sequenze e interi programmi come singoli numeri naturali. È l'idea che permette a un programma di ricevere un altro programma come dato, e quindi di parlare di programmi che analizzano programmi."}-->
+
+<h2>Perché codificare</h2>
+<p>Le funzioni del linguaggio S prendono numeri e restituiscono numeri. Per parlare di «un programma che riceve come input un altro programma» dobbiamo poter rappresentare un programma come un <b>numero</b>. Prima di arrivarci servono due strumenti: codificare una <b>coppia</b> di numeri in un numero, e codificare una <b>sequenza</b> finita di numeri in un numero. Tutte le codifiche devono essere <b>biiettive</b> (o almeno iniettive) e le funzioni di codifica e decodifica devono essere <b>primitive ricorsive</b>, così da poterle usare dentro i programmi.</p>
+<p>Lo hai visto in pratica ogni volta che un file eseguibile viene salvato su disco: un programma è una sequenza di byte, cioè un numero (enorme) in base 256. Gödel ebbe la stessa idea nel 1931 per codificare formule matematiche come numeri, e la usò per costruire una formula che «parla di sé stessa».</p>
+
+<h2>Funzione di accoppiamento</h2>
+<div class="def"><span class="k">Definizione</span>
+<p>\[\langle x, y \rangle = 2^x(2y + 1) - 1.\]</p>
+</div>
+<div class="thm"><span class="k">Teorema</span>
+<p>\(\langle x, y\rangle\) è una biiezione \(\mathbb N \times \mathbb N \to \mathbb N\), primitiva ricorsiva. Le funzioni inverse \(l(z)\) e \(r(z)\), con \(z = \langle l(z), r(z)\rangle\), sono primitive ricorsive.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p><b>Biiezione.</b> Ogni intero positivo \(z + 1\) si scrive in modo unico come \(2^x \cdot d\) con \(d\) dispari (\(x\) è il numero di fattori 2), e ogni dispari si scrive in modo unico come \(d = 2y + 1\). Quindi per ogni \(z\) esiste un'unica coppia con \(\langle x, y\rangle = z\).</p>
+<p><b>Primitività.</b> \(\langle x, y\rangle\) è composizione di potenza, prodotto, somma e sottrazione troncata. Per le inverse si osserva che \(x \le z\) e \(y \le z\) (perché \(2^x \ge x + 1\) e \(2y + 1 \ge y + 1\)), quindi si trovano con minimalizzazione limitata:
+\[l(z) = \min_{x \le z}\,\big[(\exists y)_{\le z}\ z = \langle x, y\rangle\big], \qquad r(z) = \min_{y \le z}\,\big[(\exists x)_{\le z}\ z = \langle x, y\rangle\big].\]</p>
+</div>
+<div class="example"><span class="k">Esempi</span>
+<p>\(\langle 0, 0\rangle = 0\), \(\langle 1, 0\rangle = 1\), \(\langle 0, 1\rangle = 2\), \(\langle 2, 3\rangle = 4 \cdot 7 - 1 = 27\).</p>
+<p>Decodifica di \(z = 23\): \(z + 1 = 24 = 2^3 \cdot 3\), quindi \(l(23) = 3\) e \(2y + 1 = 3\), \(r(23) = 1\).</p>
+</div>
+
+<h2>Numeri di Gödel delle sequenze</h2>
+<div class="def"><span class="k">Definizione</span>
+<p>Il numero di Gödel della sequenza \((a_1, \dots, a_n)\) è
+\[[a_1, \dots, a_n] = \prod_{i=1}^{n} p_i^{a_i},\]
+dove \(p_i\) è l'\(i\)-esimo numero primo (\(p_1 = 2, p_2 = 3, p_3 = 5, \dots\)). La sequenza vuota ha numero 1.</p>
+</div>
+<div class="def"><span class="k">Funzioni di decodifica</span>
+<ul>
+<li>\((x)_i\) = esponente di \(p_i\) nella fattorizzazione di \(x\) = \(\min_{t \le x}\,\neg\big(p_i^{t+1} \mid x\big)\). È l'\(i\)-esimo elemento.</li>
+<li>\(\mathrm{Lt}(x)\) = indice del più grande primo che divide \(x\) = \(\min_{i \le x}\,\big[(x)_i \neq 0 \wedge (\forall j)_{\le x}(j \le i \vee (x)_j = 0)\big]\). È la lunghezza.</li>
+</ul>
+<p>Entrambe sono primitive ricorsive (minimalizzazioni e quantificatori limitati di predicati p.r.).</p>
+</div>
+<div class="thm"><span class="k">Teorema (unicità)</span>
+<p>Se \([a_1, \dots, a_n] = [b_1, \dots, b_n]\) allora \(a_i = b_i\) per ogni \(i\). Segue dal teorema fondamentale dell'aritmetica (unicità della fattorizzazione in primi).</p>
+</div>
+<div class="warn"><span class="k">Attenzione agli zeri finali</span>
+<p>\([1, 0, 2] = 2^1 \cdot 3^0 \cdot 5^2 = 50 = [1, 0, 2, 0]\), perché \(7^0 = 1\). La codifica è iniettiva solo tra sequenze <b>della stessa lunghezza</b>, oppure tra sequenze che non terminano con 0. DSW lo dice esplicitamente e tiene conto di questo dettaglio quando codifica i programmi.</p>
+</div>
+
+<div class="example"><span class="k">Esempi</span>
+<p>\([2, 1] = 2^2 \cdot 3 = 12\). \([1, 1, 1] = 2 \cdot 3 \cdot 5 = 30\). \(360 = 2^3 \cdot 3^2 \cdot 5^1\), quindi \(360 = [3, 2, 1]\), \(\mathrm{Lt}(360) = 3\), \((360)_2 = 2\).</p>
+</div>
+<div data-w="godel"></div>
+
+<h2>Codificare i programmi</h2>
+<p>Ora possiamo assegnare un numero a ogni programma di S. Servono convenzioni per numerare variabili ed etichette.</p>
+<div class="def"><span class="k">Convenzioni di numerazione</span>
+<ul>
+<li><b>Variabili</b> nell'ordine \(Y, X_1, Z_1, X_2, Z_2, X_3, \dots\): quindi \(\#(Y) = 1\), \(\#(X_i) = 2i\), \(\#(Z_i) = 2i + 1\).</li>
+<li><b>Etichette</b> nell'ordine \(A_1, B_1, C_1, D_1, E_1, A_2, B_2, \dots\): \(\#(A_1) = 1\), \(\#(B_1) = 2\), …, \(\#(E_1) = 5\), \(\#(A_2) = 6\).</li>
+</ul>
+</div>
+<div class="def"><span class="k">Codice di un'istruzione</span>
+<p>Un'istruzione \(I\) ha codice \(\#(I) = \langle a, \langle b, c\rangle\rangle\) dove</p>
+<ul>
+<li>\(a = 0\) se \(I\) non ha etichetta, \(a = \#(L)\) se ha etichetta \(L\);</li>
+<li>\(c = \#(V) - 1\), dove \(V\) è la variabile nominata in \(I\);</li>
+<li>\(b\) è il tipo: \(b = 0\) per \(V \leftarrow V\); \(b = 1\) per \(V \leftarrow V + 1\); \(b = 2\) per \(V \leftarrow V - 1\); \(b = \#(L') + 2\) per \(\mathrm{IF}\ V \neq 0\ \mathrm{GOTO}\ L'\).</li>
+</ul>
+</div>
+<p>Ogni numero naturale \(q\) è il codice di un'unica istruzione: \(a = l(q)\), \(b = l(r(q))\), \(c = r(r(q))\). Questo è il motivo delle convenzioni (l'istruzione vuota \(V \leftarrow V\) serve a dare significato a \(b = 0\)).</p>
+<div class="def"><span class="k">Codice di un programma</span>
+<p>Il programma \(\mathcal P = I_1, \dots, I_k\) ha numero
+\[\#(\mathcal P) = [\#(I_1), \dots, \#(I_k)] - 1.\]</p>
+</div>
+<p>Il \(-1\) serve a includere lo zero: il programma vuoto ha numero \([\,] - 1 = 0\). Per evitare il problema degli zeri finali DSW vieta che l'ultima istruzione sia \(Y \leftarrow Y\) senza etichetta, l'unica con codice 0. Con questa convenzione <b>ogni numero naturale è il numero di uno e un solo programma</b>.</p>
+
+<div class="example"><span class="k">Esempio (DSW, §4.1)</span>
+<p>\([A]\ X \leftarrow X - 1\): \(a = 1\), \(b = 2\), \(c = \#(X_1) - 1 = 1\); \(\#(I_1) = \langle 1, \langle 2, 1\rangle\rangle = \langle 1, 11 \rangle = 45\).<br>
+\(Y \leftarrow Y + 1\): \(a = 0\), \(b = 1\), \(c = 0\); \(\#(I_2) = \langle 0, \langle 1, 0\rangle\rangle = \langle 0, 1\rangle = 2\).<br>
+\(\mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ A\): \(a = 0\), \(b = \#(A) + 2 = 3\), \(c = 1\); \(\#(I_3) = \langle 0, \langle 3, 1\rangle\rangle = \langle 0, 23\rangle = 46\).</p>
+<p>Il programma ha numero \(2^{45} \cdot 3^2 \cdot 5^{46} - 1\). Puoi verificarlo nella scheda «Programmi» del widget sopra.</p>
+</div>
+<div class="example"><span class="k">Decodifica · quale programma ha numero 199?</span>
+<p>\(199 + 1 = 200 = 2^3 \cdot 5^2 = [3, 0, 2]\). Istruzioni: \(3 = \langle 2, 0 \rangle\): etichetta \(B\), \(\langle b, c\rangle = 0\) cioè \(b = 0, c = 0\): \([B]\ Y \leftarrow Y\). \(0\): \(Y \leftarrow Y\). \(2 = \langle 0, 1\rangle\): nessuna etichetta, \(\langle b, c\rangle = 1 = \langle 1, 0\rangle\): \(Y \leftarrow Y + 1\). Il programma è \([B]\ Y \leftarrow Y;\ Y \leftarrow Y;\ Y \leftarrow Y + 1\) e calcola la costante 1.</p>
+</div>
+
+<h2>La conseguenza: un elenco di tutte le funzioni calcolabili</h2>
+<p>Siccome ogni numero è un programma e ogni programma ha un numero, possiamo scrivere
+\[\Phi^{(n)}_y(x_1, \dots, x_n) = \Psi^{(n)}_{\mathcal P}(x_1, \dots, x_n) \quad \text{dove } \#(\mathcal P) = y.\]
+\(\Phi_0, \Phi_1, \Phi_2, \dots\) è un elenco di <b>tutte</b> le funzioni parzialmente calcolabili di un argomento (con ripetizioni: molti programmi calcolano la stessa funzione). Nella prossima lezione costruiremo un programma che, ricevuti \(x\) e \(y\), calcola \(\Phi_y(x)\), e dimostreremo che invece non esiste un programma che decide se \(\Phi_y(x)\) è definita.</p>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>\(\langle x, y \rangle = 2^x(2y+1) - 1\): biiezione p.r., inverse \(l, r\) p.r.</li>
+<li>\([a_1, \dots, a_n] = \prod p_i^{a_i}\): decodifica \((x)_i\), \(\mathrm{Lt}(x)\) p.r.; attenzione agli zeri finali.</li>
+<li>\(\#(I) = \langle a, \langle b, c\rangle\rangle\), \(\#(\mathcal P) = [\#(I_1), \dots, \#(I_k)] - 1\).</li>
+<li>Ogni numero è un programma: \(\Phi_y\) elenca tutte le funzioni parzialmente calcolabili.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Calcola \(\langle 3, 2\rangle\), \(l(39)\), \(r(39)\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\langle 3, 2\rangle = 8 \cdot 5 - 1 = 39\). Quindi \(l(39) = 3\), \(r(39) = 2\). Controllo: \(39 + 1 = 40 = 2^3 \cdot 5\), \(2y + 1 = 5\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Calcola \([0, 3, 1]\) e decodifica \(x = 1500\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\([0, 3, 1] = 2^0 \cdot 3^3 \cdot 5 = 135\). \(1500 = 2^2 \cdot 3 \cdot 5^3 = [2, 1, 3]\), \(\mathrm{Lt}(1500) = 3\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Calcola il numero dell'istruzione \([B]\ Z \leftarrow Z + 1\) e quello del programma composto dalla sola istruzione \(\mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ A\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\([B]\ Z \leftarrow Z + 1\): \(a = 2\), \(b = 1\), \(c = \#(Z_1) - 1 = 2\). \(\langle 1, 2\rangle = 2 \cdot 5 - 1 = 9\); \(\langle 2, 9\rangle = 4 \cdot 19 - 1 = 75\).</p>
+<p>\(\mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ A\) ha codice 46 (vedi esempio), quindi il programma ha numero \(2^{46} - 1\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Quale programma ha numero 575?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(576 = 2^6 \cdot 3^2 = [6, 2]\). Prima istruzione, codice 6: \(6 + 1 = 7 = 2^0 \cdot 7\), quindi \(l(6) = 0\), \(r(6) = 3\); \(3 = \langle 2, 0\rangle\): \(b = 2\), \(c = 0\): \(Y \leftarrow Y - 1\). Seconda istruzione, codice 2: \(2 = \langle 0, 1\rangle\) e \(1 = \langle 1, 0\rangle\), quindi \(Y \leftarrow Y + 1\). Programma: \(Y \leftarrow Y - 1;\ Y \leftarrow Y + 1\). Calcola la costante 1.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che la funzione \(\mathrm{Lab}(y, i)\) = «etichetta dell'\(i\)-esima istruzione del programma \(y\)» è primitiva ricorsiva.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\mathrm{Lab}(y, i) = l\big((y + 1)_i\big)\): composizione di somma, \((x)_i\) e \(l\), tutte p.r. Allo stesso modo il tipo è \(l(r((y+1)_i))\) e la variabile è \(r(r((y+1)_i)) + 1\). Sono le funzioni che il programma universale usa per «leggere» il programma simulato.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci \(\langle x, y\rangle\) e dimostra che è una biiezione.</summary><div>\(2^x(2y+1) - 1\). Ogni \(z + 1 \ge 1\) si scrive in modo unico come potenza di 2 per un dispari, e ogni dispari come \(2y + 1\).</div></details>
+<details><summary>Come si codifica una sequenza? Che problema c'è con gli zeri finali?</summary><div>\([a_1, \dots, a_n] = \prod p_i^{a_i}\). Gli zeri finali non cambiano il prodotto: \([1,0,2] = [1,0,2,0]\).</div></details>
+<details><summary>Come si assegna un numero a un programma S?</summary><div>Istruzione: \(\langle a, \langle b, c\rangle\rangle\) con \(a\) etichetta, \(b\) tipo, \(c = \#(V) - 1\). Programma: \([\#(I_1), \dots, \#(I_k)] - 1\). Ogni numero corrisponde a un unico programma.</div></details>
+<details><summary>Perché è importante che ogni numero sia un programma?</summary><div>Si ottiene un elenco \(\Phi_0, \Phi_1, \dots\) di tutte le funzioni parzialmente calcolabili, e i programmi possono ricevere altri programmi (i loro numeri) come input: è la base del programma universale e dell'indecidibilità.</div></details>
+</section>

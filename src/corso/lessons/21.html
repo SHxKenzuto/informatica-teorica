@@ -1,0 +1,152 @@
+<!--{"n":21,"mod":"C","title":"Insiemi ricorsivi e ricorsivamente enumerabili","dsw":"§4.4–4.5 (PDF p. 97–107)","sipser":"§3.2 «Enumerators», §4.2 «A Turing-unrecognizable language»","time":"3 ore","lead":"Due livelli di risolvibilità: problemi in cui si può sempre rispondere sì o no, e problemi in cui si possono solo confermare le risposte positive. La distinzione spiega perché alcuni problemi indecidibili sono «meno impossibili» di altri."}-->
+
+<h2>Le definizioni</h2>
+<p>In DSW si lavora con insiemi di numeri naturali (che, tramite le codifiche, possono rappresentare stringhe, programmi, grammatiche). Nel Sipser con linguaggi. Le nozioni sono le stesse.</p>
+<div class="def"><span class="k">Definizione · insieme ricorsivo</span>
+<p>\(B \subseteq \mathbb N\) è <b>ricorsivo</b> (decidibile) se il suo predicato caratteristico \(P_B(x) = 1 \iff x \in B\) è calcolabile. Cioè: esiste un programma che, su ogni input \(x\), termina e risponde correttamente sì o no.</p>
+</div>
+<div class="def"><span class="k">Definizione · insieme ricorsivamente enumerabile</span>
+<p>\(B\) è <b>ricorsivamente enumerabile</b> (r.e., semidecidibile, Turing-riconoscibile) se esiste una funzione parzialmente calcolabile \(g\) tale che
+\[B = \{x \in \mathbb N : g(x)\!\downarrow\}.\]
+Cioè: esiste un programma che termina esattamente sugli elementi di \(B\) (e va in loop sugli altri).</p>
+</div>
+<p>Si scrive \(W_n = \{x : \Phi_n(x)\!\downarrow\}\): è l'\(n\)-esimo insieme r.e. Siccome \(\Phi_0, \Phi_1, \dots\) elenca tutte le funzioni parzialmente calcolabili, \(W_0, W_1, \dots\) elenca tutti gli insiemi r.e.</p>
+<p>Ogni insieme ricorsivo è r.e.: dato il programma che decide \(B\), lo si modifica perché vada in loop quando risponderebbe «no».</p>
+
+<h2>Il primo insieme r.e. non ricorsivo</h2>
+<div class="def"><span class="k">Definizione</span>
+<p>\[K = \{n \in \mathbb N : n \in W_n\} = \{n : \Phi_n(n)\!\downarrow\}.\]
+È l'insieme dei programmi che terminano quando ricevono come input il proprio numero: la diagonale della tabella di HALT.</p>
+</div>
+<div class="thm"><span class="k">Teorema</span>
+<p>\(K\) è ricorsivamente enumerabile ma non ricorsivo.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p><b>R.e.</b>: \(n \in K \iff \Phi(n, n)\!\downarrow\), e \(\Phi(x, y)\) è parzialmente calcolabile (programma universale). Quindi \(K\) è il dominio della funzione parzialmente calcolabile \(n \mapsto \Phi(n,n)\).</p>
+<p><b>Non ricorsivo</b>: \(n \in K \iff \mathrm{HALT}(n, n)\). Se \(K\) fosse ricorsivo, il predicato \(\mathrm{HALT}(x, x)\) sarebbe calcolabile, e la dimostrazione della lezione 19 usa solo quello. In alternativa, direttamente: se \(K\) fosse ricorsivo, lo sarebbe \(\overline{K}\), che (vedi sotto) non è nemmeno r.e.</p>
+</div>
+
+<h2>Il teorema del complemento</h2>
+<div class="thm"><span class="k">Teorema (Post)</span>
+<p>\(B\) è ricorsivo se e solo se sia \(B\) sia \(\overline B\) sono ricorsivamente enumerabili.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>(\(\Rightarrow\)) Se \(B\) è ricorsivo lo è anche \(\overline B\) (si inverte la risposta); ogni ricorsivo è r.e.</p>
+<p>(\(\Leftarrow\)) Siano \(B = W_p\) e \(\overline B = W_q\). Per decidere se \(x \in B\) si eseguono <b>in parallelo</b> i due programmi, alternando i passi: per \(t = 0, 1, 2, \dots\) si controlla \(\mathrm{STP}(x, p, t)\) e \(\mathrm{STP}(x, q, t)\). Siccome \(x\) sta in \(B\) oppure in \(\overline B\), uno dei due programmi prima o poi termina. Se termina \(p\) si risponde sì, se termina \(q\) si risponde no. Formalmente:
+\[P_B(x) = \mathrm{STP}\big(x, p, \mu t\,[\mathrm{STP}(x,p,t) \vee \mathrm{STP}(x,q,t)]\big),\]
+e la \(\mu\) è sempre definita.</p>
+</div>
+<div class="thm"><span class="k">Corollario</span>
+<p>\(\overline K\) non è ricorsivamente enumerabile.</p>
+</div>
+<p>(Se lo fosse, \(K\) sarebbe ricorsivo per il teorema.) Si può anche dimostrare direttamente per diagonalizzazione: se \(\overline K = W_e\), allora \(e \in W_e \iff e \in \overline K \iff e \notin W_e\).</p>
+
+<div class="remark"><span class="k">La mappa dei problemi</span>
+<p>Abbiamo tre livelli: <b>ricorsivi</b> (decidibili), <b>r.e. non ricorsivi</b> (come \(K\) e HALT: si possono confermare i «sì»), <b>non r.e.</b> (come \(\overline K\): non si possono nemmeno confermare i «sì»). Il teorema dice che un problema è decidibile esattamente quando si possono confermare sia i «sì» sia i «no».</p>
+</div>
+
+<h2>Proprietà di chiusura</h2>
+<ul>
+<li><b>Ricorsivi</b>: chiusi per unione, intersezione, complemento (si combinano i predicati con \(\vee, \wedge, \neg\)).</li>
+<li><b>R.e.</b>: chiusi per unione e intersezione.
+<ul>
+<li>Intersezione: si esegue il primo programma e, se termina, il secondo.</li>
+<li>Unione: <b>non</b> si può eseguire il primo e poi il secondo (il primo potrebbe non terminare). Si eseguono in parallelo: \(x \in B \cup C \iff \exists t\,[\mathrm{STP}(x,p,t) \vee \mathrm{STP}(x,q,t)]\).</li>
+</ul></li>
+<li><b>R.e.</b>: <b>non</b> chiusi per complemento (\(K\) e \(\overline K\)).</li>
+</ul>
+
+<h2>Decidere contro enumerare</h2>
+<p>Il programma del corso distingue <b>problemi di decisione</b> («\(x \in B\)?») e <b>problemi di enumerazione</b> («elenca tutti gli elementi di \(B\)»). Il nome «ricorsivamente enumerabile» viene proprio dal secondo punto di vista.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Sia \(B \neq \emptyset\). Sono equivalenti:</p>
+<ol>
+<li>\(B\) è r.e.;</li>
+<li>\(B\) è l'immagine di una funzione primitiva ricorsiva;</li>
+<li>\(B\) è l'immagine di una funzione calcolabile (totale);</li>
+<li>\(B\) è l'immagine di una funzione parzialmente calcolabile.</li>
+</ol>
+</div>
+<p>In altre parole, un insieme r.e. non vuoto si può <b>elencare</b>: \(B = \{f(0), f(1), f(2), \dots\}\) con \(f\) calcolabile (con eventuali ripetizioni). Il passaggio delicato è da 1 a 2: come si elenca \(B = W_p\) se il programma \(p\) può non terminare su alcuni input?</p>
+<div class="proof"><span class="k">Dimostrazione (1 ⇒ 2): il dovetailing</span>
+<p>Sia \(B = W_p\) e \(x_0 \in B\) un elemento fissato. Si definisce \(f(u)\), interpretando \(u\) come coppia \(u = \langle x, t\rangle\):
+\[f(\langle x, t\rangle) = \begin{cases} x & \text{se } \mathrm{STP}(x, p, t) \\ x_0 & \text{altrimenti}\end{cases}\]
+\(f\) è primitiva ricorsiva. Ogni valore di \(f\) sta in \(B\). Viceversa se \(x \in B\), il programma termina su \(x\) in qualche numero di passi \(t\), e \(f(\langle x, t\rangle) = x\). Quindi l'immagine di \(f\) è \(B\).</p>
+<p>Percorrere \(u = 0, 1, 2, \dots\) significa percorrere le coppie \((x, t)\) per diagonali: si provano tutti gli input con tutti i budget di passi, senza mai restare bloccati su uno.</p>
+</div>
+<p>La stessa idea, con le macchine di Turing e le stringhe, è nel Sipser (teorema 3.21): un linguaggio è Turing-riconoscibile se e solo se un enumeratore lo stampa. L'enumeratore procede per fasi: nella fase \(k\) esegue il riconoscitore per \(k\) passi su ciascuna delle prime \(k\) stringhe (in ordine shortlex) e stampa quelle accettate.</p>
+<div data-w="dovetail"></div>
+
+<div class="thm"><span class="k">Teorema</span>
+<p>\(B\) infinito è ricorsivo se e solo se è l'immagine di una funzione calcolabile <b>strettamente crescente</b> (cioè si può elencare in ordine crescente).</p>
+</div>
+<p>(Se l'elenco è crescente, per decidere \(x\) basta generare elementi finché si supera \(x\).)</p>
+
+<h2>Il teorema del parametro (s-m-n)</h2>
+<p>Spesso serve «fissare» un argomento di un programma, ottenendo un nuovo programma con un argomento in meno. Il teorema del parametro dice che questa operazione è calcolabile, anzi primitiva ricorsiva, sui numeri dei programmi.</p>
+<div class="thm"><span class="k">Teorema del parametro</span>
+<p>Per ogni \(n, m\) esiste una funzione primitiva ricorsiva \(S^n_m(u_1, \dots, u_n, y)\) tale che
+\[\Phi^{(m+n)}_y(x_1, \dots, x_m, u_1, \dots, u_n) = \Phi^{(m)}_{S^n_m(u_1, \dots, u_n, y)}(x_1, \dots, x_m).\]</p>
+</div>
+<div class="proof"><span class="k">Idea</span>
+<p>Il programma \(S^n_m(\vec u, y)\) è: «metti \(u_1\) in \(X_{m+1}\), …, \(u_n\) in \(X_{m+n}\) (con \(u_i\) istruzioni di incremento ciascuna), poi esegui il programma \(y\)». Il suo numero di Gödel si calcola da \(\vec u\) e \(y\) con operazioni primitive ricorsive (si aggiungono in testa le codifiche delle istruzioni di incremento).</p>
+</div>
+<p>È lo strumento tecnico delle <b>riduzioni</b> (lezione 22): per mostrare che un problema sui programmi è indecidibile si costruisce, a partire da un'istanza di HALT, un programma con certe proprietà; il teorema del parametro garantisce che la costruzione è calcolabile. In informatica pratica corrisponde al <b>currying</b> e alla <b>specializzazione parziale</b> dei programmi.</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dimostrare la chiusura per unione degli r.e. eseguendo i due programmi uno dopo l'altro.</li>
+<li>Pensare che «r.e.» significhi «si può elencare in ordine crescente»: quello equivale a ricorsivo.</li>
+<li>Dire che \(\overline K\) è r.e. «perché basta aspettare che il programma non termini».</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Ricorsivo: predicato caratteristico calcolabile. R.e.: dominio di una funzione parzialmente calcolabile, \(W_n\).</li>
+<li>\(K = \{n : n \in W_n\}\) è r.e. non ricorsivo; \(\overline K\) non è r.e.</li>
+<li>Post: ricorsivo ⇔ \(B\) e \(\overline B\) r.e. (esecuzione in parallelo).</li>
+<li>R.e. non vuoto ⇔ immagine di una funzione p.r. (dovetailing) ⇔ enumerabile.</li>
+<li>Teorema del parametro: fissare argomenti è un'operazione p.r. sui numeri dei programmi.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che ogni insieme finito è ricorsivo e che il complemento di un insieme finito è ricorsivo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(x \in \{a_1, \dots, a_k\} \iff x = a_1 \vee \dots \vee x = a_k\): predicato p.r. Il complemento si decide invertendo la risposta.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(\{x : W_x \neq \emptyset\}\) è r.e.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(W_x \neq \emptyset \iff \exists \langle n, t\rangle\ \mathrm{STP}(n, x, t)\). Il programma cerca \(u = 0, 1, 2, \dots\) finché \(\mathrm{STP}(l(u), x, r(u))\) è vero: termina se e solo se \(W_x\) non è vuoto. (Dovetailing su input e passi.)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Siano \(A\) e \(B\) r.e. con \(A \cup B = \mathbb N\) e \(A \cap B = \emptyset\). Dimostra che \(A\) è ricorsivo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(B = \overline A\), quindi \(A\) e \(\overline A\) sono r.e.: per il teorema di Post \(A\) è ricorsivo.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che se \(f\) è parzialmente calcolabile allora il suo grafo \(\{\langle x, y\rangle : f(x) = y\}\) è r.e. Se \(f\) è totale, il grafo è ricorsivo?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Per decidere (in modo semi) se \(f(x) = y\): si esegue il programma di \(f\) su \(x\); se termina, si confronta con \(y\) (e se diverso si va in loop). Termina esattamente sulle coppie del grafo. Se \(f\) è totale, il programma termina sempre e si può rispondere «no» quando il risultato è diverso da \(y\): il grafo è ricorsivo.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che \(\mathrm{TOT} = \{x : \Phi_x \text{ è totale}\}\) non è r.e.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Per diagonalizzazione: se TOT fosse r.e. e non vuoto, sarebbe l'immagine di una funzione calcolabile \(f\): \(\Phi_{f(0)}, \Phi_{f(1)}, \dots\) elencherebbe tutte le funzioni calcolabili totali. Allora \(g(x) = \Phi_{f(x)}(x) + 1\) sarebbe calcolabile e totale, quindi \(g = \Phi_{f(k)}\) per qualche \(k\), ma \(g(k) \neq \Phi_{f(k)}(k)\). (TOT non è nemmeno co-r.e.: sta più in alto nella gerarchia aritmetica, DSW cap. 8.)</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci insieme ricorsivo e insieme ricorsivamente enumerabile.</summary><div>Ricorsivo: il predicato caratteristico è calcolabile. R.e.: è il dominio di una funzione parzialmente calcolabile (\(W_n\)).</div></details>
+<details><summary>Dimostra che \(B\) è ricorsivo se e solo se \(B\) e \(\overline B\) sono r.e.</summary><div>⇒ ovvio. ⇐: esecuzione alternata dei due semidecisori con STP; uno dei due termina per ogni \(x\).</div></details>
+<details><summary>Perché \(K\) è r.e. ma \(\overline K\) non lo è?</summary><div>\(K\) è il dominio di \(n \mapsto \Phi(n,n)\), calcolabile con il programma universale. Se \(\overline K\) fosse r.e., per Post \(K\) sarebbe ricorsivo, ma \(K\) è la diagonale di HALT.</div></details>
+<details><summary>Cosa dice il teorema del parametro? A cosa serve?</summary><div>\(\Phi_y(\vec x, \vec u) = \Phi_{S(\vec u, y)}(\vec x)\) con \(S\) primitiva ricorsiva: fissare argomenti è calcolabile. Serve a costruire le riduzioni.</div></details>
+</section>

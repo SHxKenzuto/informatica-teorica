@@ -1,0 +1,174 @@
+<!--{"n":15,"mod":"C","title":"Algoritmi, funzioni calcolabili e il linguaggio S","dsw":"cap. 2 (PDF p. 36–57)","sipser":"§3.3 «The definition of algorithm» per il contesto storico","time":"3 ore","lead":"Per dimostrare che qualcosa NON si può calcolare serve una definizione precisa di «calcolare». DSW la dà con un linguaggio di programmazione minimale: tre istruzioni, variabili naturali, salti. Sembra un giocattolo, ma calcola tutto ciò che calcola Java."}-->
+
+<h2>Che cos'è un algoritmo?</h2>
+<p>Intuitivamente un algoritmo è una procedura <b>finita</b>, fatta di passi <b>elementari</b> e <b>non ambigui</b>, che si può eseguire meccanicamente. Per secoli questa idea è bastata: per mostrare che un problema era risolvibile si esibiva un algoritmo, e nessuno chiedeva una definizione formale.</p>
+<p>Il problema nasce quando si vuole dimostrare che un problema <b>non</b> ha un algoritmo. Nel 1900 Hilbert chiese (decimo problema) un procedimento per stabilire se un'equazione polinomiale a coefficienti interi ha soluzioni intere. Per dimostrare che un tale procedimento non esiste (cosa che fu fatta nel 1970) bisogna sapere esattamente che cosa si sta escludendo. Negli anni '30 Gödel, Church, Kleene e Turing proposero definizioni formali diverse: funzioni ricorsive, λ-calcolo, macchine di Turing. Si scoprì che erano tutte <b>equivalenti</b>.</p>
+<p>DSW sceglie un modello molto vicino all'esperienza di un programmatore: un <b>linguaggio di programmazione</b> ridotto all'osso.</p>
+
+<h2>Il linguaggio S</h2>
+<div class="def"><span class="k">Definizione · variabili</span>
+<p>Le variabili assumono valori in \(\mathbb N\) e sono di tre tipi:</p>
+<ul>
+<li><b>input</b> \(X_1, X_2, X_3, \dots\);</li>
+<li><b>locali</b> \(Z_1, Z_2, Z_3, \dots\);</li>
+<li><b>output</b> \(Y\) (una sola).</li>
+</ul>
+<p>Si scrive \(X\) per \(X_1\) e \(Z\) per \(Z_1\). Le <b>etichette</b> sono \(A_1, B_1, C_1, D_1, E_1, A_2, B_2, \dots\), e si scrive \(A\) per \(A_1\).</p>
+</div>
+<div class="def"><span class="k">Definizione · istruzioni</span>
+<p>Le istruzioni di S sono solo tre (\(V\) è una variabile qualsiasi, \(L\) un'etichetta):</p>
+<ul>
+<li>\(V \leftarrow V + 1\): incrementa \(V\);</li>
+<li>\(V \leftarrow V - 1\): decrementa \(V\) se \(V \neq 0\), altrimenti la lascia a 0;</li>
+<li>\(\mathrm{IF}\ V \neq 0\ \mathrm{GOTO}\ L\): se \(V \neq 0\) salta alla prima istruzione con etichetta \(L\), altrimenti prosegue.</li>
+</ul>
+<p>Ogni istruzione può avere un'etichetta, scritta \([L]\) davanti. Per comodità si ammette anche l'istruzione «vuota» \(V \leftarrow V\), che non fa nulla. Un <b>programma</b> è una sequenza finita di istruzioni.</p>
+</div>
+
+<h3>Esecuzione</h3>
+<p>All'inizio gli input \(X_i\) contengono i valori dati, mentre \(Y\) e tutte le \(Z_i\) valgono 0. Le istruzioni si eseguono in ordine, tranne i salti. Il programma <b>termina</b> quando:</p>
+<ul>
+<li>esegue l'ultima istruzione senza saltare, oppure</li>
+<li>salta a un'etichetta che non compare nel programma (per convenzione si usa \(E\) per «exit»).</li>
+</ul>
+<p>Formalmente DSW definisce lo <b>stato</b> (i valori delle variabili), la <b>descrizione istantanea</b> (\(i, \sigma\)) = (numero dell'istruzione da eseguire, stato) e la <b>computazione</b> come sequenza di descrizioni istantanee in cui ognuna si ottiene dalla precedente eseguendo un'istruzione. La computazione è <b>terminante</b> se raggiunge un \(i\) oltre l'ultima istruzione.</p>
+
+<h2>Funzioni calcolate</h2>
+<div class="def"><span class="k">Definizione · funzione calcolata da un programma</span>
+<p>Per un programma \(\mathcal P\) e un intero \(m \ge 1\), la funzione \(\Psi^{(m)}_{\mathcal P} : \mathbb N^m \to \mathbb N\) è definita così: si esegue \(\mathcal P\) con \(X_1 = r_1, \dots, X_m = r_m\);</p>
+<ul>
+<li>se la computazione termina, \(\Psi^{(m)}_{\mathcal P}(r_1, \dots, r_m)\) è il valore finale di \(Y\);</li>
+<li>se non termina, \(\Psi^{(m)}_{\mathcal P}(r_1, \dots, r_m)\!\uparrow\) (indefinita).</li>
+</ul>
+</div>
+<div class="def"><span class="k">Definizione · funzioni calcolabili</span>
+<p>Una funzione (possibilmente parziale) \(f\) è <b>parzialmente calcolabile</b> se esiste un programma \(\mathcal P\) con \(f = \Psi^{(m)}_{\mathcal P}\), cioè: \(f\) e \(\Psi_{\mathcal P}\) sono definite sugli stessi input e lì coincidono. \(f\) è <b>calcolabile</b> se è parzialmente calcolabile e totale.</p>
+</div>
+<p>Lo stesso programma calcola funzioni diverse a seconda di quanti argomenti si considerano: se \(\mathcal P\) usa solo \(X_1\), allora \(\Psi^{(2)}_{\mathcal P}(x_1, x_2) = \Psi^{(1)}_{\mathcal P}(x_1)\) (il secondo input è ignorato). Se \(\mathcal P\) usa \(X_2\) ma consideriamo \(m = 1\), \(X_2\) parte da 0.</p>
+
+<h2>Primi programmi</h2>
+<div class="example"><span class="k">Esempio 1 · un programma sbagliato per \(f(x) = x\)</span>
+<p>\([A]\ X \leftarrow X - 1\)<br>\(\phantom{[A]}\ Y \leftarrow Y + 1\)<br>\(\phantom{[A]}\ \mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ A\)</p>
+<p>Su \(x > 0\) il ciclo viene eseguito \(x\) volte e \(Y = x\). Ma su \(x = 0\) il corpo viene eseguito una volta e \(Y = 1\). Il programma calcola \(f(x) = x\) per \(x > 0\) e \(f(0) = 1\). È un errore istruttivo: il test va fatto <b>prima</b> del corpo del ciclo.</p>
+</div>
+<div class="example"><span class="k">Esempio 2 · \(f(x) = x\), corretto</span>
+<p>\([A]\ \mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ B\)<br>
+\(\phantom{[A]}\ Z \leftarrow Z + 1\)<br>
+\(\phantom{[A]}\ \mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ E\)<br>
+\([B]\ X \leftarrow X - 1\)<br>
+\(\phantom{[B]}\ Y \leftarrow Y + 1\)<br>
+\(\phantom{[B]}\ Z \leftarrow Z + 1\)<br>
+\(\phantom{[B]}\ \mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ A\)</p>
+<p>La coppia \(Z \leftarrow Z + 1;\ \mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ L\) è un <b>salto incondizionato</b>: dopo l'incremento \(Z \neq 0\), quindi il salto avviene sempre. Il programma però distrugge \(X\) (alla fine vale 0).</p>
+</div>
+<p>Prova gli esempi nell'interprete: puoi eseguire passo per passo e vedere le variabili. L'ultimo esempio non termina mai: la funzione calcolata è ovunque indefinita.</p>
+<div data-w="sprog"></div>
+
+<h2>Le macro</h2>
+<p>Scrivere tutto con tre istruzioni è faticoso. DSW introduce le <b>macro</b>: pseudo-istruzioni che sono abbreviazioni di frammenti di programma. Ogni volta che si usa una macro la si <b>espande</b>, rinominando variabili locali ed etichette in modo che siano nuove (diverse da tutte quelle già usate). Le macro non aggiungono potere al linguaggio, solo leggibilità.</p>
+<div class="tblwrap"><table class="data">
+<tr><th>Macro</th><th>Espansione (idea)</th></tr>
+<tr><td>\(\mathrm{GOTO}\ L\)</td><td>\(Z \leftarrow Z + 1;\ \mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ L\)</td></tr>
+<tr><td>\(V \leftarrow 0\)</td><td>\([L]\ V \leftarrow V - 1;\ \mathrm{IF}\ V \neq 0\ \mathrm{GOTO}\ L\)</td></tr>
+<tr><td>\(Y \leftarrow X\)</td><td>sposta \(X\) in \(Y\) e in \(Z\) contemporaneamente (svuotando \(X\)), poi rimette \(Z\) in \(X\)</td></tr>
+<tr><td>\(V \leftarrow V'\)</td><td>\(V \leftarrow 0\), poi copia come sopra</td></tr>
+</table></div>
+
+<div class="example"><span class="k">Esempio 3 · copia che conserva l'input</span>
+<p>\(\phantom{[A]}\ Y \leftarrow 0\)<br>
+\([A]\ \mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ B\)<br>
+\(\phantom{[A]}\ \mathrm{GOTO}\ C\)<br>
+\([B]\ X \leftarrow X - 1\)<br>
+\(\phantom{[B]}\ Y \leftarrow Y + 1\)<br>
+\(\phantom{[B]}\ Z \leftarrow Z + 1\)<br>
+\(\phantom{[B]}\ \mathrm{GOTO}\ A\)<br>
+\([C]\ \mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ D\)<br>
+\(\phantom{[C]}\ \mathrm{GOTO}\ E\)<br>
+\([D]\ Z \leftarrow Z - 1\)<br>
+\(\phantom{[D]}\ X \leftarrow X + 1\)<br>
+\(\phantom{[D]}\ \mathrm{GOTO}\ C\)</p>
+<p>Prima fase: ogni unità di \(X\) va sia in \(Y\) sia in \(Z\). Seconda fase: \(Z\) viene riversata in \(X\). Alla fine \(Y = X\) e \(X\) ha il valore originale. Questa è l'espansione della macro \(Y \leftarrow X\).</p>
+</div>
+
+<div class="example"><span class="k">Esempio 4 · somma \(f(x_1, x_2) = x_1 + x_2\)</span>
+<p>\(\phantom{[B]}\ Y \leftarrow X_1\)<br>
+\(\phantom{[B]}\ Z \leftarrow X_2\)<br>
+\([B]\ \mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ A\)<br>
+\(\phantom{[B]}\ \mathrm{GOTO}\ E\)<br>
+\([A]\ Z \leftarrow Z - 1\)<br>
+\(\phantom{[A]}\ Y \leftarrow Y + 1\)<br>
+\(\phantom{[A]}\ \mathrm{GOTO}\ B\)</p>
+<p>Con le macro il programma è leggibile. Una volta dimostrato che la somma è calcolabile, anche \(V \leftarrow V_1 + V_2\) diventa una macro, e così via: <b>ogni funzione già dimostrata calcolabile può essere usata come macro</b>.</p>
+</div>
+
+<div class="example"><span class="k">Esempio 5 · prodotto e sottrazione</span>
+<p><b>Prodotto</b>: \(Y \leftarrow 0\), poi ripeti \(X_2\) volte \(Y \leftarrow Y + X_1\) (usando la macro della somma). <b>Sottrazione troncata</b> \(x_1 \mathbin{\dot-} x_2\): \(Y \leftarrow X_1\), poi ripeti \(X_2\) volte \(Y \leftarrow Y - 1\). <b>Sottrazione vera</b> \(x_1 - x_2\), definita solo se \(x_1 \ge x_2\): come prima, ma se \(Y\) diventa 0 mentre restano decrementi da fare il programma entra in un ciclo infinito (\([L]\ \mathrm{GOTO}\ L\)). Così si ottiene una funzione <b>parziale</b> calcolata da un programma.</p>
+</div>
+
+<h3>Macro condizionali</h3>
+<p>Se \(P(x_1, \dots, x_n)\) è un predicato calcolabile, si può usare la macro
+\[\mathrm{IF}\ P(V_1, \dots, V_n)\ \mathrm{GOTO}\ L\]
+espansa come: \(Z \leftarrow P(V_1, \dots, V_n)\) (macro della funzione calcolabile \(P\)), poi \(\mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ L\). È la macro che useremo nella prova dell'indecidibilità della fermata.</p>
+
+<div class="remark"><span class="k">Quanto è potente S?</span>
+<p>S ha solo variabili naturali, incremento, decremento e salto condizionato. Eppure, come vedremo, calcola esattamente le stesse funzioni delle macchine di Turing, delle funzioni ricorsive di Kleene e di qualunque linguaggio di programmazione reale (con memoria illimitata). Il fatto che un modello così povero sia già «completo» è uno dei risultati più sorprendenti della teoria. Per questo è sensato definire «calcolabile» come «calcolabile in S».</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dimenticare che \(Y\) e le \(Z\) partono da 0, oppure che \(V \leftarrow V - 1\) su 0 lascia 0.</li>
+<li>Scrivere cicli «do-while» che eseguono il corpo almeno una volta (esempio 1).</li>
+<li>Distruggere un input che serve dopo: per riusarlo bisogna copiarlo con la macro che lo conserva.</li>
+<li>Usare la stessa variabile locale in due macro diverse: nell'espansione vanno rinominate.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>S: variabili \(X_i, Z_i, Y\) in \(\mathbb N\); istruzioni \(V \leftarrow V + 1\), \(V \leftarrow V - 1\), \(\mathrm{IF}\ V \neq 0\ \mathrm{GOTO}\ L\).</li>
+<li>\(\Psi^{(m)}_{\mathcal P}\): valore di \(Y\) se termina, indefinita altrimenti.</li>
+<li>Parzialmente calcolabile = calcolata da un programma; calcolabile = in più totale.</li>
+<li>Le macro abbreviano frammenti; ogni funzione calcolabile già nota diventa una macro.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Scrivi un programma S (puoi usare le macro GOTO e \(V \leftarrow 0\)) per \(f(x) = 2x\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\([A]\ \mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ B\)<br>\(\phantom{[A]}\ \mathrm{GOTO}\ E\)<br>\([B]\ X \leftarrow X - 1\)<br>\(\phantom{[B]}\ Y \leftarrow Y + 1\)<br>\(\phantom{[B]}\ Y \leftarrow Y + 1\)<br>\(\phantom{[B]}\ \mathrm{GOTO}\ A\)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Quale funzione \(\Psi^{(1)}_{\mathcal P}\) calcola il programma \([A]\ \mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ A\)? E \(\Psi^{(2)}_{\mathcal P}\)?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Se \(x \neq 0\) il programma salta a sé stesso per sempre: indefinita. Se \(x = 0\) termina con \(Y = 0\). Quindi \(\Psi^{(1)}(0) = 0\) e \(\Psi^{(1)}(x)\!\uparrow\) per \(x > 0\). \(\Psi^{(2)}(x_1, x_2)\) è uguale, perché \(X_2\) non viene usata.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Scrivi un programma che calcola \(f(x) = \lfloor x / 2 \rfloor\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\([A]\ \mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ B\)<br>\(\phantom{[A]}\ \mathrm{GOTO}\ E\)<br>\([B]\ X \leftarrow X - 1\)<br>\(\phantom{[B]}\ \mathrm{IF}\ X \neq 0\ \mathrm{GOTO}\ C\)<br>\(\phantom{[B]}\ \mathrm{GOTO}\ E\)<br>\([C]\ X \leftarrow X - 1\)<br>\(\phantom{[C]}\ Y \leftarrow Y + 1\)<br>\(\phantom{[C]}\ \mathrm{GOTO}\ A\)</p>
+<p>Ogni giro toglie 2 da \(X\) e aggiunge 1 a \(Y\); se resta un 1 si esce senza contarlo.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Scrivi un programma che calcola la funzione parziale \(f(x) = x/2\) se \(x\) è pari, indefinita se \(x\) è dispari.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Come sopra, ma quando dopo il primo decremento \(X = 0\) (cioè \(x\) dispari) invece di \(\mathrm{GOTO}\ E\) si va in un ciclo infinito: \([D]\ \mathrm{GOTO}\ D\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Mostra che per ogni programma \(\mathcal P\) esiste un programma \(\mathcal P'\) che calcola la stessa funzione e in cui ogni salto va a un'etichetta presente nel programma tranne un'unica istruzione finale di uscita.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Si rinominano tutte le etichette di salto che non compaiono nel programma in una stessa etichetta nuova \(E'\), e si aggiunge in fondo l'istruzione \([E']\ Y \leftarrow Y\). Saltare a \(E'\) porta all'ultima istruzione, che non fa nulla, e poi il programma termina: stesso comportamento di prima.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Descrivi il linguaggio S: variabili, istruzioni, terminazione.</summary><div>Variabili naturali \(X_i\) (input), \(Z_i\) (locali, inizialmente 0), \(Y\) (output, inizialmente 0). Istruzioni: incremento, decremento troncato, salto condizionato \(\mathrm{IF}\ V \neq 0\ \mathrm{GOTO}\ L\). Termina dopo l'ultima istruzione o saltando a un'etichetta assente.</div></details>
+<details><summary>Cos'è una funzione parzialmente calcolabile? E una calcolabile?</summary><div>Parzialmente calcolabile: \(f = \Psi^{(m)}_{\mathcal P}\) per qualche programma, indefinita dove \(\mathcal P\) non termina. Calcolabile: parzialmente calcolabile e totale.</div></details>
+<details><summary>Come si realizza un salto incondizionato in S?</summary><div>\(Z \leftarrow Z + 1;\ \mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ L\) con \(Z\) variabile non usata altrove.</div></details>
+<details><summary>Perché le macro non aumentano il potere di S?</summary><div>Ogni macro è un'abbreviazione che si espande in istruzioni di S con variabili ed etichette nuove: ogni programma con macro equivale a uno senza.</div></details>
+</section>

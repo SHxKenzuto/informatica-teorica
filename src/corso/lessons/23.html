@@ -1,0 +1,127 @@
+<!--{"n":23,"mod":"C","title":"Problemi indecidibili su grammatiche: PCP","sipser":"§5.2 (PDF p. 220–227), §5.1 «Reductions via computation histories»","dsw":"cap. 7, §1–6 (PDF p. 188–215)","time":"3 ore","lead":"L'indecidibilità non riguarda solo programmi che analizzano programmi. Anche domande che sembrano puramente combinatorie, su tessere del domino o su grammatiche, non hanno algoritmo. Il ponte è l'idea di storia di computazione."}-->
+
+<h2>Il problema di corrispondenza di Post</h2>
+<div class="def"><span class="k">Definizione · PCP</span>
+<p>Un'istanza è un insieme finito di <b>tessere</b> (domino), ciascuna con una stringa sopra e una sotto:
+\[P = \left\{ \left[\frac{t_1}{b_1}\right], \left[\frac{t_2}{b_2}\right], \dots, \left[\frac{t_k}{b_k}\right] \right\}.\]
+Un <b>match</b> è una sequenza non vuota di indici \(i_1, i_2, \dots, i_\ell\) (con ripetizioni ammesse) tale che
+\[t_{i_1}t_{i_2}\cdots t_{i_\ell} = b_{i_1}b_{i_2}\cdots b_{i_\ell}.\]
+Il PCP chiede: data \(P\), esiste un match?</p>
+</div>
+<div class="example"><span class="k">Esempio (Sipser)</span>
+<p>Tessere: \([b/ca]\), \([a/ab]\), \([ca/a]\), \([abc/c]\). La sequenza 2, 1, 3, 2, 4 dà sopra \(a \cdot b \cdot ca \cdot a \cdot abc = abcaaabc\) e sotto \(ab \cdot ca \cdot a \cdot ab \cdot c = abcaaabc\): è un match.</p>
+<p>Invece \(\{[abc/ab], [ca/a], [acc/ba]\}\) non ha match: in ogni tessera la stringa sopra è più lunga di quella sotto, quindi le due righe non possono mai pareggiare.</p>
+</div>
+<p>Prova a trovare il match: osserva quale tessera può iniziare (sopra e sotto devono iniziare con lo stesso simbolo) e come la riga più corta «insegue» la più lunga.</p>
+<div data-w="pcp"></div>
+
+<div class="thm"><span class="k">Teorema (Post, 1946)</span>
+<p>Il PCP è indecidibile.</p>
+</div>
+<p>È sorprendente: il problema non menziona macchine né programmi. Ma, come vedremo, un match può essere costretto a «descrivere» una computazione.</p>
+
+<h2>Storie di computazione</h2>
+<div class="def"><span class="k">Definizione</span>
+<p>Una <b>storia di computazione accettante</b> di una macchina di Turing \(M\) su \(w\) è la sequenza di configurazioni \(C_1, C_2, \dots, C_\ell\) dove \(C_1 = q_0w\) è la configurazione iniziale, \(C_\ell\) è di accettazione e ogni \(C_{i+1}\) segue da \(C_i\) con un passo di \(M\). Si scrive come una stringa: \(\#C_1\#C_2\#\cdots\#C_\ell\#\).</p>
+</div>
+<p>\(M\) accetta \(w\) se e solo se esiste una storia di computazione accettante (per una macchina deterministica, al più una). Verificare che una stringa data <b>sia</b> una storia accettante è facile e «locale»: ogni configurazione differisce dalla successiva solo intorno alla testina. Questa località è ciò che si può tradurre in tessere o in regole di grammatica.</p>
+
+<h2>Idea della prova di indecidibilità del PCP</h2>
+<p>Si riduce \(A_{\mathrm{TM}}\) al PCP (con un passaggio intermedio, il «PCP modificato» in cui il match deve iniziare con la prima tessera). Data \(\langle M, w\rangle\) si costruiscono tessere tali che un match esiste se e solo se \(M\) accetta \(w\):</p>
+<ol>
+<li><b>Tessera iniziale</b> \(\left[\dfrac{\#}{\#q_0w\#}\right]\): sotto c'è già la prima configurazione, sopra niente. La riga sotto è «avanti» di una configurazione.</li>
+<li><b>Tessere di transizione</b>: per ogni mossa di \(M\), per esempio \(\delta(q, a) = (r, b, R)\), la tessera \(\left[\dfrac{qa}{br}\right]\). Copiando sopra la configurazione corrente, sotto si è costretti a scrivere la configurazione successiva.</li>
+<li><b>Tessere di copia</b> \(\left[\dfrac{a}{a}\right]\) per ogni simbolo, e \(\left[\dfrac{\#}{\#}\right]\): copiano le parti del nastro lontane dalla testina.</li>
+<li><b>Tessere di chiusura</b>: quando compare \(q_{\mathrm{accept}}\), tessere come \(\left[\dfrac{a\,q_{acc}}{q_{acc}}\right]\) «mangiano» i simboli rimanenti, e una tessera finale \(\left[\dfrac{q_{acc}\#\#}{\#}\right]\) permette alla riga sopra di raggiungere quella sotto.</li>
+</ol>
+<p>La riga sotto è sempre una configurazione avanti; la riga sopra può pareggiarla solo se la computazione arriva in \(q_{\mathrm{accept}}\). Quindi c'è un match se e solo se \(M\) accetta \(w\). Siccome \(A_{\mathrm{TM}}\) è indecidibile, lo è anche il PCP.</p>
+
+<div class="remark"><span class="k">L'approccio di DSW</span>
+<p>DSW arriva allo stesso risultato passando per i <b>processi di Semi-Thue</b> (sistemi di riscrittura di stringhe con regole \(g \to h\)): mostra che le computazioni di una macchina di Turing si simulano con un processo di Semi-Thue, che quindi il «word problem» (la stringa \(u\) si riscrive in \(v\)?) è indecidibile, e poi riduce quest'ultimo al PCP (§7.4). Dal word problem ottiene anche che i linguaggi delle grammatiche di tipo 0 sono esattamente gli r.e. (§7.5).</p>
+</div>
+
+<h2>Problemi indecidibili sulle grammatiche context-free</h2>
+<p>Dal PCP si ottengono, per riduzione, molti problemi indecidibili sulle grammatiche CF. L'idea chiave: data un'istanza del PCP, si costruiscono due grammatiche \(G_T\) e \(G_B\) che generano le stringhe «sopra» e «sotto» di ogni sequenza di tessere, marcate con gli indici usati:
+\[G_T: \ T \to t_i\,T\,i \mid t_i\,i \qquad\qquad G_B: \ B \to b_i\,B\,i \mid b_i\,i\]
+(con \(i\) un simbolo nuovo per ogni tessera). Una stringa sta in entrambi i linguaggi se e solo se corrisponde a un match.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Per grammatiche context-free \(G, G_1, G_2\) i seguenti problemi sono indecidibili:</p>
+<ol>
+<li>\(L(G_1) \cap L(G_2) = \emptyset\)? (Sì se e solo se l'istanza PCP non ha match.)</li>
+<li>\(G\) è ambigua? (La grammatica \(S \to T \mid B\) è ambigua se e solo se c'è un match.)</li>
+<li>\(L(G) = \Sigma^*\)? (Il complemento di un'intersezione di questo tipo si genera con una grammatica CF; Sipser lo dimostra con le storie di computazione, teorema 5.13.)</li>
+<li>\(L(G_1) = L(G_2)\)? (Da 3: \(L(G) = \Sigma^* \iff L(G) = L(G_{\Sigma^*})\).)</li>
+<li>\(L(G_1) \subseteq L(G_2)\)?</li>
+</ol>
+</div>
+
+<h3>Che cosa resta decidibile</h3>
+<div class="thm"><span class="k">Teorema</span>
+<p>Per una grammatica context-free \(G\) sono decidibili:</p>
+<ul>
+<li><b>appartenenza</b> «\(w \in L(G)\)?»: si converte in CNF e si provano le derivazioni di \(2|w| - 1\) passi, oppure CYK (lezione 10);</li>
+<li><b>vuotezza</b> «\(L(G) = \emptyset\)?»: si marcano i terminali, poi ripetutamente ogni variabile \(A\) con una regola \(A \to U_1 \cdots U_k\) in cui tutti gli \(U_i\) sono marcati; \(L(G) \neq \emptyset\) se e solo se la variabile iniziale viene marcata;</li>
+<li><b>finitezza</b> «\(L(G)\) è finito?».</li>
+</ul>
+</div>
+
+<div class="tblwrap"><table class="data">
+<tr><th>Problema</th><th>DFA</th><th>CFG</th><th>Macchina di Turing</th></tr>
+<tr><td>appartenenza (\(A\))</td><td>decidibile</td><td>decidibile</td><td>indecidibile (r.e.)</td></tr>
+<tr><td>vuotezza (\(E\))</td><td>decidibile</td><td>decidibile</td><td>indecidibile (non r.e.)</td></tr>
+<tr><td>universalità (\(L = \Sigma^*\))</td><td>decidibile</td><td>indecidibile</td><td>indecidibile</td></tr>
+<tr><td>equivalenza (\(EQ\))</td><td>decidibile</td><td>indecidibile</td><td>indecidibile</td></tr>
+<tr><td>ambiguità</td><td>—</td><td>indecidibile</td><td>—</td></tr>
+</table></div>
+<p>Il quadro mostra il prezzo dell'espressività: più il modello è potente, meno domande su di esso hanno risposta algoritmica.</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Pensare che il PCP sia decidibile «perché le tessere sono finite»: è la lunghezza del match a non essere limitata.</li>
+<li>Confondere l'appartenenza (decidibile per CFG) con la vuotezza dell'intersezione (indecidibile).</li>
+<li>Dire che l'equivalenza di grammatiche CF è decidibile perché lo è quella dei DFA.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>PCP: esiste una sequenza di tessere con sopra = sotto? Indecidibile.</li>
+<li>Prova: le tessere costringono un match a trascrivere una storia di computazione accettante.</li>
+<li>Per le CFG: indecidibili intersezione vuota, ambiguità, universalità, equivalenza; decidibili appartenenza e vuotezza.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Trova, se esiste, un match per \(\{[a/ab], [bb/b], [ab/ba]\}\) e per \(\{[ab/aba], [bba/aa], [aba/bab]\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Primo: 1, 2: sopra \(a \cdot bb = abb\), sotto \(ab \cdot b = abb\). Match.</p>
+<p>Secondo: deve iniziare con la tessera 1 (le altre hanno primi simboli diversi sopra e sotto: \(b\)/\(a\), \(a\)/\(b\)). Dopo \([ab/aba]\) sopra c'è \(ab\), sotto \(aba\): serve una tessera che sopra inizi con \(a\): la 1 o la 3. Con la 1 si ottiene \(abab\) contro \(abaaba\): differiscono al quarto simbolo, ramo morto. Con la 3: sopra \(ababa\), sotto \(ababab\): di nuovo sotto avanti di un \(b\) finale, e la prossima tessera deve iniziare sopra con \(b\): solo la 2, che dà sopra \(ababa\,bba\), sotto \(ababab\,aa\), incompatibili. Non c'è match.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Mostra che il PCP su un alfabeto di <b>un solo simbolo</b> è decidibile.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Con un solo simbolo conta solo la lunghezza: ogni tessera ha una differenza \(d_i = |t_i| - |b_i|\). Un match esiste se e solo se esiste una tessera con \(d_i = 0\), oppure una con \(d_i > 0\) e una con \(d_j < 0\) (si prendono \(|d_j|\) copie della prima e \(d_i\) della seconda). Si controlla in tempo lineare.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Descrivi un algoritmo che decide se \(L(G) = \emptyset\) per una grammatica CF e applicalo a \(S \to AB \mid a\,C\), \(A \to aA\), \(B \to b\), \(C \to Cc\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Marco i terminali \(a, b, c\). Passo 1: \(B \to b\) ha tutto marcato: marco \(B\). Passo 2: \(A \to aA\) richiede \(A\), non marcata; \(C \to Cc\) richiede \(C\). \(S \to AB\) richiede \(A\); \(S \to aC\) richiede \(C\). Nessun nuovo marcato: stabilità. \(S\) non è marcata, quindi \(L(G) = \emptyset\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Data un'istanza del PCP con \(k\) tessere, scrivi le grammatiche \(G_T\) e \(G_B\) e spiega perché \(S \to T \mid B\) è ambigua se e solo se c'è un match.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(G_T: T \to t_i\,T\,a_i \mid t_i\,a_i\), \(G_B: B \to b_i\,B\,a_i \mid b_i\,a_i\), con \(a_1, \dots, a_k\) simboli nuovi. Ciascuna delle due grammatiche è non ambigua (la sequenza di indici in fondo determina la derivazione). Una stringa ha due alberi in \(S \to T \mid B\) solo se sta sia in \(L(T)\) sia in \(L(B)\), cioè se \(t_{i_1}\cdots t_{i_\ell}\,a_{i_\ell}\cdots a_{i_1} = b_{i_1}\cdots b_{i_\ell}\,a_{i_\ell}\cdots a_{i_1}\): esattamente un match.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Enuncia il PCP e dai un'istanza con soluzione.</summary><div>Date tessere \([t_i/b_i]\), esiste una sequenza con \(t_{i_1}\cdots = b_{i_1}\cdots\)? Esempio \([b/ca],[a/ab],[ca/a],[abc/c]\), soluzione 2,1,3,2,4 con stringa \(abcaaabc\).</div></details>
+<details><summary>Qual è l'idea della riduzione di \(A_{\mathrm{TM}}\) al PCP?</summary><div>Le tessere costringono un match a trascrivere la storia di computazione: la riga sotto è sempre una configurazione avanti, e può essere raggiunta solo quando compare \(q_{accept}\).</div></details>
+<details><summary>Quali problemi sulle grammatiche CF sono decidibili e quali no?</summary><div>Decidibili: appartenenza, vuotezza, finitezza. Indecidibili: ambiguità, intersezione vuota, universalità, equivalenza, inclusione.</div></details>
+<details><summary>Cos'è una storia di computazione e perché è utile?</summary><div>La sequenza di configurazioni di una computazione accettante. Verificarla è un controllo locale tra configurazioni consecutive, che si può codificare in tessere, grammatiche o formule (Cook–Levin).</div></details>
+</section>

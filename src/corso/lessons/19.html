@@ -1,0 +1,129 @@
+<!--{"n":19,"mod":"C","title":"Il problema della fermata e il programma universale","dsw":"§4.2–4.3 (PDF p. 87–97)","sipser":"§4.2 «The halting problem» (PDF p. 194–206)","time":"3 ore","lead":"Il risultato centrale del corso: esiste un programma che sa eseguire tutti gli altri, ma non esiste un programma che sappia dire, in generale, se un altro programma terminerà."}-->
+
+<h2>Il problema</h2>
+<p>Ogni programmatore ha scritto almeno una volta un ciclo infinito per errore. Sarebbe comodo avere uno strumento che, dato un programma e un input, dica in anticipo: «questo terminerà» oppure «questo andrà in loop». Gli IDE moderni segnalano alcuni casi ovvi (<code>while(true)</code> senza <code>break</code>), ma uno strumento che funzioni <b>sempre</b> è impossibile. Questa lezione dimostra perché.</p>
+
+<div class="def"><span class="k">Definizione · il predicato HALT</span>
+<p>\[\mathrm{HALT}(x, y) \iff \text{il programma con numero } y \text{, eseguito con input } x \text{, termina}.\]
+In simboli: \(\mathrm{HALT}(x, y) \iff \Psi^{(1)}_{\mathcal P}(x)\!\downarrow\) con \(\#(\mathcal P) = y\), cioè \(\Phi_y(x)\!\downarrow\).</p>
+</div>
+<p>HALT è un predicato totale ben definito: per ogni coppia \((x, y)\) il programma termina oppure no. La domanda è se sia <b>calcolabile</b>.</p>
+
+<h2>Il teorema</h2>
+<div class="thm"><span class="k">Teorema (Turing, 1936)</span>
+<p>\(\mathrm{HALT}(x, y)\) non è un predicato calcolabile.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Supponiamo per assurdo che HALT sia calcolabile. Allora possiamo usarlo come macro condizionale (lezione 15) e scrivere il programma \(\mathcal P\):</p>
+<p>\([A]\ \mathrm{IF}\ \mathrm{HALT}(X, X)\ \mathrm{GOTO}\ A\)</p>
+<p>Che cosa fa \(\mathcal P\) su input \(x\)?</p>
+<ul>
+<li>se \(\mathrm{HALT}(x, x)\) è vero, salta a sé stesso per sempre: <b>non termina</b>;</li>
+<li>se \(\mathrm{HALT}(x, x)\) è falso, prosegue oltre l'ultima istruzione: <b>termina</b>.</li>
+</ul>
+<p>Quindi \(\Psi_{\mathcal P}(x)\!\downarrow \iff \neg\mathrm{HALT}(x, x)\). Sia \(y_0 = \#(\mathcal P)\). Per definizione di HALT, \(\Psi_{\mathcal P}(x)\!\downarrow \iff \mathrm{HALT}(x, y_0)\). Mettendo insieme:
+\[\mathrm{HALT}(x, y_0) \iff \neg\mathrm{HALT}(x, x) \quad \text{per ogni } x.\]
+Con \(x = y_0\): \(\mathrm{HALT}(y_0, y_0) \iff \neg\mathrm{HALT}(y_0, y_0)\). Contraddizione.</p>
+</div>
+
+<h3>Perché è una diagonalizzazione</h3>
+<p>Disponi in una tabella infinita i valori di HALT: riga \(i\) = programma \(i\), colonna \(j\) = input \(j\), cella = ↓ se il programma termina, ↑ se no. Il programma \(\mathcal P\) è costruito per comportarsi, sull'input \(i\), in modo <b>opposto</b> alla cella diagonale \((i, i)\). Quindi \(\mathcal P\) differisce da ogni riga, ma \(\mathcal P\) è un programma e deve essere una riga. L'unica ipotesi usata per costruire \(\mathcal P\) è che HALT sia calcolabile: è quella che cade.</p>
+<div data-w="diag-halt"></div>
+
+<div class="remark"><span class="k">La versione del Sipser</span>
+<p>Il Sipser formula lo stesso risultato con le macchine di Turing: il linguaggio \(A_{\mathrm{TM}} = \{\langle M, w\rangle : M \text{ è una TM che accetta } w\}\) è indecidibile. Si suppone un decisore \(H\) per \(A_{\mathrm{TM}}\), si costruisce \(D\) che su input \(\langle M\rangle\) esegue \(H\) su \(\langle M, \langle M\rangle\rangle\) e fa l'opposto, e si ottiene una contraddizione eseguendo \(D\) su \(\langle D\rangle\). Poi, per riduzione, anche \(\mathrm{HALT}_{\mathrm{TM}}\) è indecidibile. È la stessa diagonalizzazione.</p>
+</div>
+
+<h2>Il programma universale</h2>
+<p>Se non possiamo <b>prevedere</b> la terminazione, possiamo almeno <b>simulare</b> un programma dato il suo numero? Sì.</p>
+<div class="thm"><span class="k">Teorema di universalità</span>
+<p>Per ogni \(n \ge 1\) esiste un programma \(\mathcal U_n\) tale che, per ogni programma \(\mathcal P\) e ogni input,
+\[\Psi^{(n+1)}_{\mathcal U_n}(x_1, \dots, x_n, \#(\mathcal P)) = \Psi^{(n)}_{\mathcal P}(x_1, \dots, x_n).\]
+In particolare la funzione \(\Phi^{(n)}(x_1, \dots, x_n, y) = \Phi^{(n)}_y(x_1, \dots, x_n)\) è parzialmente calcolabile.</p>
+</div>
+<div class="proof"><span class="k">Idea della dimostrazione</span>
+<p>\(\mathcal U_n\) tiene in due variabili lo stato della computazione simulata:</p>
+<ul>
+<li>\(K\) = numero dell'istruzione da eseguire;</li>
+<li>\(S\) = codifica dei valori delle variabili come numero di Gödel: \(S = \prod_i p_i^{\text{valore della variabile } i}\), con le variabili nell'ordine \(Y, X_1, Z_1, X_2, \dots\).</li>
+</ul>
+<p>All'inizio \(K = 1\) e \(S = \prod_{i=1}^{n} p_{2i}^{x_i}\) (le \(X_i\) hanno i valori di input, tutto il resto è 0). Poi \(\mathcal U_n\) ripete:</p>
+<ol>
+<li>Se \(K = \mathrm{Lt}(y + 1) + 1\) oppure \(K = 0\) (oltre l'ultima istruzione, o etichetta inesistente): esce con \(Y = (S)_1\).</li>
+<li>Decodifica l'istruzione \(K\)-esima: \(U = r((y+1)_K)\), variabile \(P = p_{r(U)+1}\) (il primo associato a quella variabile), tipo \(l(U)\).</li>
+<li>Esegue: se è un incremento, \(S \leftarrow S \cdot P\); se è un decremento e \(P \mid S\), \(S \leftarrow \lfloor S / P\rfloor\); se è un salto e \(P \mid S\) (la variabile è \(\neq 0\)), \(K \leftarrow\) la prima istruzione con l'etichetta giusta; altrimenti \(K \leftarrow K + 1\).</li>
+</ol>
+<p>Tutte le operazioni usate (\(l, r, (x)_i, \mathrm{Lt}\), divisibilità, minimo indice con una certa etichetta) sono primitive ricorsive, quindi sono macro legittime. Il ciclo principale termina se e solo se il programma simulato termina.</p>
+</div>
+
+<div class="remark"><span class="k">Perché è un'idea enorme</span>
+<p>Un singolo programma fisso esegue <b>qualunque</b> altro programma ricevuto come dato. È il principio del computer a programma memorizzato (von Neumann), degli interpreti, della JVM che esegue bytecode, degli emulatori. Turing lo dimostrò nel 1936 per le sue macchine, prima che esistessero i computer.</p>
+</div>
+
+<h3>Simulare non basta per decidere</h3>
+<p>Perché non decidere HALT eseguendo \(\mathcal U\)? Perché se il programma simulato non termina, nemmeno la simulazione termina, e non c'è un momento in cui si possa rispondere «no». Si può però:</p>
+<ul>
+<li>rispondere «sì» quando la simulazione termina: HALT è <b>semidecidibile</b> (r.e., lezione 21);</li>
+<li>simulare per un numero <b>limitato</b> di passi. Il predicato \(\mathrm{STP}^{(n)}(x_1, \dots, x_n, y, t)\) = «il programma \(y\) termina entro \(t\) passi» è <b>primitivo ricorsivo</b>. Allora
+\[\mathrm{HALT}(x, y) \iff (\exists t)\ \mathrm{STP}(x, y, t),\]
+con un quantificatore <b>non limitato</b>: è proprio quello che non si può calcolare.</li>
+</ul>
+
+<h2>Conseguenze</h2>
+<ul>
+<li>Esiste una funzione parzialmente calcolabile (\(\Phi(x, y)\)) che non si può estendere a una funzione calcolabile totale: altrimenti si deciderebbe HALT.</li>
+<li>Nessun «verificatore universale di terminazione» per programmi Java, Python, ecc.: un tale verificatore deciderebbe HALT.</li>
+<li>Gli strumenti di analisi statica reali sono quindi necessariamente <b>incompleti</b> (a volte rispondono «non so») oppure <b>non corretti</b> (a volte sbagliano).</li>
+</ul>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Scrivere il programma diagonale come \(\mathrm{IF}\ \mathrm{HALT}(X, X)\ \mathrm{GOTO}\ E\) (comportamento uguale, non opposto, alla diagonale): non si ottiene contraddizione.</li>
+<li>Dimenticare di dire che il programma \(\mathcal P\) è legittimo <b>proprio perché</b> si è supposto HALT calcolabile.</li>
+<li>Confondere «indecidibile» con «non sappiamo come farlo»: è dimostrato che <b>nessun</b> programma ci riesce.</li>
+<li>Concludere che nessun programma particolare si può analizzare: per molti programmi specifici la terminazione si dimostra benissimo. È il caso <b>generale</b> a essere impossibile.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>\(\mathrm{HALT}(x, y)\): il programma \(y\) termina su \(x\). Non calcolabile.</li>
+<li>Prova: \([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ A\), numero \(y_0\), valutato su \(y_0\).</li>
+<li>Programma universale: simula qualunque programma dato il numero (stato codificato con Gödel).</li>
+<li>STP (entro \(t\) passi) è p.r.; HALT = \(\exists t\,\mathrm{STP}\), semidecidibile ma non decidibile.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che il predicato \(H_0(y)\) = «il programma \(y\) termina sull'input 0» non è calcolabile. (Suggerimento: dato \(x\) e \(y\), costruisci un programma che ignora l'input, mette \(x\) in \(X\) e poi si comporta come \(y\).)</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Per ogni \(x, y\) sia \(\mathcal Q_{x,y}\) il programma che azzera \(X\), esegue \(x\) volte \(X \leftarrow X + 1\) e poi le istruzioni del programma \(y\). \(\mathcal Q_{x,y}\) termina su 0 se e solo se \(y\) termina su \(x\). La funzione \((x, y) \mapsto \#(\mathcal Q_{x,y})\) è calcolabile (anzi p.r., è il teorema del parametro della lezione 21). Se \(H_0\) fosse calcolabile, \(\mathrm{HALT}(x, y) = H_0(\#(\mathcal Q_{x,y}))\) lo sarebbe.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Perché la prova non funziona per i programmi che terminano sempre? In altre parole: dato un linguaggio in cui tutti i programmi terminano (per esempio solo cicli <code>for</code>), il suo «HALT» è banalmente decidibile. Dove si rompe l'argomento diagonale?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Il programma diagonale \([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ A\) contiene un ciclo infinito, che in quel linguaggio non si può scrivere. L'oggetto diagonale non appartiene alla classe elencata. In quel caso si diagonalizza sui <b>valori</b> invece che sulla terminazione (lezione 16): si ottiene una funzione calcolabile totale che il linguaggio non sa calcolare.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che la funzione \(g(x) = 1\) se \(\Phi_x(x)\!\downarrow\), \(g(x) = 0\) altrimenti, non è calcolabile, senza usare il teorema su HALT ma ripetendo direttamente la diagonalizzazione.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Se \(g\) fosse calcolabile, il programma \([A]\ \mathrm{IF}\ g(X) \neq 0\ \mathrm{GOTO}\ A\) avrebbe un numero \(e\) e terminerebbe su \(x\) se e solo se \(g(x) = 0\), cioè se e solo se \(\Phi_x(x)\!\uparrow\). Per \(x = e\): \(\Phi_e(e)\!\downarrow \iff \Phi_e(e)\!\uparrow\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che non esiste una funzione calcolabile totale \(f\) tale che \(f(x, y) \ge\) numero di passi impiegati dal programma \(y\) sull'input \(x\), ogni volta che questo termina.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Se esistesse, \(\mathrm{HALT}(x, y) \iff \mathrm{STP}(x, y, f(x,y))\): un predicato p.r. composto con una funzione calcolabile, quindi calcolabile. Contraddizione. Morale: il tempo di esecuzione dei programmi che terminano non è limitato da alcuna funzione calcolabile.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Dimostra che HALT non è calcolabile.</summary><div>Per assurdo, il programma \([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ A\) è legittimo; ha numero \(y_0\); termina su \(x\) iff \(\neg\mathrm{HALT}(x,x)\); con \(x = y_0\) si ha \(\mathrm{HALT}(y_0,y_0) \iff \neg\mathrm{HALT}(y_0,y_0)\).</div></details>
+<details><summary>Cosa dice il teorema di universalità? Come funziona il programma universale?</summary><div>Esiste \(\mathcal U_n\) con \(\Psi_{\mathcal U_n}(\vec x, \#\mathcal P) = \Psi_{\mathcal P}(\vec x)\). Tiene il contatore \(K\) e lo stato \(S\) come numero di Gödel; decodifica l'istruzione \(K\)-esima e aggiorna \(S\) moltiplicando o dividendo per il primo della variabile.</div></details>
+<details><summary>Perché non si può decidere HALT simulando con il programma universale?</summary><div>Se il programma simulato non termina, la simulazione non termina e non si può mai rispondere «no». HALT è solo semidecidibile.</div></details>
+<details><summary>Che relazione c'è tra HALT e STP?</summary><div>\(\mathrm{STP}(x,y,t)\) (termina entro \(t\) passi) è primitivo ricorsivo; \(\mathrm{HALT}(x,y) \iff \exists t\ \mathrm{STP}(x,y,t)\) con quantificatore non limitato.</div></details>
+</section>

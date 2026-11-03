@@ -1,0 +1,154 @@
+<!--{"n":8,"mod":"A","title":"Pumping lemma e linguaggi non regolari","sipser":"§1.4 (PDF p. 98–106)","dsw":"§9.6–9.7 (PDF p. 279–288)","time":"3–4 ore","lead":"Lo strumento per dimostrare che un linguaggio NON è regolare. È l'esercizio che compare più spesso allo scritto: va capito a fondo e scritto con precisione."}-->
+
+<h2>L'intuizione: la memoria finita si ripete</h2>
+<p>Un DFA con \(p\) stati, leggendo una stringa di almeno \(p\) simboli, attraversa almeno \(p + 1\) stati (contando quello iniziale). Per il <b>principio dei cassetti</b> qualche stato deve ripetersi. Tra le due visite allo stesso stato l'automa ha letto un pezzo di input \(y\) che lo ha riportato al punto di partenza: un <b>ciclo</b>. Ma allora quel ciclo si può percorrere zero volte, due volte, cento volte, e l'automa non se ne accorge: arriva sempre negli stessi stati e dà la stessa risposta.</p>
+<p>Conseguenza: in un linguaggio regolare, ogni stringa abbastanza lunga contiene un pezzo che si può «pompare» (ripetere o togliere) restando nel linguaggio. Se troviamo una stringa lunga in cui nessun pezzo si può pompare, il linguaggio non è regolare.</p>
+
+<h2>L'enunciato</h2>
+<div class="thm"><span class="k">Pumping lemma per i linguaggi regolari</span>
+<p>Se \(L\) è regolare, esiste un numero \(p \ge 1\) (la <b>lunghezza di pumping</b>) tale che ogni stringa \(s \in L\) con \(|s| \ge p\) si può scrivere come \(s = xyz\) con:</p>
+<ol>
+<li>\(xy^iz \in L\) per ogni \(i \ge 0\);</li>
+<li>\(|y| \ge 1\);</li>
+<li>\(|xy| \le p\).</li>
+</ol>
+</div>
+<p>Con i quantificatori, che è il modo giusto di ricordarlo:
+\[L \text{ regolare} \;\Rightarrow\; \exists p\ \forall s \in L,\ |s| \ge p\ \exists x,y,z:\ s = xyz,\ |y| \ge 1,\ |xy| \le p,\ \forall i \ge 0\ \ xy^iz \in L.\]</p>
+
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Sia \(M = (Q, \Sigma, \delta, q_1, F)\) un DFA per \(L\) e sia \(p = |Q|\). Sia \(s = s_1 s_2 \cdots s_n \in L\) con \(n \ge p\), e sia \(r_1, r_2, \dots, r_{n+1}\) la sequenza di stati attraversati (\(r_1 = q_1\), \(r_{k+1} = \delta(r_k, s_k)\), \(r_{n+1} \in F\)).</p>
+<p>Tra i primi \(p + 1\) stati \(r_1, \dots, r_{p+1}\) ce ne sono due uguali, perché gli stati distinti sono solo \(p\): sia \(r_j = r_l\) con \(j < l \le p + 1\). Poniamo
+\[x = s_1 \cdots s_{j-1}, \qquad y = s_j \cdots s_{l-1}, \qquad z = s_l \cdots s_n.\]</p>
+<ul>
+<li>\(x\) porta \(M\) da \(r_1\) a \(r_j\); \(y\) da \(r_j\) a \(r_l = r_j\); \(z\) da \(r_l\) a \(r_{n+1} \in F\). Quindi \(xy^iz\) porta da \(r_1\) a \(r_j\), poi \(i\) volte da \(r_j\) a \(r_j\), poi a \(r_{n+1}\): accettata per ogni \(i\). <b>Condizione 1.</b></li>
+<li>\(j < l\) quindi \(|y| = l - j \ge 1\). <b>Condizione 2.</b></li>
+<li>\(l \le p + 1\) quindi \(|xy| = l - 1 \le p\). <b>Condizione 3.</b></li>
+</ul>
+</div>
+
+<h2>Come si usa: lo schema della dimostrazione</h2>
+<p>Il lemma dice «regolare \(\Rightarrow\) pompabile». Lo si usa nella forma contronominale: «non pompabile \(\Rightarrow\) non regolare». Conviene vederlo come un <b>gioco contro un avversario</b> che difende la regolarità di \(L\). Le mosse sono alternate, seguendo i quantificatori:</p>
+<ol>
+<li><b>L'avversario</b> sceglie \(p\) (\(\exists p\)). Tu non sai quanto vale: devi ragionare per un \(p\) generico.</li>
+<li><b>Tu</b> scegli \(s \in L\) con \(|s| \ge p\) (\(\forall s\)): la stringa la scegli tu, in funzione di \(p\).</li>
+<li><b>L'avversario</b> sceglie la scomposizione \(s = xyz\) con \(|xy| \le p\) e \(|y| \ge 1\) (\(\exists x,y,z\)). Devi vincere contro <b>ogni</b> scomposizione ammessa.</li>
+<li><b>Tu</b> scegli \(i\) (\(\forall i\)) e mostri che \(xy^iz \notin L\).</li>
+</ol>
+<p>Se vinci comunque giochi l'avversario, hai dimostrato che \(L\) non soddisfa il lemma e quindi non è regolare.</p>
+<div data-w="pump-reg"></div>
+
+<h2>Esempi svolti</h2>
+<div class="example"><span class="k">Esempio 1 · \(L = \{0^n1^n : n \ge 0\}\)</span>
+<p>Supponiamo per assurdo \(L\) regolare e sia \(p\) la lunghezza di pumping. Scegliamo \(s = 0^p1^p \in L\), che ha lunghezza \(2p \ge p\).</p>
+<p>Sia \(s = xyz\) una scomposizione qualsiasi con \(|xy| \le p\) e \(|y| \ge 1\). Siccome i primi \(p\) simboli di \(s\) sono tutti 0, \(x\) e \(y\) sono fatti solo di 0: \(y = 0^k\) con \(k \ge 1\).</p>
+<p>Prendiamo \(i = 2\): \(xy^2z = 0^{p+k}1^p\), che ha più 0 che 1, quindi \(\notin L\). Contraddizione.</p>
+</div>
+<p>Nota come il vincolo \(|xy| \le p\) abbia fatto tutto il lavoro: ha costretto \(y\) dentro il blocco di 0. Per questo si sceglie una stringa che inizia con un blocco lungo almeno \(p\).</p>
+
+<div class="example"><span class="k">Esempio 2 · \(L = \{ww : w \in \{0,1\}^*\}\)</span>
+<p>Scegliamo \(s = 0^p1\,0^p1\). (Con \(s = 0^p0^p\) non funzionerebbe: \(0^{2p}\) si pompa restando in \(L\) se \(|y|\) è pari.)</p>
+<p>Ogni scomposizione ammessa ha \(y = 0^k\), \(k \ge 1\), dentro il primo blocco. Con \(i = 2\) otteniamo \(0^{p+k}1\,0^p1\). Se stesse in \(L\), sarebbe \(ww\) con \(|w| = p + 1 + k/2\); la prima metà finisce prima del primo 1 o lo contiene in una posizione diversa dalla seconda metà. In ogni caso le due metà sono diverse: \(\notin L\).</p>
+</div>
+
+<div class="example"><span class="k">Esempio 3 · \(L = \{0^i1^j : i > j\}\) (pompare verso il basso)</span>
+<p>Scegliamo \(s = 0^{p+1}1^p\). Ogni scomposizione ha \(y = 0^k\), \(k \ge 1\). Pompare verso l'alto (\(i = 2\)) dà \(0^{p+1+k}1^p \in L\): non serve. Pompiamo <b>verso il basso</b>, \(i = 0\): \(xz = 0^{p+1-k}1^p\), e \(p + 1 - k \le p\), quindi \(\notin L\).</p>
+</div>
+
+<div class="example"><span class="k">Esempio 4 · \(L = \{1^{n^2} : n \ge 0\}\) (stringhe di lunghezza quadrata)</span>
+<p>Scegliamo \(s = 1^{p^2}\). Ogni scomposizione ha \(1 \le |y| \le p\). Con \(i = 2\): \(|xy^2z| = p^2 + |y|\), e
+\[p^2 < p^2 + |y| \le p^2 + p < p^2 + 2p + 1 = (p+1)^2.\]
+Una lunghezza strettamente compresa tra due quadrati consecutivi non è un quadrato: \(\notin L\).</p>
+</div>
+
+<div class="example"><span class="k">Esempio 5 · con le proprietà di chiusura</span>
+<p>\(L = \{w \in \{0,1\}^* : \#_0(w) = \#_1(w)\}\). Si può usare direttamente il pumping lemma con \(s = 0^p1^p\) (stesso argomento dell'esempio 1), oppure osservare che \(L \cap 0^*1^* = \{0^n1^n\}\): se \(L\) fosse regolare lo sarebbe anche l'intersezione.</p>
+</div>
+
+<h2>Come scegliere la stringa</h2>
+<ul>
+<li>Deve <b>dipendere da \(p\)</b> e stare in \(L\). Una stringa fissata come \(0011\) non va bene: l'avversario sceglie \(p\) più grande.</li>
+<li>Conviene che i <b>primi \(p\) simboli siano uniformi</b>, così \(|xy| \le p\) costringe \(y\) dentro un blocco noto.</li>
+<li>Deve essere «al limite» del linguaggio: un piccolo cambiamento deve farla uscire. \(0^p1^p\) è al limite per \(0^n1^n\); per \(i > j\) lo è \(0^{p+1}1^p\).</li>
+<li>Se l'avversario ha una scomposizione che resiste per tutti gli \(i\), cambia stringa. Il simulatore sopra te lo mostra nell'elenco delle scomposizioni.</li>
+</ul>
+
+<div class="warn"><span class="k">Gli errori che fanno perdere l'esercizio</span>
+<ul>
+<li>Scegliere un valore numerico per \(p\) («sia \(p = 3\)»): \(p\) è dell'avversario.</li>
+<li>Scegliere <b>una</b> scomposizione comoda («prendo \(y = 0\)») invece di considerarle tutte.</li>
+<li>Dimenticare il vincolo \(|xy| \le p\) e quindi dover gestire casi in cui \(y\) contiene 1 (con \(0^p1^p\) quei casi non esistono: dillo esplicitamente).</li>
+<li>Usare il pumping lemma per dimostrare che un linguaggio <b>è</b> regolare. Il lemma vale solo in una direzione: esistono linguaggi non regolari che soddisfano le sue condizioni.</li>
+<li>Dimenticare \(i = 0\), che a volte è l'unica scelta vincente.</li>
+</ul>
+</div>
+
+<h2>Oltre il pumping lemma: Myhill–Nerode</h2>
+<p>Il pumping lemma è una condizione <b>necessaria</b> ma non sufficiente. Una caratterizzazione esatta dei linguaggi regolari è il teorema di Myhill–Nerode, che DSW tratta nel §9.7.</p>
+<div class="def"><span class="k">Definizione · stringhe distinguibili</span>
+<p>Due stringhe \(x, y\) sono <b>distinguibili</b> rispetto a \(L\) se esiste \(z\) tale che una sola tra \(xz\) e \(yz\) sta in \(L\). Altrimenti sono <b>indistinguibili</b>, \(x \equiv_L y\). La relazione \(\equiv_L\) è di equivalenza.</p>
+</div>
+<div class="thm"><span class="k">Teorema (Myhill–Nerode)</span>
+<p>\(L\) è regolare se e solo se \(\equiv_L\) ha un numero finito di classi. In tal caso il numero di classi è il numero di stati del DFA minimo per \(L\), che è unico a meno di rinominare gli stati.</p>
+</div>
+<p>L'idea: due stringhe che portano un DFA nello stesso stato sono indistinguibili (da lì in poi il comportamento è identico). Quindi un DFA con \(k\) stati non può separare più di \(k\) classi. Viceversa le classi stesse formano gli stati di un DFA.</p>
+<div class="example"><span class="k">Esempio · \(\{0^n1^n\}\) con Myhill–Nerode</span>
+<p>Le stringhe \(0, 00, 000, \dots\) sono a due a due distinguibili: per \(i \neq j\), con \(z = 1^i\) si ha \(0^i1^i \in L\) ma \(0^j1^i \notin L\). Infinite classi, quindi \(L\) non è regolare. Questa dimostrazione è spesso più breve del pumping lemma.</p>
+</div>
+<p>Myhill–Nerode dà anche un algoritmo di <b>minimizzazione</b>: si parte separando stati finali e non finali, poi si separano ripetutamente due stati se c'è un simbolo che li porta in gruppi diversi; quando non si separa più nulla, i gruppi sono gli stati del DFA minimo.</p>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Pumping lemma: \(\exists p\ \forall s\ (|s| \ge p)\ \exists xyz\ (|xy| \le p, |y| \ge 1)\ \forall i: xy^iz \in L\).</li>
+<li>Viene dal principio dei cassetti sugli stati di un DFA con \(p\) stati.</li>
+<li>Schema: p è dell'avversario, s tua, scomposizione dell'avversario (tutte!), i tua.</li>
+<li>Myhill–Nerode: regolare \(\iff\) finite classi di indistinguibilità; dà il DFA minimo.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che \(L = \{a^nb^{2n} : n \ge 0\}\) non è regolare.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Sia \(p\) la lunghezza di pumping, \(s = a^pb^{2p}\). Ogni scomposizione ha \(y = a^k\), \(k \ge 1\). Con \(i = 0\): \(a^{p-k}b^{2p}\), e \(2(p-k) \neq 2p\): \(\notin L\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che il linguaggio delle parentesi bilanciate su \(\{(, )\}\) non è regolare.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(s = (^p)^p\). \(y\) è fatto solo di parentesi aperte; con \(i = 2\) le aperte superano le chiuse. In alternativa: \(L \cap (^*)^* = \{(^n)^n\}\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(L = \{w \in \{a,b\}^* : w = w^R\}\) (palindromi) non è regolare.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(s = a^pba^p\). \(y = a^k\) nel primo blocco. Con \(i = 2\): \(a^{p+k}ba^p\), che non è palindroma perché la \(b\) non è più al centro.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(L = \{1^q : q \text{ primo}\}\) non è regolare.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Sia \(q \ge p + 2\) un primo e \(s = 1^q\). Sia \(|y| = k \ge 1\). Scegliamo \(i = q - k\): \(|xy^iz| = (q - k) + ik = (q - k) + (q - k)k = (q-k)(1 + k)\). Entrambi i fattori sono \(\ge 2\) (\(q - k \ge 2\) perché \(k \le p \le q - 2\)), quindi la lunghezza non è prima.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Il linguaggio \(L = \{0^n1^m : n, m \ge 0\}\) soddisfa il pumping lemma? Qual è la sua lunghezza di pumping minima?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>È regolare (\(0^*1^*\)), quindi lo soddisfa. Con \(p = 1\): ogni \(s\) non vuota si scrive con \(y\) = primo simbolo, e ripetere o togliere il primo simbolo lascia la stringa nella forma \(0^*1^*\). Quindi \(p = 1\) è la minima.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Mostra che \(L = \{a^ib^jc^k : i = 0 \text{ oppure } j = k\}\) soddisfa le condizioni del pumping lemma ma non è regolare.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Con \(p = 1\) e \(y\) = <b>primo simbolo</b> della stringa (\(x = \varepsilon\)). Se \(s\) non contiene \(a\), \(s = b^jc^k\): ripetere o togliere il primo simbolo lascia una stringa senza \(a\), che sta in \(L\). Se \(s\) contiene \(a\), allora \(s = a^ib^jc^j\) con \(i \ge 1\) e \(y = a\): pompando si ottiene \(a^{i-1+t}b^jc^j\), che sta in \(L\) sia quando il numero di \(a\) è 0 sia quando è positivo, perché \(j = k\). Quindi le condizioni del lemma valgono.</p>
+<p>Non è regolare: con Myhill–Nerode, le stringhe \(ab^i\) per \(i \ge 0\) sono a due a due distinguibili (per \(i \neq j\), \(ab^ic^i \in L\) ma \(ab^jc^i \notin L\)), quindi ci sono infinite classi. Equivalentemente, \(L \cap ab^*c^* = \{ab^jc^j\}\) non è regolare.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Enuncia il pumping lemma per i regolari con tutte le condizioni e i quantificatori.</summary><div>\(\exists p \ge 1\ \forall s \in L\) con \(|s| \ge p\ \exists x,y,z\) con \(s = xyz\), \(|y| \ge 1\), \(|xy| \le p\), tali che \(\forall i \ge 0\ xy^iz \in L\).</div></details>
+<details><summary>Dimostra il pumping lemma.</summary><div>\(p\) = numero di stati di un DFA per \(L\). Sui primi \(p\) simboli si attraversano \(p+1\) stati: uno si ripete. Il tratto tra le due occorrenze è \(y\), un ciclo che si può percorrere quante volte si vuole.</div></details>
+<details><summary>Dimostra che \(\{0^n1^n\}\) non è regolare.</summary><div>\(s = 0^p1^p\); \(|xy| \le p\) implica \(y = 0^k\), \(k \ge 1\); \(xy^2z = 0^{p+k}1^p \notin L\).</div></details>
+<details><summary>Il pumping lemma caratterizza i linguaggi regolari?</summary><div>No, è solo una condizione necessaria: esistono linguaggi non regolari che la soddisfano. Una caratterizzazione esatta è Myhill–Nerode (finite classi di indistinguibilità).</div></details>
+</section>

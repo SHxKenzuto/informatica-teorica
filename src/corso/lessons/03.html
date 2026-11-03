@@ -1,0 +1,157 @@
+<!--{"n":3,"mod":"A","title":"Automi finiti deterministici","sipser":"§1.1 (PDF p. 52–68)","dsw":"§9.1 (PDF p. 256)","time":"3 ore","lead":"Il modello di calcolo più semplice: una memoria finita, l'input letto una sola volta da sinistra a destra, una risposta sì o no alla fine. Da qui parte tutta la teoria."}-->
+
+<h2>L'idea</h2>
+<p>Pensa a un tornello della metropolitana: è chiuso, inserisci il biglietto e si sblocca, passi e si richiude. Non ricorda quante persone sono passate né l'ordine degli eventi: ricorda solo <b>in che situazione si trova</b>. Un automa finito è esattamente questo: un dispositivo con un numero finito di <b>stati</b>, che legge un simbolo alla volta e a ogni simbolo cambia stato secondo una regola fissa.</p>
+<p>Il punto chiave è la <b>memoria finita</b>. Un automa con 10 stati, dopo aver letto un prefisso dell'input, può «ricordare» solo una tra 10 informazioni. Tutta la teoria dei linguaggi regolari ruota intorno a una domanda: <i>quante informazioni devo ricordare del prefisso letto per poter rispondere alla fine?</i> Se ne bastano un numero finito, il linguaggio è regolare.</p>
+
+<h2>La definizione formale</h2>
+<div class="def"><span class="k">Definizione · automa finito deterministico (DFA)</span>
+<p>Un DFA è una quintupla \(M = (Q, \Sigma, \delta, q_0, F)\) dove:</p>
+<ul>
+<li>\(Q\) è un insieme finito di <b>stati</b>;</li>
+<li>\(\Sigma\) è l'<b>alfabeto</b> di input;</li>
+<li>\(\delta : Q \times \Sigma \to Q\) è la <b>funzione di transizione</b>;</li>
+<li>\(q_0 \in Q\) è lo <b>stato iniziale</b>;</li>
+<li>\(F \subseteq Q\) è l'insieme degli <b>stati di accettazione</b> (o finali).</li>
+</ul>
+</div>
+<p>Due dettagli importanti nascosti nella definizione:</p>
+<ul>
+<li>\(\delta\) è una <b>funzione totale</b>: per ogni stato e per ogni simbolo c'è <b>esattamente una</b> transizione. È questo che rende l'automa deterministico. Se in un diagramma manca una freccia, quello non è un DFA (a meno di sottintendere uno stato pozzo, vedi sotto).</li>
+<li>\(F\) può essere vuoto (l'automa non accetta nulla) o tutto \(Q\) (accetta tutto).</li>
+</ul>
+
+<div class="def"><span class="k">Definizione · computazione e accettazione</span>
+<p>\(M\) <b>accetta</b> \(w = a_1 a_2 \cdots a_n\) se esiste una sequenza di stati \(r_0, r_1, \dots, r_n\) con</p>
+<ol>
+<li>\(r_0 = q_0\),</li>
+<li>\(r_{i+1} = \delta(r_i, a_{i+1})\) per \(i = 0, \dots, n-1\),</li>
+<li>\(r_n \in F\).</li>
+</ol>
+<p>Il <b>linguaggio riconosciuto</b> da \(M\) è \(L(M) = \{w \in \Sigma^* : M \text{ accetta } w\}\). Un linguaggio è <b>regolare</b> se esiste un DFA che lo riconosce.</p>
+</div>
+<p>Per un DFA la sequenza \(r_0, \dots, r_n\) è unica (determinismo): c'è una sola computazione per ogni input, e la risposta dipende solo dallo stato finale.</p>
+
+<h3>La funzione di transizione estesa</h3>
+<p>Spesso è comodo estendere \(\delta\) alle stringhe. Si definisce per ricorsione \(\hat\delta : Q \times \Sigma^* \to Q\):
+\[\hat\delta(q, \varepsilon) = q, \qquad \hat\delta(q, wa) = \delta(\hat\delta(q, w), a).\]
+\(\hat\delta(q, w)\) è lo stato in cui si arriva partendo da \(q\) e leggendo \(w\). Allora \(L(M) = \{w : \hat\delta(q_0, w) \in F\}\). Nota che \(\varepsilon \in L(M)\) se e solo se \(q_0 \in F\).</p>
+
+<h2>Primo esempio: stringhe che terminano con 01</h2>
+<p>Sia \(L = \{w \in \{0,1\}^* : w \text{ termina con } 01\}\). Cosa devo ricordare del prefisso letto? Solo «quanto di 01 ho già visto alla fine»:</p>
+<ul>
+<li>\(q_0\): il prefisso non termina né con 0 né con 01 (oppure è vuoto);</li>
+<li>\(q_1\): il prefisso termina con 0;</li>
+<li>\(q_2\): il prefisso termina con 01. È l'unico stato finale.</li>
+</ul>
+<p>Le transizioni si ricavano ragionando su cosa succede aggiungendo un simbolo. Da \(q_2\) (fine 01) leggendo 0 si ottiene un prefisso che finisce con 0, quindi \(q_1\); leggendo 1 si ottiene una fine «11», che non è inizio di 01, quindi \(q_0\).</p>
+
+<div data-w="dfa-01"></div>
+
+<p>In forma tabellare (il modo più sicuro allo scritto per non dimenticare transizioni):</p>
+<div class="tblwrap"><table class="data">
+<tr><th>\(\delta\)</th><th>0</th><th>1</th></tr>
+<tr><td>\(\to q_0\)</td><td>\(q_1\)</td><td>\(q_0\)</td></tr>
+<tr><td>\(q_1\)</td><td>\(q_1\)</td><td>\(q_2\)</td></tr>
+<tr><td>\(* q_2\)</td><td>\(q_1\)</td><td>\(q_0\)</td></tr>
+</table></div>
+<p>(La freccia indica lo stato iniziale, l'asterisco gli stati finali.)</p>
+
+<h2>Secondo esempio: divisibilità per 3</h2>
+<p>Sia \(L = \{w \in \{0,1\}^* : w \text{ è la scrittura binaria di un multiplo di } 3\}\) (con \(\varepsilon\) che vale 0). Qui l'informazione da ricordare è il <b>resto modulo 3</b> del numero letto finora. Se il prefisso vale \(n\) e leggo il bit \(b\), il nuovo valore è \(2n + b\), quindi il nuovo resto è \((2r + b) \bmod 3\), dove \(r\) è il vecchio resto. Bastano tre stati \(r_0, r_1, r_2\).</p>
+
+<div data-w="dfa-mod3"></div>
+
+<p>Questo esempio mostra un fatto profondo: l'automa non può memorizzare il numero (che può essere arbitrariamente grande), ma non ne ha bisogno. Gli basta un'informazione «compressa» con un numero finito di valori possibili.</p>
+
+<h2>Stati pozzo e automi incompleti</h2>
+<p>Per \(L = \{w \in \{a,b\}^* : w \text{ inizia con } ab\}\), appena l'input inizia in modo sbagliato la risposta è decisa: rifiutare. Si introduce uno <b>stato pozzo</b> (trappola) non finale, da cui tutte le transizioni rientrano in sé stesso. Analogamente, uno stato finale con cappi su tutti i simboli è un pozzo «accettante».</p>
+
+<div data-w="dfa-sink"></div>
+
+<p>Nei diagrammi lo stato pozzo spesso si omette per leggibilità, con la convenzione che «le frecce mancanti vanno al pozzo». Allo scritto è meglio dichiararlo esplicitamente, soprattutto se poi devi complementare l'automa (lezione 6): lì il pozzo diventa finale e non può essere dimenticato.</p>
+
+<h2>Come si progetta un DFA</h2>
+<ol>
+<li><b>Identifica l'informazione da ricordare.</b> Chiediti: dopo aver letto un prefisso \(x\), cosa mi serve sapere per decidere, qualunque sia il resto \(z\), se \(xz \in L\)? Ogni «tipo» di prefisso diverso diventa uno stato.</li>
+<li><b>Dai un nome descrittivo a ogni stato</b> («ho visto un numero pari di 1», «l'ultimo simbolo è 0»). Questo è anche l'invariante che userai per dimostrare la correttezza.</li>
+<li><b>Scrivi le transizioni</b> per tutti gli stati e tutti i simboli, ragionando su come cambia l'informazione aggiungendo un simbolo.</li>
+<li><b>Scegli lo stato iniziale</b> (descrive il prefisso vuoto) e gli <b>stati finali</b> (descrivono i prefissi che stanno in \(L\)).</li>
+<li><b>Verifica</b> su stringhe di confine: \(\varepsilon\), stringhe di lunghezza 1 e 2, una stringa che sta in \(L\) e una «quasi uguale» che non ci sta.</li>
+</ol>
+
+<div class="example"><span class="k">Esempio svolto · numero pari di 0 e numero dispari di 1</span>
+<p>Servono due bit di informazione: la parità degli 0 e la parità degli 1. Quindi 4 stati: \(PP, PD, DP, DD\) (prima lettera = parità degli 0, seconda = parità degli 1). Iniziale \(PP\) (zero 0 e zero 1, entrambi pari). Finale \(PD\). Leggere 0 cambia la prima lettera, leggere 1 la seconda: \(\delta(PP, 0) = DP\), \(\delta(PP, 1) = PD\), e così via.</p>
+<p>Questo è un caso particolare della costruzione del prodotto (lezione 6): l'automa per «pari 0» e quello per «dispari 1» eseguiti in parallelo.</p>
+</div>
+
+<h2>Dimostrare che un DFA è corretto</h2>
+<p>All'esame a volte si chiede di dimostrare che \(L(M) = L\). Si fa associando a ogni stato un <b>invariante</b> e dimostrandolo per induzione sulla lunghezza dell'input.</p>
+<div class="example"><span class="k">Esempio · correttezza del DFA modulo 3</span>
+<p>Invariante: per ogni \(w\), \(\hat\delta(r_0, w) = r_i\) dove \(i = \mathrm{val}(w) \bmod 3\).</p>
+<p>Base: \(w = \varepsilon\), \(\mathrm{val}(\varepsilon) = 0\) e \(\hat\delta(r_0, \varepsilon) = r_0\).</p>
+<p>Passo: \(w = xb\). Per ipotesi \(\hat\delta(r_0, x) = r_j\) con \(j = \mathrm{val}(x) \bmod 3\). Allora \(\hat\delta(r_0, xb) = \delta(r_j, b) = r_{(2j + b) \bmod 3}\), e \(\mathrm{val}(xb) = 2\,\mathrm{val}(x) + b \equiv 2j + b \pmod 3\).</p>
+<p>Conclusione: \(w\) è accettata \(\iff \hat\delta(r_0, w) = r_0 \iff \mathrm{val}(w) \equiv 0 \pmod 3\).</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici allo scritto</span>
+<ul>
+<li>Transizioni mancanti: un DFA deve avere una freccia per ogni simbolo da ogni stato.</li>
+<li>Dimenticare il caso \(\varepsilon\): lo stato iniziale è finale se e solo se \(\varepsilon \in L\).</li>
+<li>Confondere «contiene» con «termina con» o «inizia con»: nei tre casi l'automa è diverso (per «contiene» lo stato finale è un pozzo accettante).</li>
+<li>Due frecce con lo stesso simbolo uscenti dallo stesso stato: quello è un NFA, non un DFA.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>DFA = \((Q, \Sigma, \delta, q_0, F)\) con \(\delta\) totale. Una sola computazione per input.</li>
+<li>Regolare = riconosciuto da un DFA.</li>
+<li>Progettare = decidere cosa ricordare. Ogni stato è un'informazione finita sul prefisso letto.</li>
+<li>Correttezza = invariante sugli stati + induzione sulla lunghezza.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Progetta un DFA su \(\{a,b\}\) per le stringhe che contengono la sottostringa \(aba\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Stati = quanta parte di \(aba\) è stata vista in fondo al prefisso: \(s_0\) (niente), \(s_1\) (\(a\)), \(s_2\) (\(ab\)), \(s_3\) (trovata, pozzo accettante).</p>
+<p>\(\delta(s_0,a) = s_1, \delta(s_0,b) = s_0\); \(\delta(s_1,a) = s_1, \delta(s_1,b) = s_2\); \(\delta(s_2,a) = s_3, \delta(s_2,b) = s_0\); \(\delta(s_3, a) = \delta(s_3, b) = s_3\). Iniziale \(s_0\), finale \(s_3\).</p>
+<p>Attenzione a \(\delta(s_1, a) = s_1\): dopo «aa» la fine «a» è ancora un inizio utile.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Progetta un DFA su \(\{0,1\}\) per le stringhe di lunghezza multipla di 3.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Tre stati \(t_0, t_1, t_2\) = lunghezza modulo 3. Ogni simbolo (0 o 1) porta da \(t_i\) a \(t_{(i+1) \bmod 3}\). Iniziale e finale \(t_0\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Progetta un DFA per \(\{w \in \{0,1\}^* : \text{ogni 0 è seguito immediatamente da almeno un 1}\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Stati: \(A\) = «tutto ok finora» (finale, iniziale), \(B\) = «ho appena letto uno 0 che aspetta un 1» (non finale), \(P\) = pozzo.</p>
+<p>\(\delta(A,0) = B, \delta(A,1) = A\); \(\delta(B,1) = A, \delta(B,0) = P\); \(P\) va in sé stesso. Esempi: \(\varepsilon, 1, 01, 0101, 011\) accettate; \(0, 00, 10\) rifiutate.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Progetta un DFA per le stringhe su \(\{a, b\}\) in cui il penultimo simbolo è \(a\). Quanti stati servono?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Bisogna ricordare gli ultimi due simboli letti: 4 stati \(aa, ab, ba, bb\) (all'inizio si può trattare il prefisso vuoto come \(bb\), perché non ci sono ancora \(a\) utili). Finali: \(aa\) e \(ab\). Da \(xy\) leggendo \(c\) si va in \(yc\).</p>
+<p>Servono davvero 4 stati: le stringhe \(aa, ab, ba, bb\) sono a due a due distinguibili (es. \(ab\) e \(bb\): aggiungendo \(\varepsilon\), la prima sta in \(L\), la seconda no; \(ba\) e \(bb\): aggiungendo \(a\) si ottiene \(baa \in L\) e \(bba \notin L\)).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Progetta un DFA per i numeri binari (letti dal bit più significativo) divisibili per 5, e dimostrane la correttezza.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Stati \(r_0, \dots, r_4\), \(\delta(r_i, b) = r_{(2i + b) \bmod 5}\), iniziale e finale \(r_0\). La correttezza è identica a quella del caso modulo 3, con 5 al posto di 3.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Dai la definizione formale di DFA e di linguaggio riconosciuto.</summary><div>\((Q, \Sigma, \delta, q_0, F)\) con \(\delta : Q \times \Sigma \to Q\) totale. \(M\) accetta \(w = a_1 \cdots a_n\) se la sequenza \(r_0 = q_0\), \(r_{i+1} = \delta(r_i, a_{i+1})\) termina in \(r_n \in F\). \(L(M)\) = insieme delle stringhe accettate.</div></details>
+<details><summary>Definisci la funzione di transizione estesa.</summary><div>\(\hat\delta(q, \varepsilon) = q\) e \(\hat\delta(q, wa) = \delta(\hat\delta(q, w), a)\). \(L(M) = \{w : \hat\delta(q_0, w) \in F\}\).</div></details>
+<details><summary>Quando lo stato iniziale deve essere finale?</summary><div>Se e solo se \(\varepsilon \in L\): su \(\varepsilon\) l'automa non si muove da \(q_0\).</div></details>
+<details><summary>Cosa vuol dire che un automa ha «memoria finita»? Fai un esempio di linguaggio che sembra richiedere memoria infinita ma è regolare.</summary><div>Può distinguere solo un numero finito di situazioni dopo aver letto un prefisso. I multipli di 3 in binario: il numero può essere enorme, ma basta ricordarne il resto modulo 3.</div></details>
+</section>

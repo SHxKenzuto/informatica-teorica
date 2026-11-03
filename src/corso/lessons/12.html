@@ -1,0 +1,132 @@
+<!--{"n":12,"mod":"B","title":"Equivalenza tra automi a pila e grammatiche","sipser":"§2.2, Lemmi 2.21 e 2.27 (PDF p. 136–144)","dsw":"§10.8 (PDF p. 327)","time":"3 ore","lead":"Un linguaggio è context-free se e solo se qualche automa a pila lo riconosce. È l'analogo del teorema di Kleene per il secondo livello della gerarchia: grammatiche e automi a pila sono due facce dello stesso oggetto."}-->
+
+<div class="thm"><span class="k">Teorema</span>
+<p>Un linguaggio è context-free se e solo se è riconosciuto da un automa a pila (non deterministico).</p>
+</div>
+<p>Le due direzioni hanno costruzioni molto diverse. La prima (grammatica → PDA) è semplice e va saputa nei dettagli con un esempio. La seconda (PDA → grammatica) è più tecnica: va saputa l'idea delle variabili \(A_{pq}\).</p>
+
+<h2>Da grammatica a automa a pila</h2>
+<h3>L'idea</h3>
+<p>Il PDA <b>simula una derivazione sinistra</b> della grammatica. In ogni momento la pila contiene la parte della forma sentenziale ancora da «verificare». Quando in cima c'è una variabile, il PDA la sostituisce con il lato destro di una sua regola, scelto in modo non deterministico (indovina la regola giusta). Quando in cima c'è un terminale, lo confronta con il prossimo simbolo dell'input: se coincidono lo toglie e avanza, altrimenti il ramo muore.</p>
+<p>Il punto chiave: i terminali a sinistra della prima variabile, in una derivazione sinistra, non cambiano più. Quindi il PDA può confrontarli subito con l'input e toglierli dalla pila, tenendo in pila solo la parte che parte dalla prima variabile.</p>
+
+<h3>La costruzione</h3>
+<div class="proof"><span class="k">Dimostrazione (CFG → PDA)</span>
+<p>Sia \(G = (V, \Sigma, R, S)\). Costruiamo un PDA con tre stati principali \(q_{\mathrm{start}}, q_{\mathrm{loop}}, q_{\mathrm{accept}}\) e alfabeto della pila \(\Gamma = V \cup \Sigma \cup \{\$\}\):</p>
+<ol>
+<li>\(q_{\mathrm{start}} \xrightarrow{\varepsilon, \varepsilon \to S\$} q_{\mathrm{loop}}\): si mette sulla pila il fondo \(\$\) e sopra la variabile iniziale.</li>
+<li>Per ogni regola \(A \to w\): un cappio su \(q_{\mathrm{loop}}\) con \(\varepsilon, A \to w\) (si toglie \(A\) e si mette \(w\), con il primo simbolo di \(w\) in cima).</li>
+<li>Per ogni terminale \(a\): un cappio su \(q_{\mathrm{loop}}\) con \(a, a \to \varepsilon\) (si confronta e si toglie).</li>
+<li>\(q_{\mathrm{loop}} \xrightarrow{\varepsilon, \$ \to \varepsilon} q_{\mathrm{accept}}\): se è rimasto solo il fondo, l'input è stato generato tutto.</li>
+</ol>
+<p>Mettere una stringa \(w\) in una sola mossa è un'abbreviazione: si realizza con una catena di stati intermedi che impilano un simbolo alla volta, dall'ultimo al primo.</p>
+<p><b>Correttezza</b> (idea): per induzione si mostra che il PDA, dopo aver letto \(x\), può avere in pila \(\alpha\$\) se e solo se \(S \Rightarrow^* x\alpha\) con una derivazione sinistra in cui \(\alpha\) inizia con una variabile (o è vuota). Con \(\alpha = \varepsilon\) e tutto l'input letto si ottiene \(S \Rightarrow^* x\).</p>
+</div>
+
+<div class="example"><span class="k">Esempio · \(S \to aSb \mid ab\) sull'input \(aabb\)</span>
+<div class="tblwrap"><table class="data">
+<tr><th>mossa</th><th>input rimasto</th><th>pila (cima a sinistra)</th></tr>
+<tr><td>inizio</td><td>aabb</td><td>ε</td></tr>
+<tr><td>\(\varepsilon, \varepsilon \to S\$\)</td><td>aabb</td><td>S$</td></tr>
+<tr><td>\(\varepsilon, S \to aSb\)</td><td>aabb</td><td>aSb$</td></tr>
+<tr><td>\(a, a \to \varepsilon\)</td><td>abb</td><td>Sb$</td></tr>
+<tr><td>\(\varepsilon, S \to ab\)</td><td>abb</td><td>abb$</td></tr>
+<tr><td>\(a, a \to \varepsilon\)</td><td>bb</td><td>bb$</td></tr>
+<tr><td>\(b, b \to \varepsilon\) (due volte)</td><td>ε</td><td>$</td></tr>
+<tr><td>\(\varepsilon, \$ \to \varepsilon\)</td><td>ε</td><td>ε — accetta</td></tr>
+</table></div>
+<p>Alla quarta riga il PDA ha «indovinato» la regola \(S \to ab\); il ramo che avesse scelto di nuovo \(S \to aSb\) sarebbe morto confrontando \(a\) con \(b\).</p>
+</div>
+<p>Il simulatore qui sotto ha costruito automaticamente il PDA a partire dalla grammatica. Osserva i rami: a ogni variabile in cima nascono tanti rami quante sono le regole.</p>
+<div data-w="pda-from-cfg"></div>
+
+<h2>Da automa a pila a grammatica</h2>
+<h3>Preparazione</h3>
+<p>Si trasforma prima il PDA in modo che abbia tre proprietà (si ottengono con modifiche semplici):</p>
+<ol>
+<li>un <b>unico stato finale</b> \(q_{\mathrm{accept}}\);</li>
+<li>la pila viene <b>svuotata</b> prima di accettare;</li>
+<li>ogni mossa fa <b>esattamente una</b> tra push e pop (le mosse che fanno entrambe si spezzano in due; quelle che non fanno nulla diventano un push seguito da un pop di un simbolo fittizio).</li>
+</ol>
+
+<h3>Le variabili \(A_{pq}\)</h3>
+<p>Per ogni coppia di stati \(p, q\) si introduce una variabile \(A_{pq}\), con il significato:</p>
+<div class="def"><span class="k">Invariante</span>
+<p>\(A_{pq} \Rightarrow^* x\) se e solo se \(x\) porta il PDA dallo stato \(p\) <b>con pila vuota</b> allo stato \(q\) <b>con pila vuota</b>. (Più precisamente: con qualunque contenuto sotto, che non viene mai toccato.)</p>
+</div>
+<p>La variabile iniziale è \(A_{q_0, q_{\mathrm{accept}}}\): genera esattamente le stringhe accettate.</p>
+<p>Consideriamo una computazione da \(p\) a \(q\) a pila vuota che legge \(x\). La prima mossa è un push (la pila è vuota, non si può togliere nulla) e l'ultima è un pop (alla fine la pila è vuota). Ci sono due casi:</p>
+<ul>
+<li><b>Il simbolo messo all'inizio è lo stesso tolto alla fine</b>: la pila non si svuota mai nel mezzo. Se la prima mossa legge \(a\), va in \(r\) e mette \(t\), e l'ultima mossa da \(s\) legge \(b\), toglie \(t\) e va in \(q\), allora in mezzo c'è una computazione da \(r\) a \(s\) a pila «vuota» (sopra \(t\)). Regola: \(A_{pq} \to a\,A_{rs}\,b\).</li>
+<li><b>La pila si svuota in un punto intermedio</b> \(r\): la computazione si spezza in due. Regola: \(A_{pq} \to A_{pr}A_{rq}\) per ogni stato \(r\).</li>
+</ul>
+<p>Infine \(A_{pp} \to \varepsilon\) per ogni \(p\) (zero mosse).</p>
+
+<div class="proof"><span class="k">Dimostrazione (PDA → CFG), riassunto</span>
+<p>Regole della grammatica:</p>
+<ul>
+<li>per ogni \(p, q, r, s \in Q\), \(t \in \Gamma\), \(a, b \in \Sigma_\varepsilon\): se \((r, t) \in \delta(p, a, \varepsilon)\) e \((q, \varepsilon) \in \delta(s, b, t)\), allora \(A_{pq} \to aA_{rs}b\);</li>
+<li>per ogni \(p, q, r\): \(A_{pq} \to A_{pr}A_{rq}\);</li>
+<li>per ogni \(p\): \(A_{pp} \to \varepsilon\).</li>
+</ul>
+<p>Si dimostra l'invariante in entrambe le direzioni: «se \(A_{pq} \Rightarrow^* x\) allora \(x\) porta da \(p\) a \(q\) a pila vuota» per induzione sul numero di passi della derivazione; il viceversa per induzione sul numero di mosse della computazione, distinguendo i due casi sopra.</p>
+</div>
+
+<h2>Conseguenze</h2>
+<ul>
+<li><b>Regolari ⊆ CF</b> anche per questa via: un DFA è un PDA che non usa la pila.</li>
+<li>Per dimostrare che un linguaggio è CF si può scegliere lo strumento più comodo: una grammatica (strutture ricorsive) o un PDA (conteggi e confronti).</li>
+<li>Le proprietà di chiusura (lezione 13) si dimostrano con l'una o con l'altra rappresentazione: unione e stella con le grammatiche, intersezione con un regolare con il prodotto PDA × DFA.</li>
+</ul>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Nella costruzione CFG → PDA, impilare il lato destro al contrario: il <b>primo</b> simbolo di \(w\) deve finire <b>in cima</b>.</li>
+<li>Dimenticare le transizioni di confronto per i terminali (\(a, a \to \varepsilon\)), o quella finale su \(\$\).</li>
+<li>Pensare che il PDA costruito sia deterministico: non lo è, sceglie la regola indovinando.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>CF = linguaggi dei PDA.</li>
+<li>CFG → PDA: \(S\$\) sulla pila; espandi la variabile in cima con una regola; confronta i terminali; accetta su \(\$\).</li>
+<li>PDA → CFG: variabili \(A_{pq}\) = stringhe che portano da \(p\) a \(q\) a pila vuota; regole \(aA_{rs}b\), \(A_{pr}A_{rq}\), \(\varepsilon\).</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Costruisci il PDA associato alla grammatica \(S \to 0S1 \mid \varepsilon\) e scrivi la sequenza di configurazioni su \(0011\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Cappi su \(q_{\mathrm{loop}}\): \(\varepsilon, S \to 0S1\); \(\varepsilon, S \to \varepsilon\); \(0, 0 \to \varepsilon\); \(1, 1 \to \varepsilon\). Più \(\varepsilon, \varepsilon \to S\$\) all'inizio e \(\varepsilon, \$ \to \varepsilon\) alla fine.</p>
+<p>Configurazioni (input, pila): (0011, S$) → (0011, 0S1$) → (011, S1$) → (011, 0S11$) → (11, S11$) → (11, 11$) → (1, 1$) → (ε, $) → accetta.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Costruisci il PDA associato alla grammatica delle espressioni \(E \to E+T \mid T\), \(T \to a\), e mostra un ramo accettante su \(a+a\). Quanti rami possono essere aperti in totale? Perché la ricorsione sinistra crea problemi?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Ramo accettante: (a+a, E$) → (a+a, E+T$) → (a+a, T+T$) → (a+a, a+T$) → (+a, +T$) → (a, T$) → (a, a$) → (ε, $) → accetta.</p>
+<p>Con la regola \(E \to E+T\) un ramo può espandere \(E\) all'infinito senza mai leggere input (la pila cresce: \(E+T, E+T+T, \dots\)). Il PDA resta corretto (quei rami non accettano mai), ma un parser deterministico top-down non può funzionare con la ricorsione sinistra: per questo i parser LL la eliminano.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Nella costruzione PDA → grammatica, perché in una computazione da \(p\) a \(q\) che parte e arriva a pila vuota la prima mossa è necessariamente un push e l'ultima un pop? Quale ipotesi di normalizzazione serve?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Serve l'ipotesi che ogni mossa faccia esattamente un push oppure un pop. All'inizio la pila è vuota, quindi la prima mossa non può essere un pop: è un push. Alla fine la pila è vuota, quindi l'ultima mossa non può essere un push (lascerebbe un simbolo): è un pop. Da qui i due casi: il simbolo tolto alla fine è quello messo all'inizio (regola \(A_{pq} \to aA_{rs}b\)), oppure la pila si svuota prima, in uno stato intermedio \(r\) (regola \(A_{pq} \to A_{pr}A_{rq}\)).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che se \(L\) è CF e \(R\) è regolare, allora \(L \cap R\) è CF.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Siano \(P\) un PDA per \(L\) e \(M\) un DFA per \(R\). Si costruisce un PDA con stati \(Q_P \times Q_M\) che simula entrambi in parallelo: la pila è quella di \(P\); quando \(P\) legge un simbolo \(a\), anche \(M\) avanza con \(a\); quando \(P\) fa una \(\varepsilon\)-mossa, \(M\) resta fermo. Finali: le coppie con entrambe le componenti finali. Il prodotto funziona perché \(M\) non ha bisogno di memoria aggiuntiva; con due PDA non si potrebbe (servirebbero due pile).</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Enuncia l'equivalenza tra grammatiche CF e automi a pila.</summary><div>Un linguaggio è context-free se e solo se è riconosciuto da un PDA non deterministico.</div></details>
+<details><summary>Come costruisci un PDA da una grammatica?</summary><div>Metti \(S\$\) sulla pila; in un unico stato ciclo: se in cima c'è una variabile, la sostituisci con il lato destro di una sua regola (scelta non deterministica); se c'è un terminale, lo confronti con l'input e lo togli; se c'è \(\$\), accetti. Simula una derivazione sinistra.</div></details>
+<details><summary>Qual è il significato delle variabili \(A_{pq}\) nella costruzione inversa?</summary><div>\(A_{pq}\) genera esattamente le stringhe che portano il PDA da \(p\) a \(q\) partendo e arrivando con pila vuota. Le regole corrispondono ai due casi: la pila non si svuota mai (\(aA_{rs}b\)) oppure si svuota in un punto intermedio (\(A_{pr}A_{rq}\)).</div></details>
+<details><summary>Perché l'intersezione di un CF con un regolare è CF?</summary><div>Prodotto tra il PDA e il DFA: il DFA non ha bisogno di memoria, quindi basta una pila sola.</div></details>
+</section>

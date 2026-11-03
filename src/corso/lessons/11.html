@@ -1,0 +1,148 @@
+<!--{"n":11,"mod":"B","title":"Automi a pila e non determinismo","sipser":"§2.2 (PDF p. 130–144)","dsw":"§10.8 (PDF p. 327)","time":"3 ore","lead":"Un automa finito con in più una pila illimitata. La pila è una memoria infinita ma ad accesso ristretto: basta per contare e per verificare strutture annidate, non per tutto il resto."}-->
+
+<h2>Perché una pila</h2>
+<p>Abbiamo visto che \(\{0^n1^n\}\) non è regolare: un automa finito non può ricordare quanti 0 ha letto. Diamogli allora una memoria in più, ma la più semplice possibile: una <b>pila</b> (stack), in cui si può solo mettere un simbolo in cima (<i>push</i>), togliere il simbolo in cima (<i>pop</i>) e leggere la cima. Per \(0^n1^n\) basta impilare un simbolo per ogni 0 e toglierne uno per ogni 1: la stringa è accettata se la pila si svuota esattamente alla fine.</p>
+<p>È la stessa struttura che usa il tuo programma Java a runtime: lo stack delle chiamate gestisce chiamate annidate, così come la pila dell'automa gestisce strutture annidate come le parentesi.</p>
+
+<h2>Definizione</h2>
+<div class="def"><span class="k">Definizione · automa a pila (PDA)</span>
+<p>Un automa a pila è una sestupla \(P = (Q, \Sigma, \Gamma, \delta, q_0, F)\) dove</p>
+<ul>
+<li>\(Q\) è l'insieme finito degli stati, \(q_0\) l'iniziale, \(F \subseteq Q\) i finali;</li>
+<li>\(\Sigma\) è l'alfabeto di input, \(\Gamma\) l'<b>alfabeto della pila</b> (possono essere diversi);</li>
+<li>\(\delta : Q \times \Sigma_\varepsilon \times \Gamma_\varepsilon \to \mathcal{P}(Q \times \Gamma_\varepsilon)\) è la funzione di transizione.</li>
+</ul>
+</div>
+<p>\((r, c) \in \delta(q, a, b)\) significa: nello stato \(q\), leggendo \(a\) dall'input e togliendo \(b\) dalla cima della pila, l'automa può andare in \(r\) e mettere \(c\) sulla pila. Ognuno dei tre simboli può essere \(\varepsilon\):</p>
+<ul>
+<li>\(a = \varepsilon\): la mossa non legge input;</li>
+<li>\(b = \varepsilon\): la mossa non guarda né toglie nulla dalla pila;</li>
+<li>\(c = \varepsilon\): la mossa non mette nulla.</li>
+</ul>
+<p>Nei diagrammi la transizione si scrive \(a, b \to c\). Per esempio \(0, \varepsilon \to 0\) significa «leggi 0 e impila 0»; \(1, 0 \to \varepsilon\) significa «leggi 1 e togli uno 0»; \(\varepsilon, \$ \to \varepsilon\) significa «senza leggere, togli il simbolo \(\$\)».</p>
+
+<div class="def"><span class="k">Definizione · accettazione</span>
+<p>\(P\) accetta \(w\) se si può scrivere \(w = w_1 \cdots w_m\) con \(w_i \in \Sigma_\varepsilon\) ed esistono stati \(r_0, \dots, r_m\) e contenuti della pila \(s_0, \dots, s_m \in \Gamma^*\) tali che</p>
+<ol>
+<li>\(r_0 = q_0\) e \(s_0 = \varepsilon\) (pila vuota all'inizio);</li>
+<li>per ogni \(i\): \((r_{i+1}, b) \in \delta(r_i, w_{i+1}, a)\), con \(s_i = at\) e \(s_{i+1} = bt\) per qualche \(t \in \Gamma^*\) (si toglie \(a\) dalla cima e si mette \(b\));</li>
+<li>\(r_m \in F\).</li>
+</ol>
+</div>
+<p>Come per gli NFA, l'accettazione è esistenziale: basta un ramo. Il PDA del Sipser è <b>non deterministico</b> per definizione.</p>
+
+<div class="remark"><span class="k">Testare la pila vuota</span>
+<p>La definizione non permette di chiedere «la pila è vuota?». Il trucco standard: la prima mossa impila un simbolo speciale \(\$\) (\(\varepsilon, \varepsilon \to \$\)). Quando in cima c'è \(\$\), la pila è «logicamente» vuota.</p>
+</div>
+
+<div class="remark"><span class="k">Varianti della definizione</span>
+<p>Alcuni testi (e a volte DSW) permettono di mettere sulla pila una <b>stringa</b> intera in una mossa, scrivendo per esempio \(a, X \to YZX\). Si simula con più mosse \(\varepsilon\) e stati intermedi, quindi non cambia nulla. Esiste anche l'accettazione <b>per pila vuota</b> (si accetta quando la pila si svuota, indipendentemente dallo stato): le due nozioni sono equivalenti per i PDA non deterministici.</p>
+</div>
+
+<h2>Esempio 1: \(\{0^n1^n : n \ge 0\}\)</h2>
+<p>Stati: \(q_1\) iniziale (e finale, per accettare \(\varepsilon\)), \(q_2\) «sto leggendo 0», \(q_3\) «sto leggendo 1», \(q_4\) finale.</p>
+<ul>
+<li>\(q_1 \xrightarrow{\varepsilon, \varepsilon \to \$} q_2\): metto il fondo.</li>
+<li>\(q_2 \xrightarrow{0, \varepsilon \to 0} q_2\): impilo ogni 0.</li>
+<li>\(q_2 \xrightarrow{1, 0 \to \varepsilon} q_3\) e \(q_3 \xrightarrow{1, 0 \to \varepsilon} q_3\): per ogni 1 tolgo uno 0.</li>
+<li>\(q_3 \xrightarrow{\varepsilon, \$ \to \varepsilon} q_4\): se ritrovo il fondo, gli 0 e gli 1 erano in egual numero.</li>
+</ul>
+<p>Prova \(000111\), \(0011\), \(001\), \(0101\): nella tabella vedi stato, input rimasto e contenuto della pila di ogni ramo.</p>
+<div data-w="pda-0n1n"></div>
+
+<h2>Esempio 2: stesso numero di 0 e di 1, in qualunque ordine</h2>
+<p>Ora 0 e 1 possono alternarsi. Idea: la pila contiene l'«eccesso» corrente. Se in cima c'è lo stesso simbolo che leggo (o il fondo), impilo; se c'è il simbolo opposto, lo tolgo (un 0 e un 1 si annullano). Alla fine si accetta se si ritrova il fondo.</p>
+<div data-w="pda-eq"></div>
+<p>Qui la mossa \(0, \$ \to 0\$\) mette due simboli (lo 0 sopra il \$ rimesso a posto): è la variante «push di stringhe», una comodità.</p>
+
+<h2>Esempio 3: dove il non determinismo serve davvero</h2>
+<p>\(L = \{ww^R : w \in \{0,1\}^*\}\), i palindromi di lunghezza pari. L'automa deve impilare la prima metà e poi confrontarla, al contrario, con la seconda. Ma come fa a sapere dove sta la metà? Non può saperlo: lo <b>indovina</b>. Da \(q_2\) (fase di impilamento) c'è sempre una mossa \(\varepsilon, \varepsilon \to \varepsilon\) verso \(q_3\) (fase di confronto). Ogni posizione della stringa genera un ramo che «scommette» che lì sia la metà; solo il ramo che indovina arriva a svuotare la pila esattamente alla fine.</p>
+<div data-w="pda-pal"></div>
+<p>Osserva nella tabella quanti rami vengono creati: a ogni passo nella fase di impilamento un ramo si stacca per tentare il confronto. Quasi tutti muoiono subito.</p>
+
+<h2>Deterministico contro non deterministico</h2>
+<div class="def"><span class="k">Definizione · PDA deterministico (DPDA)</span>
+<p>Un PDA è deterministico se in ogni configurazione è applicabile <b>al più una</b> mossa: per ogni \(q, a, b\), tra \(\delta(q, a, b)\), \(\delta(q, \varepsilon, b)\), \(\delta(q, a, \varepsilon)\) e \(\delta(q, \varepsilon, \varepsilon)\) al più uno è non vuoto, e quello contiene al più un elemento. I linguaggi riconosciuti dai DPDA si chiamano <b>context-free deterministici</b> (DCFL).</p>
+</div>
+<div class="thm"><span class="k">Teorema</span>
+<p>I DCFL sono un sottoinsieme proprio dei linguaggi context-free. Ad esempio \(\{ww^R\}\) è CF ma non è riconosciuto da alcun PDA deterministico.</p>
+</div>
+<p>Per gli automi finiti il non determinismo non aggiungeva potere; per gli automi a pila sì. Il motivo intuitivo: un DPDA che legge \(ww^R\) deve decidere in tempo reale quando smettere di impilare, ma nessuna informazione locale glielo dice. (La dimostrazione formale non è richiesta.)</p>
+<p>Invece \(\{0^n1^n\}\) e \(\{w\,c\,w^R\}\) (con un separatore \(c\) al centro) sono DCFL: c'è un segnale che dice quando cambiare fase.</p>
+
+<div class="remark"><span class="k">Perché importa nella pratica</span>
+<p>I parser dei compilatori (LL, LR, quelli generati da yacc/bison o ANTLR) sono in sostanza automi a pila <b>deterministici</b>: devono analizzare il codice in tempo lineare senza tornare indietro. Per questo le grammatiche dei linguaggi di programmazione sono progettate per essere deterministiche, e alcuni costrutti ambigui (il «dangling else») vanno risolti con regole extra.</p>
+</div>
+
+<h3>Altre differenze tra CF e DCFL</h3>
+<ul>
+<li>I DCFL sono chiusi per <b>complemento</b> (si invertono gli stati finali, con qualche accortezza sulle \(\varepsilon\)-mosse); i CF no.</li>
+<li>Ogni DCFL ha una grammatica non ambigua; esistono CF inerentemente ambigui.</li>
+</ul>
+
+<h2>Come progettare un PDA</h2>
+<ol>
+<li>Decidi <b>cosa mettere sulla pila</b>: un contatore (un simbolo per unità), la parte di stringa da confrontare dopo, o simboli che rappresentano «impegni» da soddisfare (parentesi aperte).</li>
+<li>Usa gli <b>stati</b> per le fasi (prima parte, seconda parte) e per i controlli di formato (prima tutti gli 0, poi tutti gli 1).</li>
+<li>Usa il <b>non determinismo</b> per indovinare i punti di passaggio tra le fasi.</li>
+<li>Usa \(\$\) per controllare la pila vuota alla fine.</li>
+</ol>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dimenticare il \(\$\) e accettare stringhe con pila non vuota, oppure non riuscire a controllare il fondo.</li>
+<li>Confondere l'ordine: la pila restituisce i simboli al <b>contrario</b>. È perfetta per \(ww^R\), inadatta per \(ww\).</li>
+<li>Dimenticare il caso \(\varepsilon\) (se \(\varepsilon \in L\), lo stato iniziale deve poter accettare).</li>
+<li>Pensare che il non determinismo sia «gratis» come negli NFA: per i PDA non si può sempre eliminare.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>PDA = NFA + pila: \(\delta : Q \times \Sigma_\varepsilon \times \Gamma_\varepsilon \to \mathcal P(Q \times \Gamma_\varepsilon)\), mosse \(a, b \to c\).</li>
+<li>Si accetta se un ramo consuma l'input e termina in \(F\). Il simbolo \(\$\) segnala la pila vuota.</li>
+<li>Il non determinismo aggiunge potere: DCFL ⊊ CF (es. \(ww^R\)).</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Progetta un PDA per \(\{a^nb^{2n} : n \ge 0\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Per ogni \(a\) si impilano <b>due</b> simboli (\(a, \varepsilon \to XX\), o due mosse con uno stato intermedio); per ogni \(b\) se ne toglie uno. Stati: \(q_1\) (iniziale, finale) \(\xrightarrow{\varepsilon,\varepsilon\to\$}\) \(q_2\) con cappio \(a, \varepsilon \to XX\); \(q_2 \xrightarrow{b, X \to \varepsilon} q_3\) con cappio \(b, X \to \varepsilon\); \(q_3 \xrightarrow{\varepsilon, \$ \to \varepsilon} q_4\) finale.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Progetta un PDA per le parentesi bilanciate su \(\{(, )\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(q_1 \xrightarrow{\varepsilon, \varepsilon \to \$} q_2\); in \(q_2\) cappi \((, \varepsilon \to X\) e \(), X \to \varepsilon\); \(q_2 \xrightarrow{\varepsilon, \$ \to \varepsilon} q_3\) finale (e \(q_1\) finale per \(\varepsilon\)). Se arriva una \()\) con \(\$\) in cima non c'è mossa: il ramo muore.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Progetta un PDA per \(\{a^ib^jc^k : i = j \text{ oppure } i = k\}\). Perché serve il non determinismo?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Si impilano le \(a\), poi si sceglie in modo non deterministico (con una \(\varepsilon\)-mossa) uno dei due rami. Ramo «\(i = j\)»: si tolgono le \(a\) leggendo le \(b\), si controlla il fondo, poi si leggono le \(c\) liberamente. Ramo «\(i = k\)»: si leggono le \(b\) senza toccare la pila, poi si tolgono le \(a\) leggendo le \(c\), e si controlla il fondo. L'automa non può sapere in anticipo quale confronto sarà quello giusto.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Progetta un PDA <b>deterministico</b> per \(\{w\,c\,w^R : w \in \{a,b\}^*\}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(q_1 \xrightarrow{\varepsilon,\varepsilon\to\$} q_2\); \(q_2\) impila ogni \(a\) e \(b\); \(q_2 \xrightarrow{c, \varepsilon \to \varepsilon} q_3\); \(q_3\) toglie \(a\) leggendo \(a\) e \(b\) leggendo \(b\); \(q_3 \xrightarrow{\varepsilon, \$ \to \varepsilon} q_4\) finale. In ogni configurazione c'è al più una mossa: la \(c\) segnala il cambio di fase.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Progetta un PDA per \(\{x \in \{a, b\}^* : x \neq ww \text{ per ogni } w\}\), sapendo che una stringa di lunghezza pari \(x = x_1 \cdots x_{2n}\) non è della forma \(ww\) se e solo se esiste \(i \le n\) con \(x_i \neq x_{n+i}\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Le stringhe di lunghezza dispari si accettano con un ramo che controlla solo la parità della lunghezza (bastano gli stati).</p>
+<p>Per quelle di lunghezza pari si usa questo fatto: \(x\) di lunghezza pari non è della forma \(ww\) se e solo se si può scrivere come \(x = yz\) dove \(y\) e \(z\) hanno lunghezza dispari e i loro simboli centrali sono diversi. (Se \(x_i \neq x_{n+i}\), si taglia in modo che \(x_i\) sia il centro di \(y\) e \(x_{n+i}\) il centro di \(z\): le lunghezze tornano perché tra le due posizioni ci sono esattamente \(n - 1\) simboli.)</p>
+<p>Il PDA quindi: riconosce una stringa \(y\) di lunghezza dispari ricordando nello stato il suo simbolo centrale \(\sigma\) (impila un simbolo per ogni carattere prima del centro, indovina il centro, spila un simbolo per ogni carattere dopo); poi fa lo stesso con \(z\) ricordando il centro \(\tau\); accetta se \(\sigma \neq \tau\). È un classico che mostra che il complemento di \(\{ww\}\), che non è CF, è invece CF.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci formalmente un automa a pila e la sua nozione di accettazione.</summary><div>\((Q, \Sigma, \Gamma, \delta, q_0, F)\) con \(\delta : Q \times \Sigma_\varepsilon \times \Gamma_\varepsilon \to \mathcal P(Q \times \Gamma_\varepsilon)\). Accetta se esiste una sequenza di mosse che, partendo da \(q_0\) con pila vuota, consuma tutto l'input e termina in uno stato di \(F\).</div></details>
+<details><summary>A cosa serve il simbolo \(\$\)?</summary><div>A riconoscere quando la pila è vuota, perché la definizione non lo permette direttamente.</div></details>
+<details><summary>Il non determinismo aggiunge potere ai PDA? Esempio.</summary><div>Sì. \(\{ww^R\}\) è CF ma non è riconosciuto da alcun PDA deterministico; per gli automi finiti invece NFA e DFA sono equivalenti.</div></details>
+<details><summary>Perché un PDA va bene per \(ww^R\) ma non per \(ww\)?</summary><div>La pila restituisce i simboli in ordine inverso: confronta naturalmente con il rovesciamento. Per \(ww\) servirebbe una coda; infatti \(\{ww\}\) non è CF.</div></details>
+</section>

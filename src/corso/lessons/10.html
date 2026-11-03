@@ -1,0 +1,149 @@
+<!--{"n":10,"mod":"B","title":"Forma normale di Chomsky","sipser":"§2.1 «Chomsky normal form» (PDF p. 127–130)","dsw":"§10.3 (PDF p. 304)","time":"2–3 ore","lead":"Ogni grammatica context-free si può riscrivere in una forma standard con regole di soli due tipi. È un esercizio d'esame classico, e la forma normale è lo strumento che rende possibili il pumping lemma per i CF e l'algoritmo di appartenenza."}-->
+
+<h2>Perché una forma normale</h2>
+<p>Le grammatiche CF possono avere regole di forma arbitraria: \(\varepsilon\)-regole, regole che riscrivono una variabile in un'altra, lati destri lunghissimi. Per dimostrare teoremi e per scrivere algoritmi conviene lavorare con grammatiche «disciplinate». Una <b>forma normale</b> è un formato ristretto in cui <i>ogni</i> grammatica CF si può trasformare senza cambiare il linguaggio generato.</p>
+
+<div class="def"><span class="k">Definizione · forma normale di Chomsky (CNF)</span>
+<p>Una grammatica è in forma normale di Chomsky se ogni regola ha una delle forme
+\[A \to BC \qquad\qquad A \to a\]
+dove \(a\) è un terminale e \(B, C\) sono variabili <b>diverse dalla variabile iniziale</b>. È ammessa in più la regola \(S \to \varepsilon\) per la sola variabile iniziale \(S\) (serve se \(\varepsilon \in L\)).</p>
+</div>
+
+<h3>Che cosa si guadagna</h3>
+<ul>
+<li><b>Alberi binari.</b> Ogni nodo interno ha due figli variabili o un solo figlio terminale. Questo rende semplici i ragionamenti sull'altezza degli alberi, usati nel pumping lemma CF (lezione 13).</li>
+<li><b>Lunghezza delle derivazioni fissata.</b> Una stringa \(w \neq \varepsilon\) con \(|w| = n\) si deriva in <b>esattamente \(2n - 1\) passi</b>: \(n - 1\) applicazioni di regole \(A \to BC\) (ognuna aumenta di 1 il numero di simboli, da 1 a \(n\)) e \(n\) applicazioni di regole \(A \to a\).</li>
+<li><b>Decidibilità dell'appartenenza.</b> Per sapere se \(w \in L(G)\) basta provare tutte le derivazioni di \(2n - 1\) passi, che sono in numero finito. L'algoritmo efficiente è CYK, in tempo \(O(n^3)\).</li>
+</ul>
+
+<h2>Il teorema</h2>
+<div class="thm"><span class="k">Teorema</span>
+<p>Ogni linguaggio context-free è generato da una grammatica in forma normale di Chomsky.</p>
+</div>
+<p>La dimostrazione è un algoritmo in cinque passi. L'<b>ordine</b> è importante: ogni passo potrebbe reintrodurre regole eliminate dai passi precedenti, se fatti in un ordine diverso.</p>
+
+<h3>Passo 1 · nuova variabile iniziale</h3>
+<p>Si aggiunge una nuova variabile iniziale \(S_0\) con la regola \(S_0 \to S\). Così la variabile iniziale non compare mai nel lato destro di una regola.</p>
+
+<h3>Passo 2 · eliminazione delle \(\varepsilon\)-regole</h3>
+<p>Per ogni regola \(A \to \varepsilon\) con \(A \neq S_0\):</p>
+<ul>
+<li>si cancella \(A \to \varepsilon\);</li>
+<li>per ogni regola che contiene \(A\) a destra, si aggiunge una nuova regola per <b>ogni</b> modo di cancellare alcune occorrenze di \(A\). Da \(R \to uAvAw\) si aggiungono \(R \to uvAw\), \(R \to uAvw\), \(R \to uvw\);</li>
+<li>se c'era \(R \to A\), si aggiunge \(R \to \varepsilon\), a meno che non sia già stata eliminata in precedenza (in quel caso si ignora, per non ciclare).</li>
+</ul>
+<p>Si ripete finché non restano \(\varepsilon\)-regole (tranne eventualmente \(S_0 \to \varepsilon\)).</p>
+<div class="remark"><span class="k">Metodo alternativo: variabili annullabili</span>
+<p>Si calcolano prima tutte le variabili <b>annullabili</b>, cioè quelle con \(A \Rightarrow^* \varepsilon\): sono quelle con una regola \(A \to \varepsilon\), poi quelle con una regola \(A \to B_1 \cdots B_k\) in cui tutte le \(B_i\) sono annullabili, e così via fino a stabilità. Poi in ogni regola si aggiungono tutte le versioni con un sottoinsieme delle occorrenze annullabili cancellato, e si eliminano tutte le \(\varepsilon\)-regole (tranne \(S_0 \to \varepsilon\) se \(S\) è annullabile). È più ordinato quando ci sono catene di \(\varepsilon\).</p>
+</div>
+
+<h3>Passo 3 · eliminazione delle regole unitarie</h3>
+<p>Una regola <b>unitaria</b> ha la forma \(A \to B\) con \(B\) variabile. Per ciascuna:</p>
+<ul>
+<li>si cancella \(A \to B\);</li>
+<li>per ogni regola \(B \to u\) si aggiunge \(A \to u\), a meno che \(A \to u\) non sia una regola unitaria già eliminata.</li>
+</ul>
+<p>Regole come \(A \to A\) si cancellano e basta. Si ripete finché non restano regole unitarie.</p>
+
+<h3>Passo 4 · spezzare i lati destri lunghi</h3>
+<p>Ogni regola \(A \to u_1u_2 \cdots u_k\) con \(k \ge 3\) si sostituisce con la catena
+\[A \to u_1A_1, \quad A_1 \to u_2A_2, \quad \dots, \quad A_{k-2} \to u_{k-1}u_k,\]
+dove le \(A_i\) sono variabili nuove.</p>
+
+<h3>Passo 5 · isolare i terminali</h3>
+<p>In ogni regola con due simboli a destra, ogni terminale \(a\) si sostituisce con una variabile nuova \(U_a\), aggiungendo la regola \(U_a \to a\).</p>
+
+<p>(I passi 4 e 5 si possono fare in qualunque ordine: il Sipser li unisce in un unico passo.)</p>
+
+<h2>Un esempio completo</h2>
+<p>Segui la conversione dell'esempio 2.10 del Sipser, un passo alla volta:</p>
+<div data-w="cnf"></div>
+
+<div class="example"><span class="k">Esempio · \(S \to aSb \mid \varepsilon\)</span>
+<ol>
+<li>\(S_0 \to S\), \(S \to aSb \mid \varepsilon\).</li>
+<li>Elimino \(S \to \varepsilon\): da \(aSb\) aggiungo \(ab\); da \(S_0 \to S\) aggiungo \(S_0 \to \varepsilon\) (ammessa: è la variabile iniziale). Risultato: \(S_0 \to S \mid \varepsilon\), \(S \to aSb \mid ab\).</li>
+<li>Elimino \(S_0 \to S\): \(S_0 \to aSb \mid ab \mid \varepsilon\).</li>
+<li>Spezzo \(aSb\): \(A \to aX\) con \(X \to Sb\) (per \(S_0\) e per \(S\)).</li>
+<li>Isolo i terminali con \(U \to a\), \(V \to b\).</li>
+</ol>
+<p>Risultato: \(S_0 \to UX \mid UV \mid \varepsilon\), \(S \to UX \mid UV\), \(X \to SV\), \(U \to a\), \(V \to b\).</p>
+<p>Verifica: \(aabb\) ha lunghezza 4, quindi 7 passi: \(S_0 \Rightarrow UX \Rightarrow aX \Rightarrow aSV \Rightarrow aUVV \Rightarrow aaVV \Rightarrow aabV \Rightarrow aabb\).</p>
+</div>
+
+<h2>Algoritmo CYK (cenno)</h2>
+<p>Con una grammatica in CNF, l'algoritmo di Cocke–Younger–Kasami decide se \(w = w_1 \cdots w_n \in L(G)\) con la <b>programmazione dinamica</b>: si riempie una tabella in cui la cella \((i, j)\) contiene l'insieme delle variabili che generano la sottostringa \(w_i \cdots w_j\).</p>
+<ul>
+<li>Sottostringhe di lunghezza 1: \(A \in T(i,i)\) se c'è la regola \(A \to w_i\).</li>
+<li>Sottostringhe più lunghe: \(A \in T(i,j)\) se c'è una regola \(A \to BC\) e un punto di taglio \(k\) con \(B \in T(i,k)\) e \(C \in T(k+1,j)\).</li>
+<li>\(w \in L(G)\) se \(S \in T(1, n)\).</li>
+</ul>
+<p>Sono \(O(n^2)\) celle, ciascuna con \(O(n)\) tagli da provare: tempo \(O(n^3)\). Questo dimostra che <b>ogni linguaggio CF è in P</b> (lezione 24).</p>
+
+<h2>Forma normale di Greibach</h2>
+<p>Un'altra forma normale, citata nel programma come «forme normali»: in <b>forma normale di Greibach</b> ogni regola ha la forma \(A \to aB_1B_2\cdots B_k\) con \(a\) terminale e \(B_i\) variabili (\(k \ge 0\)). Ogni passo di derivazione produce esattamente un terminale, quindi una stringa di lunghezza \(n\) si deriva in \(n\) passi. Dalla forma di Greibach si costruisce facilmente un automa a pila che legge un simbolo a ogni mossa. Ogni linguaggio CF senza \(\varepsilon\) ha una grammatica in forma di Greibach; la conversione è più laboriosa (richiede di eliminare la ricorsione sinistra) e di solito non è chiesta nei dettagli.</p>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Dimenticare il passo 1 e trovarsi con la variabile iniziale a destra.</li>
+<li>Nell'eliminazione delle \(\varepsilon\), aggiungere solo la versione con <i>tutte</i> le occorrenze cancellate e non quelle con <i>alcune</i> cancellate.</li>
+<li>Eliminare le regole unitarie prima delle \(\varepsilon\)-regole: l'eliminazione delle \(\varepsilon\) può creare nuove regole unitarie (come \(S \to S\) nell'esempio del Sipser).</li>
+<li>Lasciare regole \(A \to aB\) o \(A \to Ba\): in CNF i terminali stanno solo in regole \(A \to a\).</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>CNF: \(A \to BC\), \(A \to a\), più \(S \to \varepsilon\) se serve.</li>
+<li>Passi: nuova iniziale; via le \(\varepsilon\); via le unitarie; spezzare; isolare i terminali.</li>
+<li>In CNF: alberi binari, derivazioni di \(2n - 1\) passi, appartenenza decidibile (CYK, \(O(n^3)\)).</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Quali di queste regole sono ammesse in CNF? \(A \to BC\), \(A \to a\), \(A \to aB\), \(A \to B\), \(A \to BCD\), \(S \to \varepsilon\) (\(S\) iniziale), \(A \to \varepsilon\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Ammesse: \(A \to BC\), \(A \to a\), \(S \to \varepsilon\). Non ammesse: \(A \to aB\) (terminale in una regola binaria), \(A \to B\) (unitaria), \(A \to BCD\) (troppo lunga), \(A \to \varepsilon\) (solo l'iniziale può).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Converti in CNF la grammatica \(S \to aSa \mid bSb \mid a \mid b \mid \varepsilon\) (palindromi).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Passo 1: \(S_0 \to S\). Passo 2: elimino \(S \to \varepsilon\): \(S \to aSa \mid bSb \mid aa \mid bb \mid a \mid b\), \(S_0 \to S \mid \varepsilon\). Passo 3: \(S_0 \to aSa \mid bSb \mid aa \mid bb \mid a \mid b \mid \varepsilon\). Passi 4–5 con \(U_a \to a\), \(U_b \to b\), \(X \to SU_a\), \(Y \to SU_b\):</p>
+<p>\(S_0 \to U_aX \mid U_bY \mid U_aU_a \mid U_bU_b \mid a \mid b \mid \varepsilon\); \(S \to U_aX \mid U_bY \mid U_aU_a \mid U_bU_b \mid a \mid b\); \(X \to SU_a\); \(Y \to SU_b\); \(U_a \to a\); \(U_b \to b\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Converti in CNF: \(S \to AB \mid aB\), \(A \to aab \mid \varepsilon\), \(B \to bbA\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Passo 1: \(S_0 \to S\). Passo 2 (\(A\) annullabile): \(S \to AB \mid B \mid aB\), \(A \to aab\), \(B \to bbA \mid bb\). Passo 3: \(S \to B\) diventa \(S \to bbA \mid bb\); \(S_0 \to S\) diventa \(S_0 \to AB \mid aB \mid bbA \mid bb\).</p>
+<p>Passi 4–5 con \(U \to a\), \(V \to b\), \(A_1 \to UV\) (per \(aab = U\,A_1\)), \(B_1 \to VA\) (per \(bbA = V\,B_1\)):</p>
+<p>\(S_0, S \to AB \mid UB \mid VB_1 \mid VV\); \(A \to UA_1\); \(A_1 \to UV\); \(B \to VB_1 \mid VV\); \(B_1 \to VA\); \(U \to a\); \(V \to b\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che in CNF una derivazione di una stringa di lunghezza \(n \ge 1\) ha esattamente \(2n - 1\) passi.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Una regola \(A \to BC\) aumenta di 1 il numero di simboli della forma sentenziale e non cambia il numero di terminali; una regola \(A \to a\) trasforma una variabile in un terminale senza cambiare la lunghezza. Si parte da 1 simbolo e si arriva a \(n\): servono \(n - 1\) regole binarie. Alla fine tutti gli \(n\) simboli sono terminali, e ognuno è stato prodotto da una regola \(A \to a\): \(n\) regole terminali. Totale \(2n - 1\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Applica CYK alla grammatica \(S \to AB \mid BC\), \(A \to BA \mid a\), \(B \to CC \mid b\), \(C \to AB \mid a\) e alla stringa \(baaba\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Lunghezza 1: \(b \to \{B\}\), \(a \to \{A, C\}\). Riga per riga (si indica con \(T_{ij}\) l'insieme per \(w_i \cdots w_j\)):</p>
+<p>\(T_{12} = \{S, A\}\), \(T_{23} = \{B\}\), \(T_{34} = \{S, C\}\), \(T_{45} = \{S, A\}\);
+\(T_{13} = \emptyset\), \(T_{24} = \{B\}\), \(T_{35} = \{B\}\);
+\(T_{14} = \emptyset\), \(T_{25} = \{S, A, C\}\);
+\(T_{15} = \{S, A, C\}\).</p>
+<p>\(S \in T_{15}\): la stringa appartiene al linguaggio. (È l'esempio classico di Hopcroft–Ullman.)</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Che forma hanno le regole in forma normale di Chomsky?</summary><div>\(A \to BC\) con \(B, C\) non iniziali, \(A \to a\), più \(S \to \varepsilon\) per la sola variabile iniziale.</div></details>
+<details><summary>Elenca i passi della conversione e spiega perché l'ordine conta.</summary><div>Nuova iniziale; eliminazione \(\varepsilon\)-regole; eliminazione regole unitarie; spezzare i lati lunghi; isolare i terminali. L'eliminazione delle \(\varepsilon\) può creare regole unitarie, quindi va fatta prima.</div></details>
+<details><summary>Quanti passi ha una derivazione in CNF? Perché è utile?</summary><div>\(2n - 1\) per una stringa di lunghezza \(n \ge 1\). Rende l'appartenenza decidibile (numero finito di derivazioni da provare) e gli alberi binari.</div></details>
+<details><summary>Cos'è la forma normale di Greibach?</summary><div>Regole \(A \to aB_1\cdots B_k\): ogni passo produce esattamente un terminale; utile per costruire automi a pila senza \(\varepsilon\)-mosse di lettura.</div></details>
+</section>

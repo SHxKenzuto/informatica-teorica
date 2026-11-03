@@ -1,0 +1,138 @@
+<!--{"n":6,"mod":"A","title":"Proprietà di chiusura dei linguaggi regolari","sipser":"§1.1 «The regular operations», §1.2 «Closure under the regular operations»","dsw":"§9.4 (PDF p. 268)","time":"2–3 ore","lead":"Se due linguaggi sono regolari, lo sono anche la loro unione, intersezione, differenza, concatenazione, stella e complemento. Ogni dimostrazione è una costruzione di automa: impararle significa saper costruire automi complessi a pezzi."}-->
+
+<h2>Che cosa vuol dire «chiusi»</h2>
+<p>Una classe di linguaggi è <b>chiusa</b> rispetto a un'operazione se, applicando l'operazione a linguaggi della classe, si ottiene ancora un linguaggio della classe. Per i regolari vale per tutte le operazioni «ragionevoli», ed è una proprietà molto utile in due direzioni:</p>
+<ul>
+<li><b>per costruire</b>: un automa per un linguaggio complicato si ottiene combinando automi per linguaggi semplici;</li>
+<li><b>per dimostrare non-regolarità</b>: se combinando \(L\) con linguaggi regolari ottengo un linguaggio sicuramente non regolare, allora \(L\) non era regolare.</li>
+</ul>
+
+<h2>Complemento</h2>
+<div class="thm"><span class="k">Teorema</span>
+<p>Se \(L\) è regolare, anche \(\overline{L} = \Sigma^* \setminus L\) è regolare.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Sia \(M = (Q, \Sigma, \delta, q_0, F)\) un DFA <b>completo</b> per \(L\). Il DFA \(\overline M = (Q, \Sigma, \delta, q_0, Q \setminus F)\) scambia stati finali e non finali. Per ogni \(w\) la computazione è la stessa e termina nello stesso stato \(\hat\delta(q_0, w)\); quello stato è in \(Q \setminus F\) esattamente quando non è in \(F\). Quindi \(L(\overline M) = \overline{L}\).</p>
+</div>
+<div class="warn"><span class="k">Due condizioni essenziali</span>
+<ul>
+<li>L'automa deve essere <b>deterministico</b>. In un NFA una stringa può avere un ramo che accetta e un altro che rifiuta: scambiando i finali la stringa verrebbe ancora accettata. Prima si determinizza (lezione 5).</li>
+<li>L'automa deve essere <b>completo</b>. Se mancano transizioni (stato pozzo sottinteso), le stringhe che finiscono nel pozzo vanno accettate dal complemento: il pozzo deve essere esplicito per diventare finale.</li>
+</ul>
+</div>
+
+<h2>Unione e intersezione: la costruzione del prodotto</h2>
+<p>Per sapere se \(w \in L_1 \cap L_2\) si potrebbe eseguire \(M_1\) su \(w\), poi \(M_2\) su \(w\). Ma un automa legge l'input <b>una sola volta</b>. La soluzione è eseguire i due automi <b>in parallelo</b>: lo stato del nuovo automa è la <b>coppia</b> degli stati dei due.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Se \(L_1\) e \(L_2\) sono regolari, lo sono anche \(L_1 \cap L_2\) e \(L_1 \cup L_2\).</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>Siano \(M_i = (Q_i, \Sigma, \delta_i, q_i, F_i)\) DFA completi per \(L_i\). Definiamo \(M = (Q_1 \times Q_2, \Sigma, \delta, (q_1, q_2), F)\) con
+\[\delta((p, q), a) = (\delta_1(p, a),\ \delta_2(q, a)).\]
+Per induzione su \(|w|\): \(\hat\delta((q_1,q_2), w) = (\hat\delta_1(q_1, w), \hat\delta_2(q_2, w))\). Quindi:</p>
+<ul>
+<li>con \(F = F_1 \times F_2\) (entrambe le componenti finali) si ottiene \(L(M) = L_1 \cap L_2\);</li>
+<li>con \(F = (F_1 \times Q_2) \cup (Q_1 \times F_2)\) (almeno una componente finale) si ottiene \(L(M) = L_1 \cup L_2\).</li>
+</ul>
+</div>
+<p>Il nuovo automa ha \(|Q_1| \cdot |Q_2|\) stati, ma in pratica si costruiscono solo le coppie raggiungibili dallo stato iniziale, come nella costruzione per sottoinsiemi. Prova a cambiare l'operazione: gli stati e le transizioni restano gli stessi, cambiano solo gli stati finali.</p>
+<div data-w="product"></div>
+
+<div class="example"><span class="k">Esempio svolto</span>
+<p>\(M_1\): numero pari di 0 (stati \(E, O\)). \(M_2\): termina con 1 (stati \(A, B\)). Prodotto: stati \((E,A)\) iniziale, \((O,A)\), \((E,B)\), \((O,B)\).</p>
+<ul>
+<li>\((E,A) \xrightarrow{0} (O,A)\), \((E,A) \xrightarrow{1} (E,B)\);</li>
+<li>\((O,A) \xrightarrow{0} (E,A)\), \((O,A) \xrightarrow{1} (O,B)\);</li>
+<li>\((E,B) \xrightarrow{0} (O,A)\), \((E,B) \xrightarrow{1} (E,B)\);</li>
+<li>\((O,B) \xrightarrow{0} (E,A)\), \((O,B) \xrightarrow{1} (O,B)\).</li>
+</ul>
+<p>Per l'intersezione è finale solo \((E,B)\); per l'unione sono finali \((E,A), (E,B), (O,B)\).</p>
+</div>
+
+<h3>Differenza e differenza simmetrica</h3>
+<p>Sono conseguenze immediate: \(L_1 \setminus L_2 = L_1 \cap \overline{L_2}\) (nel prodotto: finali le coppie in \(F_1 \times (Q_2 \setminus F_2)\)), e la differenza simmetrica \(L_1 \triangle L_2\) ha come finali le coppie in cui <b>esattamente una</b> componente è finale. Quest'ultima è utile per decidere se due DFA sono equivalenti: lo sono se e solo se \(L_1 \triangle L_2 = \emptyset\), cioè se nel prodotto nessuno stato «una sì e una no» è raggiungibile.</p>
+
+<h2>Le operazioni regolari con gli NFA</h2>
+<p>Per concatenazione e stella il prodotto non funziona: non si sa <i>dove</i> finisce la prima parte e inizia la seconda. Qui il non determinismo è decisivo: l'automa «indovina» il punto di taglio con una \(\varepsilon\)-mossa.</p>
+<p>Siano \(N_1 = (Q_1, \Sigma, \delta_1, q_1, F_1)\) e \(N_2 = (Q_2, \Sigma, \delta_2, q_2, F_2)\) NFA con stati disgiunti.</p>
+
+<h3>Unione</h3>
+<p>Nuovo stato iniziale \(q_0\) con \(\varepsilon\)-mosse verso \(q_1\) e \(q_2\). Finali \(F_1 \cup F_2\). L'automa sceglie all'inizio quale dei due simulare. (È più semplice del prodotto, ma il risultato è non deterministico.)</p>
+
+<h3>Concatenazione \(L_1 L_2\)</h3>
+<p>Stato iniziale \(q_1\). Si aggiungono \(\varepsilon\)-mosse da <b>ogni stato finale di \(N_1\)</b> verso \(q_2\). Finali: solo \(F_2\). L'automa legge un pezzo con \(N_1\); quando si trova in uno stato finale di \(N_1\) può scommettere che la prima parte è finita e passare a \(N_2\).</p>
+
+<h3>Stella \(L_1^*\)</h3>
+<p>Nuovo stato iniziale \(q_0\), <b>anche finale</b> (per accettare \(\varepsilon\)), con \(\varepsilon\)-mossa verso \(q_1\). Si aggiungono \(\varepsilon\)-mosse da ogni stato di \(F_1\) di nuovo verso \(q_1\) (per ricominciare con un altro pezzo). Finali: \(F_1 \cup \{q_0\}\).</p>
+
+<div class="warn"><span class="k">Perché serve un nuovo stato iniziale per la stella</span>
+<p>Sarebbe tentante rendere finale \(q_1\) invece di aggiungere \(q_0\). Ma se in \(N_1\) ci sono transizioni che <b>rientrano</b> in \(q_1\), il nuovo automa accetterebbe stringhe che tornano a \(q_1\) senza aver completato un pezzo di \(L_1\). Esempio: \(N_1\) con \(q_1 \xrightarrow{a} f \xrightarrow{b} q_1\), \(f\) finale, riconosce \(a(ba)^*\). Rendendo finale \(q_1\) si accetterebbe \(ab\), che non sta in \((a(ba)^*)^*\).</p>
+</div>
+
+<h2>Altre operazioni</h2>
+<ul>
+<li><b>Inversione</b> \(L^R = \{w^R : w \in L\}\): si invertono le frecce, il vecchio iniziale diventa finale, un nuovo iniziale ha \(\varepsilon\)-mosse verso i vecchi finali.</li>
+<li><b>Prefissi</b> \(\mathrm{Pref}(L) = \{x : xy \in L \text{ per qualche } y\}\): nel DFA si rendono finali tutti gli stati da cui si può raggiungere uno stato finale.</li>
+<li><b>Omomorfismi</b>: sostituire ogni simbolo con una stringa fissata preserva la regolarità (si sostituisce ogni arco con un cammino).</li>
+</ul>
+
+<h2>Usare le chiusure per dimostrare non-regolarità</h2>
+<p>Il ragionamento è per assurdo: se \(L\) fosse regolare, allora un certo linguaggio ottenuto da \(L\) con operazioni che conservano la regolarità sarebbe regolare; ma quel linguaggio sappiamo che non lo è.</p>
+<div class="example"><span class="k">Esempio</span>
+<p>\(L = \{w \in \{0,1\}^* : \#_0(w) = \#_1(w)\}\) non è regolare. Infatti se lo fosse, lo sarebbe anche \(L \cap 0^*1^* = \{0^n 1^n : n \ge 0\}\), perché \(0^*1^*\) è regolare e i regolari sono chiusi per intersezione. Ma \(\{0^n1^n\}\) non è regolare (lo dimostreremo con il pumping lemma nella lezione 8).</p>
+</div>
+<div class="example"><span class="k">Esempio</span>
+<p>\(L = \{w : \#_0(w) \neq \#_1(w)\}\) non è regolare: il suo complemento è il linguaggio dell'esempio precedente.</p>
+</div>
+<div class="warn"><span class="k">Attenzione al verso del ragionamento</span>
+<p>Le chiusure funzionano in un solo verso. Che \(L_1 \cup L_2\) sia regolare <b>non</b> implica che \(L_1\) e \(L_2\) lo siano: \(\{0^n1^n\} \cup \overline{\{0^n1^n\}} = \Sigma^*\) è regolare, ma nessuno dei due pezzi lo è.</p>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Complemento: scambio dei finali in un DFA completo.</li>
+<li>Intersezione, unione, differenza: prodotto di DFA, cambiano solo i finali.</li>
+<li>Unione, concatenazione, stella: costruzioni con NFA e \(\varepsilon\)-mosse.</li>
+<li>Per dimostrare che \(L\) non è regolare, intersecalo con un regolare per ottenere un linguaggio noto come non regolare.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Costruisci con il prodotto un DFA per le stringhe su \(\{a,b\}\) che contengono almeno una \(a\) <b>e</b> hanno lunghezza pari.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(M_1\): stati \(N\) (nessuna \(a\)), \(S\) (almeno una \(a\), pozzo accettante). \(M_2\): \(P\), \(D\) (parità della lunghezza). Prodotto con stati \((N,P)\) iniziale, \((N,D), (S,P), (S,D)\): ogni simbolo cambia la seconda componente; la prima passa a \(S\) leggendo \(a\). Finale: solo \((S,P)\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Dato l'NFA per \(L = \{ab\}\), costruisci con le regole viste un NFA per \(L^*\) e verifica che accetta \(\varepsilon\), \(ab\), \(abab\) e rifiuta \(a\), \(aba\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>NFA per \(L\): \(q_1 \xrightarrow{a} q_2 \xrightarrow{b} q_3\), finale \(q_3\). Per la stella: nuovo \(q_0\) iniziale e finale con \(q_0 \xrightarrow{\varepsilon} q_1\), più \(q_3 \xrightarrow{\varepsilon} q_1\). Finali \(\{q_0, q_3\}\). \(\varepsilon\) è accettata in \(q_0\); \(abab\): \(q_0 \to q_1 \to q_2 \to q_3 \to q_1 \to q_2 \to q_3\). \(aba\) termina in \(q_2\), non finale.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Mostra con un controesempio che, se nella costruzione della concatenazione si fondessero gli stati finali di \(N_1\) con \(q_2\) invece di usare \(\varepsilon\)-mosse, il risultato potrebbe essere sbagliato.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Sia \(N_1\) con \(q_1 \xrightarrow{a} f\), \(f \xrightarrow{a} f\) (riconosce \(a^+\)) e \(N_2\) con \(q_2 \xrightarrow{b} g\) (riconosce \(\{b\}\)). Fondendo \(f\) con \(q_2\), il cappio \(a\) su \(f\) e l'arco \(b\) verso \(g\) stanno nello stesso stato: funziona in questo caso. Ma se \(N_2\) avesse un arco che <b>rientra</b> in \(q_2\), es. \(N_2\): \(q_2 \xrightarrow{b} g \xrightarrow{c} q_2\), \(g\) finale (riconosce \(b(cb)^*\)), la fusione permetterebbe di leggere \(abcab\): dopo \(bc\) si torna in \(f = q_2\) e si possono di nuovo leggere \(a\) di \(N_1\). La stringa \(abcab\) non sta in \(a^+ b(cb)^*\). Le \(\varepsilon\)-mosse evitano queste interferenze.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che \(L = \{0^m 1^n : m \neq n\}\) non è regolare usando le proprietà di chiusura.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Se \(L\) fosse regolare lo sarebbe \(\overline L \cap 0^*1^* = \{0^n1^n\}\), che non è regolare. (Il complemento contiene anche le stringhe che non sono della forma \(0^*1^*\), ma l'intersezione le elimina.)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che se \(L\) è regolare allora anche \(\mathrm{half}(L) = \{x : \exists y,\ |y| = |x|,\ xy \in L\}\) è regolare.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Idea: si simula il DFA \(M\) di \(L\) su \(x\) e, in parallelo, si tiene l'insieme degli stati da cui si può raggiungere \(F\) in esattamente \(|x|\) passi «procedendo all'indietro». Stati: coppie \((q, S)\) con \(q \in Q\) e \(S \subseteq Q\). Inizialmente \((q_0, F)\). Leggendo \(a\): \(q\) diventa \(\delta(q,a)\), \(S\) diventa l'insieme dei predecessori di \(S\) con un qualunque simbolo. Si accetta se \(q \in S\). Il numero di stati è finito (\(|Q| \cdot 2^{|Q|}\)).</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Dimostra che i regolari sono chiusi per intersezione.</summary><div>Prodotto di DFA: stati \(Q_1 \times Q_2\), \(\delta((p,q),a) = (\delta_1(p,a), \delta_2(q,a))\), iniziale \((q_1,q_2)\), finali \(F_1 \times F_2\). Invariante: dopo \(w\) le componenti sono gli stati di \(M_1\) e \(M_2\) dopo \(w\).</div></details>
+<details><summary>Perché per il complemento serve un DFA e non basta un NFA?</summary><div>In un NFA una stringa può avere rami accettanti e non accettanti; scambiando i finali resta accettata. Serve un automa in cui ogni stringa ha una sola computazione, e completo.</div></details>
+<details><summary>Come costruisci un automa per la concatenazione? Perché servono le \(\varepsilon\)-mosse?</summary><div>\(\varepsilon\)-mosse dai finali di \(N_1\) all'iniziale di \(N_2\), finali solo quelli di \(N_2\). Servono per «indovinare» il punto di taglio tra le due parti senza interferenze tra gli automi.</div></details>
+<details><summary>Come usi le chiusure per dimostrare che un linguaggio non è regolare?</summary><div>Per assurdo: se \(L\) fosse regolare, operando con linguaggi regolari (intersezione, complemento…) otterrei un linguaggio noto come non regolare, per esempio \(L \cap 0^*1^* = \{0^n1^n\}\).</div></details>
+</section>

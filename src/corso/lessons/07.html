@@ -1,0 +1,166 @@
+<!--{"n":7,"mod":"A","title":"Espressioni regolari e teorema di Kleene","sipser":"§1.3 (PDF p. 84–98)","dsw":"§9.5 (PDF p. 272)","time":"3 ore","lead":"Gli automi descrivono un linguaggio con una macchina; le espressioni regolari lo descrivono con una formula. Il teorema di Kleene dice che le due descrizioni hanno esattamente lo stesso potere."}-->
+
+<h2>Una notazione algebrica per i linguaggi</h2>
+<p>Se usi <code>grep</code>, le regex di Java (<code>Pattern</code>) o la validazione di un campo email, conosci già le espressioni regolari. Quelle della teoria sono la versione minimale: solo unione, concatenazione e stella, più i casi base. Tutto il resto (classi di caratteri, <code>+</code>, <code>?</code>, quantificatori <code>{n,m}</code>) è zucchero sintattico che si riscrive con queste tre operazioni. (Attenzione: i backreference delle regex di Java o Perl, come <code>(a*)b\1</code>, vanno <b>oltre</b> i linguaggi regolari.)</p>
+
+<div class="def"><span class="k">Definizione · espressione regolare</span>
+<p>Le espressioni regolari su \(\Sigma\) e i linguaggi che descrivono sono definiti per induzione:</p>
+<ul>
+<li>\(a\), per ogni \(a \in \Sigma\), descrive \(\{a\}\);</li>
+<li>\(\varepsilon\) descrive \(\{\varepsilon\}\);</li>
+<li>\(\emptyset\) descrive il linguaggio vuoto;</li>
+<li>se \(R_1, R_2\) sono espressioni regolari, lo sono anche \((R_1 \cup R_2)\), \((R_1 R_2)\) e \((R_1^*)\), che descrivono \(L(R_1) \cup L(R_2)\), \(L(R_1)L(R_2)\) e \(L(R_1)^*\).</li>
+</ul>
+</div>
+<p><b>Precedenza</b>: stella, poi concatenazione, poi unione. Quindi \(ab^* \cup c\) si legge \((a(b^*)) \cup c\). Si usano le abbreviazioni \(R^+ = RR^*\), \(R^k\) = \(R\) concatenata \(k\) volte, e \(\Sigma\) per «un simbolo qualsiasi» (cioè \(a_1 \cup \dots \cup a_k\)). In DSW l'unione si scrive spesso \(+\) o \(\cup\).</p>
+
+<div class="remark"><span class="k">Nota sulla definizione</span>
+<p>La definizione è <b>ricorsiva</b> (casi base + tre costruttori). Quindi le proprietà delle espressioni regolari si dimostrano per <b>induzione strutturale</b>: si verifica la proprietà nei casi base e si mostra che si conserva applicando \(\cup\), concatenazione e \(^*\). È esattamente come la dimostriamo nella direzione «espressione → automa» del teorema di Kleene.</p>
+</div>
+
+<h2>Leggere e scrivere espressioni regolari</h2>
+<div class="example"><span class="k">Esempi su \(\Sigma = \{0, 1\}\)</span>
+<ul>
+<li>\(0^*10^*\): esattamente un 1.</li>
+<li>\(\Sigma^* 1 \Sigma^*\): almeno un 1.</li>
+<li>\(\Sigma^* 001 \Sigma^*\): contiene la sottostringa 001.</li>
+<li>\(1^*(01^+)^*\): ogni 0 è seguito da almeno un 1.</li>
+<li>\((\Sigma\Sigma)^*\): lunghezza pari. \((\Sigma\Sigma\Sigma)^*\): lunghezza multipla di 3.</li>
+<li>\(01 \cup 10\): solo le due stringhe 01 e 10.</li>
+<li>\(0\Sigma^*0 \cup 1\Sigma^*1 \cup 0 \cup 1\): inizia e finisce con lo stesso simbolo.</li>
+<li>\((0 \cup \varepsilon)1^* = 01^* \cup 1^*\).</li>
+<li>\(1^*\emptyset = \emptyset\) (concatenare con il vuoto dà il vuoto) e \(\emptyset^* = \{\varepsilon\}\).</li>
+</ul>
+</div>
+<p>Sperimenta: scrivi un'espressione e guarda quali stringhe genera in ordine di lunghezza. È il modo più rapido per accorgersi di un errore, per esempio di un'espressione che genera troppo o che dimentica \(\varepsilon\).</p>
+<div data-w="regex"></div>
+
+<h3>Identità utili</h3>
+<div class="tblwrap"><table class="data">
+<tr><th>Identità</th><th>Perché</th></tr>
+<tr><td>\(R \cup \emptyset = R\)</td><td>unire il vuoto non aggiunge nulla</td></tr>
+<tr><td>\(R\varepsilon = \varepsilon R = R\)</td><td>\(\{\varepsilon\}\) è l'elemento neutro della concatenazione</td></tr>
+<tr><td>\(R\emptyset = \emptyset R = \emptyset\)</td><td>\(\emptyset\) è lo «zero» della concatenazione</td></tr>
+<tr><td>\(\emptyset^* = \varepsilon\), \(\varepsilon^* = \varepsilon\)</td><td>\(L^0 = \{\varepsilon\}\) sempre</td></tr>
+<tr><td>\((R^*)^* = R^*\)</td><td>concatenazioni di concatenazioni</td></tr>
+<tr><td>\(R^*R^* = R^*\)</td><td>idem</td></tr>
+<tr><td>\((R \cup S)^* = (R^*S^*)^*\)</td><td>alternare blocchi di \(R\) e di \(S\)</td></tr>
+<tr><td>\(R(SR)^* = (RS)^*R\)</td><td>«scorrimento»: entrambe danno \(RSRS\cdots R\)</td></tr>
+</table></div>
+<div class="warn"><span class="k">Identità false che si sentono spesso</span>
+<ul>
+<li>\(R \cup \varepsilon \neq R\) in generale (\(0 \cup \varepsilon\) contiene \(\varepsilon\), \(0\) no).</li>
+<li>\((R \cup S)^* \neq R^* \cup S^*\) (vedi l'esercizio della lezione 1).</li>
+<li>\((RS)^* \neq R^*S^*\): \(0101 \in (01)^*\) ma \(\notin 0^*1^*\).</li>
+</ul>
+</div>
+
+<h2>Il teorema di Kleene</h2>
+<div class="thm"><span class="k">Teorema (Kleene, 1956)</span>
+<p>Un linguaggio è regolare se e solo se è descritto da un'espressione regolare.</p>
+</div>
+<p>La dimostrazione ha due direzioni, molto diverse tra loro.</p>
+
+<h3>Da espressione regolare a NFA</h3>
+<div class="proof"><span class="k">Dimostrazione (\(\Leftarrow\))</span>
+<p>Per induzione sulla struttura dell'espressione \(R\) costruiamo un NFA \(N_R\) con \(L(N_R) = L(R)\).</p>
+<ul>
+<li>\(R = a\): due stati, \(q \xrightarrow{a} f\), \(f\) finale.</li>
+<li>\(R = \varepsilon\): un solo stato, iniziale e finale.</li>
+<li>\(R = \emptyset\): un solo stato, iniziale e non finale.</li>
+<li>\(R = R_1 \cup R_2\), \(R_1R_2\), \(R_1^*\): per ipotesi induttiva esistono NFA per \(R_1\) e \(R_2\); si applicano le costruzioni di unione, concatenazione e stella della lezione 6.</li>
+</ul>
+</div>
+<div class="example"><span class="k">Esempio · \((ab \cup a)^*\) (esempio 1.56 del Sipser)</span>
+<ol>
+<li>NFA per \(a\) e per \(b\) (due stati ciascuno).</li>
+<li>\(ab\): concatenazione, \(\varepsilon\)-mossa dal finale di \(a\) all'iniziale di \(b\). 4 stati.</li>
+<li>\(ab \cup a\): nuovo iniziale con \(\varepsilon\) verso l'NFA di \(ab\) e verso un nuovo NFA per \(a\). 7 stati.</li>
+<li>\((ab \cup a)^*\): nuovo iniziale finale, \(\varepsilon\) verso il precedente, \(\varepsilon\) dai finali all'iniziale precedente. 8 stati.</li>
+</ol>
+<p>Il risultato ha molte \(\varepsilon\)-mosse ed è più grande del necessario, ma la costruzione è <b>meccanica</b>: è quella che usano i compilatori di regex (costruzione di Thompson).</p>
+</div>
+
+<h3>Da automa a espressione regolare</h3>
+<p>Questa direzione è più delicata. Il Sipser usa gli <b>automi finiti generalizzati</b> (GNFA): automi i cui archi sono etichettati da <b>espressioni regolari</b> invece che da simboli. Un GNFA legge un blocco di input alla volta, purché il blocco appartenga al linguaggio dell'etichetta.</p>
+<div class="def"><span class="k">Definizione · GNFA in forma speciale</span>
+<ul>
+<li>un unico stato iniziale \(s\) senza archi entranti, con archi verso tutti gli altri stati;</li>
+<li>un unico stato finale \(f\), diverso da \(s\), senza archi uscenti, con archi da tutti gli altri;</li>
+<li>tra ogni coppia di altri stati (e da ogni stato a sé stesso) c'è esattamente un arco. Gli archi «mancanti» hanno etichetta \(\emptyset\).</li>
+</ul>
+</div>
+<div class="proof"><span class="k">Dimostrazione (\(\Rightarrow\))</span>
+<p>Dato un DFA, si ottiene un GNFA aggiungendo \(s\) con \(s \xrightarrow{\varepsilon} q_0\), aggiungendo \(f\) con \(q \xrightarrow{\varepsilon} f\) per ogni \(q\) finale, e fondendo gli archi paralleli in un'unione (\(a, b\) diventa \(a \cup b\)).</p>
+<p>Poi si <b>eliminano gli stati</b> diversi da \(s\) e \(f\) uno alla volta. Per eliminare \(q_{\mathrm{rip}}\), ogni coppia \(q_i, q_j\) riceve la nuova etichetta
+\[(R_1)(R_2)^*(R_3) \cup R_4,\]
+dove \(R_1\) è l'etichetta di \(q_i \to q_{\mathrm{rip}}\), \(R_2\) quella del cappio su \(q_{\mathrm{rip}}\), \(R_3\) quella di \(q_{\mathrm{rip}} \to q_j\), \(R_4\) quella di \(q_i \to q_j\). Le stringhe che prima andavano da \(q_i\) a \(q_j\) passando (una o più volte) per \(q_{\mathrm{rip}}\) sono esattamente quelle di \(R_1R_2^*R_3\). Il linguaggio non cambia.</p>
+<p>Quando restano solo \(s\) e \(f\), l'etichetta dell'unico arco \(s \to f\) è l'espressione regolare cercata.</p>
+</div>
+<p>Segui l'algoritmo passo per passo sul DFA «termina con 01» della lezione 3:</p>
+<div data-w="gnfa"></div>
+
+<div class="remark"><span class="k">L'approccio di DSW</span>
+<p>DSW (§9.5) dimostra la stessa direzione per induzione sul numero di stati, con i linguaggi \(R^k_{ij}\) = stringhe che portano dallo stato \(i\) allo stato \(j\) passando solo per stati intermedi di indice \(\le k\):
+\[R^{k}_{ij} = R^{k-1}_{ij} \cup R^{k-1}_{ik}\,(R^{k-1}_{kk})^*\,R^{k-1}_{kj}.\]
+È lo stesso calcolo dell'eliminazione degli stati (e dello stesso schema dell'algoritmo di Floyd–Warshall sui grafi), solo scritto in forma di ricorrenza.</p>
+</div>
+
+<div class="warn"><span class="k">Errori tipici</span>
+<ul>
+<li>Nell'eliminazione, dimenticare il termine \(R_4\) (il vecchio arco diretto) o il cappio \(R_2^*\).</li>
+<li>Dimenticare coppie \((q_i, q_j)\) con \(q_i = q_j\): l'eliminazione può creare nuovi cappi.</li>
+<li>Non semplificare mai, e ottenere espressioni ingestibili: usa le identità (\(\emptyset R = \emptyset\), \(\emptyset \cup R = R\), \(\emptyset^* = \varepsilon\)) a ogni passo.</li>
+<li>Scrivere \(\Sigma^*\) quando serve \(\Sigma^+\), o viceversa: controlla sempre se \(\varepsilon\) deve appartenere al linguaggio.</li>
+</ul>
+</div>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Espressioni regolari: \(a, \varepsilon, \emptyset\), chiuse per \(\cup\), concatenazione, \(^*\).</li>
+<li>Kleene: espressioni regolari = DFA = NFA.</li>
+<li>Espressione → NFA: induzione strutturale con le costruzioni di chiusura.</li>
+<li>Automa → espressione: GNFA ed eliminazione degli stati con \(R_1R_2^*R_3 \cup R_4\).</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Scrivi espressioni regolari su \(\{0,1\}\) per: (a) le stringhe con almeno due 1; (b) le stringhe che non contengono 11; (c) le stringhe con un numero pari di 0.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) \(\Sigma^*1\Sigma^*1\Sigma^*\). (b) \((0 \cup 10)^*(\varepsilon \cup 1)\): ogni 1 è seguito da 0, tranne eventualmente l'ultimo. (c) \(1^*(01^*01^*)^*\), oppure \((1 \cup 01^*0)^*\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Descrivi a parole il linguaggio di \((0 \cup 1)^*0(0 \cup 1)(0 \cup 1)\) e di \(1^*(0 \cup \varepsilon)1^*\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Il primo: stringhe in cui il terzultimo simbolo è 0. Il secondo: stringhe con al più uno 0.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Costruisci, con il metodo induttivo, un NFA per \((0 \cup 1)^*1\), poi semplificalo a mano.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Meccanicamente: NFA per 0 e per 1, unione (5 stati), stella (6 stati), concatenazione con l'NFA per 1 (8 stati). A mano si vede che basta \(q_0\) con cappio \(0,1\) e \(q_0 \xrightarrow{1} q_1\), \(q_1\) finale: 2 stati.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Trasforma in espressione regolare il DFA con stati \(1\) (iniziale) e \(2\) (finale), \(\delta(1,a) = 1\), \(\delta(1,b) = 2\), \(\delta(2,a) = \delta(2,b) = 2\).</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>GNFA: \(s \xrightarrow{\varepsilon} 1\), cappio \(a\) su 1, \(1 \xrightarrow{b} 2\), cappio \(a \cup b\) su 2, \(2 \xrightarrow{\varepsilon} f\). Elimino 1: \(s \to 2\) diventa \(\varepsilon a^* b = a^*b\). Elimino 2: \(s \to f\) diventa \(a^*b(a \cup b)^*\varepsilon = a^*b(a \cup b)^*\): almeno una \(b\). (È l'esempio 1.66 del Sipser.)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Dimostra che \((R \cup S)^* = (R^*S^*)^*\) per ogni coppia di espressioni regolari.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\subseteq\): ogni \(w \in (R \cup S)^*\) è concatenazione di pezzi \(w_1 \cdots w_k\) ciascuno in \(R\) o in \(S\). Ogni pezzo \(w_i\) sta in \(R^*S^*\) (se \(w_i \in R\), come \(w_i\varepsilon\); se \(w_i \in S\), come \(\varepsilon w_i\)). Quindi \(w \in (R^*S^*)^*\).</p>
+<p>\(\supseteq\): ogni elemento di \(R^*S^*\) è una concatenazione di pezzi di \(R\) seguiti da pezzi di \(S\), quindi sta in \((R \cup S)^*\); e \((R \cup S)^*\) è chiuso per concatenazione, quindi contiene anche \((R^*S^*)^*\).</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Dai la definizione induttiva di espressione regolare.</summary><div>Casi base \(a \in \Sigma\), \(\varepsilon\), \(\emptyset\); se \(R_1, R_2\) sono espressioni regolari lo sono \(R_1 \cup R_2\), \(R_1R_2\), \(R_1^*\).</div></details>
+<details><summary>Enuncia il teorema di Kleene e accenna alle due direzioni.</summary><div>Regolari = linguaggi descritti da espressioni regolari. Espressione → NFA per induzione strutturale con le costruzioni di chiusura; NFA → espressione con GNFA ed eliminazione degli stati (\(R_1R_2^*R_3 \cup R_4\)).</div></details>
+<details><summary>Cos'è un GNFA?</summary><div>Un automa con archi etichettati da espressioni regolari; legge blocchi di input appartenenti all'etichetta. In forma speciale ha un unico iniziale senza archi entranti, un unico finale senza archi uscenti, e un arco tra ogni coppia di altri stati.</div></details>
+<details><summary>Quanto valgono \(\emptyset^*\) e \(R\emptyset\)?</summary><div>\(\emptyset^* = \{\varepsilon\}\), \(R\emptyset = \emptyset\).</div></details>
+</section>

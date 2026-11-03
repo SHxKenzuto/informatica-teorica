@@ -1,0 +1,769 @@
+# Formato: "## n" = lezione; "@k" = dopo la sezione k; "+" risposta giusta; "-" sbagliata; ">" spiegazione
+
+## 1
+@2 Quanti elementi ha \(\mathcal P(\{a,b,c\})\)?
+- 3
+- 6
++ 8
+- 9
+> Ogni elemento si prende o non si prende: \(2^3 = 8\) sottoinsiemi, compresi \(\emptyset\) e l'insieme intero.
+
+@2 Quale affermazione è vera?
+- \(\emptyset = \{\emptyset\}\)
++ \(\emptyset \subseteq A\) per ogni insieme \(A\)
+- \((1,2) = (2,1)\)
+- \(\{1,2\} \neq \{2,1\}\)
+> L'insieme vuoto è sottoinsieme di ogni insieme. \(\{\emptyset\}\) ha un elemento, le coppie sono ordinate, gli insiemi no.
+
+@3 La relazione \(x \, R\, y \iff |x - y| \le 1\) su \(\mathbb N\) è…
+- di equivalenza
++ riflessiva e simmetrica ma non transitiva
+- transitiva ma non simmetrica
+- solo riflessiva
+> \(0\,R\,1\) e \(1\,R\,2\) ma non \(0\,R\,2\): manca la transitività.
+
+@4 La funzione \(h(n) = n - 1\) su \(\mathbb N\) è…
+- totale e iniettiva
++ parziale: \(h(0)\!\uparrow\)
+- totale e suriettiva
+- costante
+> \(-1 \notin \mathbb N\), quindi \(h\) non è definita in 0. La versione totale è la sottrazione troncata \(n \mathbin{\dot-} 1\).
+
+@5 Quanto vale \(L\,\emptyset\) per un linguaggio qualsiasi \(L\)?
++ \(\emptyset\)
+- \(L\)
+- \(\{\varepsilon\}\)
+- dipende da \(L\)
+> Per formare \(xy\) serve una \(y \in \emptyset\), che non esiste. \(\emptyset\) è lo «zero» della concatenazione.
+
+@5 Quanto vale \(\emptyset^*\)?
+- \(\emptyset\)
++ \(\{\varepsilon\}\)
+- \(\Sigma^*\)
+- non è definito
+> \(L^* = L^0 \cup L^1 \cup \dots\) e \(L^0 = \{\varepsilon\}\) sempre.
+
+@6 In una dimostrazione per induzione, nel passo induttivo si può usare…
+- la tesi da dimostrare
++ l'ipotesi induttiva sul caso più piccolo
+- un esempio numerico
+- solo la base
+> Si suppone vera \(P(n)\) e si dimostra \(P(n+1)\). Usare la tesi stessa è un ragionamento circolare.
+
+## 2
+@2 Quale di questi insiemi NON è numerabile?
+- \(\mathbb Z\)
+- \(\mathbb N \times \mathbb N\)
+- \(\Sigma^*\)
++ \(\mathcal P(\mathbb N)\)
+> Per il teorema di Cantor \(\mathcal P(\mathbb N)\) non è numerabile; gli altri si elencano.
+
+@2 Perché elencare \(\mathbb N \times \mathbb N\) riga per riga non funziona?
++ La prima riga è infinita e non si arriva mai alla seconda
+- Le coppie sono troppe
+- Si ripetono elementi
+- Funziona, è solo più lento
+> Serve un ordine in cui ogni elemento compare in posizione finita: per diagonali.
+
+@3 Nella prova di Cantor l'insieme diagonale è…
+- \(\{i : i \in S_i\}\)
++ \(\{i : i \notin S_i\}\)
+- \(\bigcup_i S_i\)
+- \(\mathbb N \setminus S_0\)
+> Capovolgendo la diagonale si ottiene un insieme diverso da ogni \(S_i\) nel punto \(i\).
+
+@4 Perché esistono linguaggi che nessuna macchina di Turing riconosce?
+- Perché alcuni linguaggi sono infiniti
++ Le macchine sono numerabili, i linguaggi no
+- Perché il nastro è finito
+- Perché alcuni alfabeti sono infiniti
+> Ogni macchina è una stringa finita, quindi sono numerabili; i linguaggi sono tanti quanti \(\mathcal P(\mathbb N)\).
+
+## 3
+@2 In un DFA la funzione \(\delta\) è…
++ totale: una transizione per ogni stato e simbolo
+- parziale
+- a valori in \(\mathcal P(Q)\)
+- definita anche su \(\varepsilon\)
+> Il determinismo richiede esattamente una mossa per ogni coppia (stato, simbolo).
+
+@2 Lo stato iniziale deve essere finale se e solo se…
+- il linguaggio è infinito
++ \(\varepsilon \in L\)
+- c'è uno stato pozzo
+- \(L = \Sigma^*\)
+> Su \(\varepsilon\) l'automa non si muove: accetta solo se \(q_0 \in F\).
+
+@3 Nel DFA «termina con 01», da \(q_2\) (fine 01) leggendo 1 si va in…
++ \(q_0\)
+- \(q_1\)
+- \(q_2\)
+- in uno stato pozzo
+> La fine diventa «11», che non è un inizio utile di 01.
+
+@4 Nel DFA dei multipli di 3 in binario, da \(r_2\) leggendo 0 si va in…
+- \(r_0\)
++ \(r_1\)
+- \(r_2\)
+> Nuovo resto \((2 \cdot 2 + 0) \bmod 3 = 1\).
+
+@7 Come si dimostra che un DFA riconosce esattamente \(L\)?
+- Provando qualche stringa
++ Invariante sugli stati e induzione sulla lunghezza
+- Minimizzandolo
+- Con il pumping lemma
+> Si associa a ogni stato una proprietà del prefisso letto e la si dimostra per induzione.
+
+## 4
+@2 In una macchina di Mealy l'uscita dipende da…
+- solo lo stato
++ stato e simbolo letto
+- solo il simbolo letto
+- l'intera stringa letta
+> \(\lambda : Q \times \Sigma \to \Delta\): l'uscita sta sugli archi.
+
+@3 Su un input di \(n\) simboli una macchina di Moore produce…
+- \(n\) simboli
++ \(n + 1\) simboli
+- \(n - 1\) simboli
+- 1 simbolo
+> C'è anche l'uscita dello stato iniziale, prima di leggere.
+
+@4 Trasformando una Mealy in una Moore gli stati diventano…
+- gli stessi
++ coppie (stato, ultima uscita)
+- coppie di stati
+- insiemi di stati
+> Lo stato deve ricordare quale uscita mostrare: al più \(|Q|\cdot|\Delta|\) stati.
+
+@2 In un rilevatore di 101 con sovrapposizioni, dopo aver riconosciuto 101 si va nello stato…
+- iniziale
++ «ho visto 1»
+- «ho visto 10»
+> L'ultimo 1 può essere l'inizio di una nuova occorrenza (es. 10101).
+
+@6 Nel sommatore seriale lo stato memorizza…
+- il risultato parziale
++ il riporto
+- i bit letti
+- la lunghezza
+> Basta sapere se c'è riporto: due stati.
+
+## 5
+@3 In un NFA \(\delta(q, a)\) è…
+- uno stato
++ un insieme di stati, eventualmente vuoto
+- una stringa
+- sempre non vuoto
+> \(\delta : Q \times \Sigma_\varepsilon \to \mathcal P(Q)\).
+
+@3 Un NFA accetta \(w\) se…
+- tutti i rami accettano
++ almeno un ramo consuma \(w\) e finisce in \(F\)
+- il primo ramo accetta
+- nessun ramo si blocca
+> L'accettazione è esistenziale.
+
+@5 Nella costruzione per sottoinsiemi lo stato iniziale è…
+- \(\{q_0\}\)
++ \(E(\{q_0\})\)
+- \(Q\)
+- \(\emptyset\)
+> L'automa può muoversi con \(\varepsilon\) prima di leggere.
+
+@6 Quali insiemi sono finali nel DFA costruito?
+- Quelli contenuti in \(F\)
++ Quelli che contengono almeno uno stato di \(F\)
+- Solo \(F\)
+- Quelli non vuoti
+> Basta che una copia dell'NFA sia in uno stato finale.
+
+@7 Per «il \(k\)-esimo simbolo dalla fine è 1» il DFA minimo ha…
+- \(k\) stati
+- \(k+1\) stati
++ \(2^k\) stati
+- \(k^2\) stati
+> Deve ricordare gli ultimi \(k\) simboli: tutte le \(2^k\) combinazioni sono distinguibili.
+
+## 6
+@2 Per complementare un linguaggio regolare si…
++ scambiano finali e non finali in un DFA completo
+- scambiano finali e non finali in un NFA
+- invertono le frecce
+- aggiunge uno stato pozzo finale
+> Con un NFA non funziona: una stringa può avere rami che accettano e rami che no.
+
+@3 Nel prodotto, per l'intersezione gli stati finali sono…
++ \(F_1 \times F_2\)
+- \(F_1 \cup F_2\)
+- \((F_1 \times Q_2) \cup (Q_1 \times F_2)\)
+- \(Q_1 \times F_2\)
+> Entrambe le componenti devono accettare.
+
+@4 Perché per la concatenazione si usano NFA?
+- Perché sono più piccoli
++ Per indovinare dove finisce la prima parte
+- Perché i DFA non sono chiusi per concatenazione
+- Per gestire \(\emptyset\)
+> L'automa non sa dove tagliare la stringa: una \(\varepsilon\)-mossa lo indovina.
+
+@6 \(L \cap 0^*1^* = \{0^n1^n\}\). Cosa si deduce?
++ \(L\) non è regolare
+- \(L\) è regolare
+- \(0^*1^*\) non è regolare
+- niente
+> Se \(L\) fosse regolare, anche l'intersezione con un regolare lo sarebbe.
+
+## 7
+@2 Quale espressione descrive «almeno un 1» su \(\{0,1\}\)?
+- \(1^*\)
++ \(\Sigma^*1\Sigma^*\)
+- \(0^*1\)
+- \((01)^*\)
+> Un 1 con qualunque cosa prima e dopo.
+
+@2 \((RS)^*\) e \(R^*S^*\) sono uguali?
+- Sì sempre
++ No: \(0101 \in (01)^*\) ma non sta in \(0^*1^*\)
+- Solo se \(R = S\)
+> La stella di una concatenazione alterna i blocchi.
+
+@3 Nell'eliminazione di uno stato da un GNFA, il nuovo arco \(p \to r\) è…
+- \(R_1R_3\)
++ \(R_1R_2^*R_3 \cup R_4\)
+- \(R_1 \cup R_2 \cup R_3\)
+- \(R_4^*\)
+> Si aggiungono i cammini che passano per lo stato eliminato al vecchio arco diretto.
+
+@3 La direzione «espressione regolare → NFA» si dimostra per…
++ induzione sulla struttura dell'espressione
+- assurdo
+- diagonalizzazione
+- pumping lemma
+> Casi base \(a, \varepsilon, \emptyset\) e le tre costruzioni di chiusura.
+
+## 8
+@2 Nel pumping lemma regolare, \(p\) è…
++ il numero di stati di un DFA per \(L\)
+- la lunghezza della stringa
+- scelto da chi dimostra
+- sempre 1
+> Viene dalla dimostrazione: cassetti sugli stati.
+
+@3 Nello schema della dimostrazione, la scomposizione \(xyz\)…
+- la scegli tu
++ è dell'avversario: devi battere tutte quelle ammesse
+- è sempre \(x = \varepsilon\)
+- non conta
+> \(\exists x,y,z\) nel lemma: per contraddirlo devi vincere contro ogni scomposizione.
+
+@4 Con \(s = 0^p1^p\) e \(|xy| \le p\), la parte \(y\) contiene…
++ solo 0
+- solo 1
+- 0 e 1
+- dipende da \(p\)
+> I primi \(p\) simboli sono tutti 0.
+
+@4 Per \(\{0^i1^j : i > j\}\) con \(s = 0^{p+1}1^p\) quale \(i\) conviene?
++ \(i = 0\)
+- \(i = 2\)
+- \(i = 5\)
+> Togliendo degli 0 non sono più strettamente più degli 1.
+
+@6 Myhill–Nerode dice che \(L\) è regolare se e solo se…
+- soddisfa il pumping lemma
++ la relazione di indistinguibilità ha finite classi
+- è finito
+- è CF
+> E il numero di classi è il numero di stati del DFA minimo.
+
+## 9
+@2 Perché le grammatiche si chiamano «context-free»?
++ Il lato sinistro è una sola variabile, riscrivibile ovunque
+- Non hanno variabili
+- Generano linguaggi finiti
+- Non usano \(\varepsilon\)
+> La riscrittura di \(A\) non dipende da ciò che la circonda.
+
+@3 Quale linguaggio genera \(S \to aSb \mid \varepsilon\)?
+- \(a^*b^*\)
++ \(\{a^nb^n : n \ge 0\}\)
+- \((ab)^*\)
+- \(\{a^nb^m\}\)
+> Ogni applicazione aggiunge una \(a\) a sinistra e una \(b\) a destra.
+
+@5 Ogni albero sintattico corrisponde a esattamente…
+- una derivazione
++ una derivazione sinistra
+- due derivazioni
+- infinite derivazioni sinistre
+> Fissando l'ordine (variabile più a sinistra) la corrispondenza è uno a uno.
+
+@6 Una grammatica è ambigua se…
+- genera infinite stringhe
++ una stringa ha due alberi sintattici distinti
+- ha due regole per la stessa variabile
+- contiene \(\varepsilon\)
+> Equivalentemente: due derivazioni sinistre distinte.
+
+@7 Le grammatiche con regole \(A \to aB\), \(A \to a\), \(A \to \varepsilon\) generano…
++ esattamente i linguaggi regolari
+- tutti i CF
+- solo linguaggi finiti
+> Variabili = stati, \(A \to aB\) = transizione.
+
+## 10
+@1 Quale regola è ammessa in CNF?
++ \(A \to BC\)
+- \(A \to aB\)
+- \(A \to B\)
+- \(A \to BCD\)
+> Solo \(A \to BC\), \(A \to a\) e \(S \to \varepsilon\).
+
+@1 In CNF una stringa di lunghezza 5 si deriva in…
+- 5 passi
++ 9 passi
+- 10 passi
+- dipende
+> \(2n - 1\): 4 regole binarie + 5 regole terminali.
+
+@2 Perché si eliminano le \(\varepsilon\)-regole prima delle unitarie?
++ Eliminando le \(\varepsilon\) possono nascere nuove regole unitarie
+- È solo una convenzione
+- Le unitarie generano \(\varepsilon\)
+> Per esempio \(S \to SA\) con \(A\) annullabile produce \(S \to S\).
+
+@4 L'algoritmo CYK ha complessità…
+- \(O(n)\)
+- \(O(n^2)\)
++ \(O(n^3)\)
+- esponenziale
+> \(O(n^2)\) celle, \(O(n)\) tagli per cella.
+
+## 11
+@2 Una mossa \(1, 0 \to \varepsilon\) significa…
++ leggi 1 e togli 0 dalla cima
+- leggi 0 e metti 1
+- leggi 1 e metti 0
+- togli 1 senza leggere
+> Formato: letto, tolto \(\to\) messo.
+
+@2 A cosa serve il simbolo \(\$\)?
+- A terminare l'input
++ A riconoscere la pila vuota
+- A separare gli stati
+- A indicare l'accettazione
+> La definizione non permette di testare direttamente la pila vuota.
+
+@5 Per \(\{ww^R\}\) il PDA deve…
++ indovinare dove sta la metà
+- contare i simboli
+- usare due pile
+- leggere due volte l'input
+> Con una \(\varepsilon\)-mossa passa dalla fase di impilamento a quella di confronto.
+
+@6 Il non determinismo aggiunge potere ai PDA?
++ Sì: \(\{ww^R\}\) non è riconosciuto da un PDA deterministico
+- No, come per gli automi finiti
+- Solo per linguaggi finiti
+> DCFL è un sottoinsieme proprio dei CF.
+
+## 12
+@1 Nella costruzione CFG → PDA la pila contiene…
++ la parte della forma sentenziale ancora da verificare
+- l'input letto
+- gli stati visitati
+- le regole usate
+> Il PDA simula una derivazione sinistra.
+
+@1 Quando in cima c'è un terminale \(a\), il PDA…
+- lo sostituisce con una regola
++ lo confronta con l'input e lo toglie
+- accetta
+- lo ignora
+> Mossa \(a, a \to \varepsilon\).
+
+@2 La variabile \(A_{pq}\) genera le stringhe che portano il PDA…
++ da \(p\) a \(q\) partendo e arrivando a pila vuota
+- da \(p\) a \(q\) in un passo
+- da \(q\) a \(p\)
+- in uno stato finale
+> È l'invariante della costruzione PDA → grammatica.
+
+## 13
+@2 Nel pumping lemma CF si pompano…
+- solo \(v\)
++ \(v\) e \(y\) insieme, con lo stesso esponente
+- solo \(x\)
+- \(u\) e \(z\)
+> Il pezzo ripetuto dell'albero produce una parte a sinistra e una a destra.
+
+@2 Il vincolo \(|vxy| \le p\) dice…
++ quanto è larga la finestra, non dove sta
+- che \(vxy\) sta all'inizio
+- che \(v = y\)
+> A differenza del caso regolare, la finestra può stare ovunque: si ragiona per casi.
+
+@4 Perché \(0^p1\,0^p1\) non basta per \(\{ww\}\)?
++ L'avversario pompa uno 0 per parte attorno al primo 1
+- Non sta nel linguaggio
+- È troppo corta
+> \(0^{p-1+i}1\,0^{p-1+i}1\) resta della forma \(ww\). Serve \(0^p1^p0^p1^p\).
+
+@5 I linguaggi CF sono chiusi per…
+- intersezione
+- complemento
++ unione, concatenazione, stella
+- differenza
+> Non per intersezione: \(\{a^nb^nc^m\} \cap \{a^mb^nc^n\}\).
+
+## 14
+@2 Quale macchina riconosce i linguaggi di tipo 1?
+- automa a pila
++ automa lineare limitato
+- automa finito
+- macchina di Turing senza limiti
+> Una TM che non esce dalla porzione di nastro dell'input.
+
+@3 Perché l'appartenenza è decidibile per le grammatiche monotone?
++ Le forme sentenziali non si accorciano: sono finite quelle da esplorare
+- Perché sono CF
+- Perché hanno pochi simboli
+> Tutte le forme utili hanno lunghezza \(\le |w|\).
+
+@3 Quale regola riordina le variabili nella grammatica per \(a^nb^nc^n\)?
++ \(CB \to BC\)
+- \(S \to aSBC\)
+- \(aB \to ab\)
+- \(cC \to cc\)
+> È una regola con contesto, impossibile in una grammatica CF.
+
+@5 Quale catena di inclusioni è corretta?
++ regolari ⊊ CF ⊊ CS ⊊ decidibili ⊊ r.e.
+- regolari ⊊ CS ⊊ CF ⊊ r.e.
+- CF = CS
+- decidibili = r.e.
+> Testimoni: \(0^n1^n\), \(a^nb^nc^n\), una diagonale, HALT.
+
+## 15
+@2 Cosa fa \(V \leftarrow V - 1\) se \(V = 0\)?
+- Errore
+- Il programma termina
++ Lascia \(V = 0\)
+- \(V\) diventa negativa
+> Le variabili sono naturali: decremento troncato.
+
+@2 Quando termina un programma S?
++ Dopo l'ultima istruzione o saltando a un'etichetta assente
+- Quando \(Y \neq 0\)
+- Dopo un numero fissato di passi
+- Mai
+> Per convenzione si usa l'etichetta \(E\) per uscire.
+
+@3 Se un programma non termina su \(x\), allora \(\Psi_{\mathcal P}(x)\)…
+- vale 0
++ è indefinita
+- vale \(x\)
+- vale il valore corrente di \(Y\)
+> È così che nascono le funzioni parziali.
+
+@4 Il programma «[A] X ← X−1; Y ← Y+1; IF X ≠ 0 GOTO A» su input 0 restituisce…
+- 0
++ 1
+- non termina
+> Il corpo del ciclo viene eseguito una volta prima del test.
+
+@5 Come si realizza un salto incondizionato?
++ \(Z \leftarrow Z + 1\) seguito da \(\mathrm{IF}\ Z \neq 0\ \mathrm{GOTO}\ L\)
+- \(\mathrm{IF}\ Y \neq 0\ \mathrm{GOTO}\ L\)
+- con un'etichetta \(E\)
+> Dopo l'incremento \(Z \neq 0\), quindi il salto avviene sempre.
+
+## 16
+@2 Quali sono le funzioni iniziali?
++ successore, zero, proiezioni
+- somma, prodotto, potenza
+- successore e predecessore
+- costanti e identità
+> \(s(x) = x+1\), \(n(x) = 0\), \(u^n_i\).
+
+@3 Lo schema di ricorsione primitiva corrisponde a…
++ un ciclo for con numero di iterazioni noto
+- un ciclo while
+- un salto incondizionato
+- una ricerca illimitata
+> Per questo le primitive ricorsive terminano sempre.
+
+@4 Perché ogni primitiva ricorsiva è calcolabile?
++ Le calcolabili totali formano una classe PRC
+- Perché sono finite
+- Per la tesi di Church
+- Perché sono crescenti
+> E le primitive ricorsive sono la più piccola classe PRC.
+
+@6 La funzione di Ackermann è…
+- primitiva ricorsiva
++ calcolabile e totale ma non primitiva ricorsiva
+- non calcolabile
+- parziale
+> Cresce più di ogni primitiva ricorsiva.
+
+## 17
+@1 Come si esprime \(P \wedge Q\) per predicati p.r.?
++ \(P \cdot Q\)
+- \(P + Q\)
+- \(\alpha(P)\)
+- \(\max(P,Q)\)
+> Il prodotto vale 1 solo se entrambi valgono 1.
+
+@3 \(\min_{t \le y} P(t, x)\) se nessun \(t \le y\) soddisfa \(P\) vale…
++ 0
+- \(y\)
+- \(y + 1\)
+- è indefinita
+> Convenzione di DSW: così resta totale.
+
+@4 \(\mu t\,[t \cdot t = x]\) su \(x = 5\)…
+- vale 2
+- vale 0
++ è indefinita
+> Nessun \(t\) ha quadrato 5: la ricerca non termina.
+
+@5 Le funzioni parziali ricorsive coincidono con…
++ le parzialmente calcolabili
+- le primitive ricorsive
+- le totali
+- le crescenti
+> Teorema di forma normale di Kleene.
+
+## 18
+@2 Quanto vale \(\langle 2, 1\rangle = 2^x(2y+1) - 1\)?
+- 9
++ 11
+- 12
+- 7
+> \(4 \cdot 3 - 1 = 11\).
+
+@2 Decodifica \(z = 23\): \(l(z), r(z)\) = ?
++ 3, 1
+- 1, 3
+- 2, 5
+- 4, 1
+> \(24 = 2^3 \cdot 3\), \(2y + 1 = 3\).
+
+@3 Quanto vale \([2, 0, 1]\)?
+- 12
++ 20
+- 30
+- 6
+> \(2^2 \cdot 3^0 \cdot 5^1 = 20\).
+
+@4 Nel codice di un'istruzione \(\langle a, \langle b, c\rangle\rangle\), \(b = 1\) significa…
+- \(V \leftarrow V\)
++ \(V \leftarrow V + 1\)
+- \(V \leftarrow V - 1\)
+- salto
+> 0 = istruzione vuota, 1 = incremento, 2 = decremento, \(\#(L)+2\) = salto.
+
+@5 Perché ogni numero naturale è un programma?
++ La codifica è biiettiva grazie al −1 e alla convenzione sull'ultima istruzione
+- Perché i programmi sono infiniti
+- Perché si ignorano i numeri non validi
+> Quindi \(\Phi_0, \Phi_1, \dots\) elenca tutte le funzioni parzialmente calcolabili.
+
+## 19
+@2 Il programma diagonale nella prova di HALT è…
++ \([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ A\)
+- \([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ E\)
+- \(Y \leftarrow \mathrm{HALT}(X,X)\)
+> Deve fare l'opposto della diagonale: andare in loop quando HALT dice «termina».
+
+@2 Su quale input si esegue il programma diagonale per ottenere la contraddizione?
+- 0
++ il suo stesso numero
+- un input qualsiasi
+> \(\mathrm{HALT}(y_0, y_0) \iff \neg\mathrm{HALT}(y_0, y_0)\).
+
+@3 Il programma universale tiene lo stato della computazione simulata…
++ come numero di Gödel delle variabili
+- su un nastro
+- in una pila
+> \(S = \prod p_i^{v_i}\): incremento = moltiplica per \(p_i\).
+
+@4 Il predicato STP(x, y, t) («termina entro t passi») è…
++ primitivo ricorsivo
+- non calcolabile
+- semidecidibile ma non decidibile
+> HALT \(= \exists t\ \mathrm{STP}\): è il quantificatore illimitato a renderlo indecidibile.
+
+## 20
+@2 La configurazione \(u\,q\,v\) significa…
++ nastro \(uv\), stato \(q\), testina sul primo simbolo di \(v\)
+- testina sull'ultimo simbolo di \(u\)
+- nastro \(u\) e input \(v\)
+> È la notazione del Sipser.
+
+@2 Una macchina che riconosce \(L\) sulle stringhe fuori da \(L\)…
+- rifiuta sempre
++ può rifiutare o non fermarsi
+- accetta
+> Un decisore invece si ferma sempre.
+
+@4 Simulando una NTM con una TM deterministica si visita l'albero…
++ in ampiezza
+- in profondità
+- a caso
+> In profondità un ramo infinito bloccherebbe la ricerca.
+
+@4 Simulare \(t\) passi di una macchina multinastro con un nastro costa…
+- \(O(t)\)
++ \(O(t^2)\)
+- \(2^{O(t)}\)
+> Ogni passo richiede di scorrere \(O(t)\) celle.
+
+@5 La tesi di Church–Turing è…
+- un teorema dimostrato da Turing
++ un'ipotesi non dimostrabile ma universalmente accettata
+- falsa
+> Collega il concetto informale di algoritmo a quello formale.
+
+## 21
+@1 Un insieme r.e. è…
++ il dominio di una funzione parzialmente calcolabile
+- l'immagine di una funzione non calcolabile
+- un insieme finito
+- un insieme decidibile
+> \(W_n = \{x : \Phi_n(x)\!\downarrow\}\).
+
+@3 \(B\) è ricorsivo se e solo se…
++ \(B\) e \(\overline B\) sono r.e.
+- \(B\) è r.e.
+- \(\overline B\) è finito
+- \(B\) è infinito
+> Teorema di Post: semidecisori eseguiti in parallelo.
+
+@3 \(\overline K\) è…
+- ricorsivo
+- r.e. non ricorsivo
++ non r.e.
+> Se fosse r.e., \(K\) sarebbe ricorsivo.
+
+@4 Per dimostrare che gli r.e. sono chiusi per unione si…
++ eseguono i due semidecisori in parallelo
+- eseguono uno dopo l'altro
+- complementa
+> Uno dei due potrebbe non terminare.
+
+@6 Il teorema del parametro serve a…
++ fissare argomenti di un programma in modo calcolabile
+- dimostrare che HALT è r.e.
+- minimizzare automi
+> È lo strumento tecnico delle riduzioni.
+
+## 22
+@1 Per dimostrare che \(B\) è indecidibile si mostra…
++ \(K \le_m B\)
+- \(B \le_m K\)
+- \(B \le_m \emptyset\)
+> La difficoltà passa nel verso della freccia: dal problema noto a quello nuovo.
+
+@1 La funzione di riduzione deve essere…
++ calcolabile e totale
+- parziale
+- biiettiva
+- primitiva ricorsiva per forza
+> Deve terminare sempre.
+
+@3 Rice si applica a «il programma ha meno di 10 istruzioni»?
+- Sì
++ No: è una proprietà sintattica
+> Programmi equivalenti possono avere lunghezze diverse.
+
+@3 Cosa garantisce il teorema di Rice?
++ \(R_\Gamma\) non ricorsivo per \(\Gamma\) non banale
+- \(R_\Gamma\) non r.e.
+- \(R_\Gamma\) r.e.
+> Non dice nulla sull'essere r.e.
+
+## 23
+@1 Il PCP chiede se esiste…
++ una sequenza di tessere con sopra e sotto uguali
+- una tessera con sopra = sotto
+- un insieme di tessere minimo
+> Con ripetizioni ammesse.
+
+@1 Il PCP su alfabeto unario è…
++ decidibile
+- indecidibile
+- r.e. non decidibile
+> Conta solo la differenza di lunghezze tra sopra e sotto.
+
+@4 Quale problema sulle grammatiche CF è decidibile?
++ \(L(G) = \emptyset\)?
+- \(G\) è ambigua?
+- \(L(G) = \Sigma^*\)?
+- \(L(G_1) = L(G_2)\)?
+> Si marcano le variabili che generano stringhe terminali.
+
+@2 Una storia di computazione accettante è…
++ la sequenza di configurazioni da \(q_0w\) a una configurazione accettante
+- l'insieme degli stati visitati
+- la tabella di transizione
+> Verificarla richiede solo controlli locali.
+
+## 24
+@2 \(2^{2n} = O(2^n)\)?
+- Sì
++ No
+> \(2^{2n} = 4^n\): il rapporto con \(2^n\) cresce senza limite.
+
+@4 Perché P è robusta?
++ I modelli deterministici ragionevoli si simulano con costo polinomiale
+- Perché usa un solo nastro
+- Perché è infinita
+> Un polinomio di un polinomio è un polinomio.
+
+@4 Provare tutti i divisori di \(N\) fino a \(\sqrt N\) è…
+- polinomiale
++ esponenziale nella lunghezza dell'input
+- lineare
+> L'input ha \(\approx \log_2 N\) cifre; \(\sqrt N = 2^{n/2}\).
+
+@5 Ogni linguaggio context-free è in P grazie a…
++ CYK
+- Euclide
+- la visita in ampiezza
+- Cook–Levin
+> Programmazione dinamica in \(O(n^3)\).
+
+## 25
+@2 NP sta per…
+- non polinomiale
++ polinomiale non deterministico
+- non P
+> E include P.
+
+@3 Il certificato per CLIQUE è…
++ i \(k\) nodi della clique
+- il grafo
+- l'elenco degli archi mancanti
+> Si verifica in \(O(k^2)\) controlli.
+
+@5 \(B\) è NP-completo se…
++ \(B \in\) NP e ogni problema di NP si riduce a \(B\) in tempo polinomiale
+- \(B\) non è in P
+- \(B\) è decidibile
+- \(B\) è in NP
+> La seconda condizione da sola è NP-difficile.
+
+@6 Nel teorema di Cook–Levin la formula descrive…
++ il tableau della computazione accettante
+- l'input
+- il codice della macchina
+> Celle, inizio, finestre legali, accettazione.
+
+@7 Nella riduzione 3SAT \(\le_P\) CLIQUE il valore di \(k\) è…
++ il numero di clausole
+- il numero di variabili
+- 3
+> Un nodo scelto per ogni clausola.

@@ -1,0 +1,105 @@
+<!--{"n":26,"mod":"E","title":"Simulazione della prova scritta","time":"2 ore e mezza + correzione","lead":"Una prova completa nello stile dell'esame: domande a risposta libera ed esercizi su tutto il programma. Fai prima la prova su carta, a tempo, poi confronta con le soluzioni svolte."}-->
+
+<h2>Come usare questa simulazione</h2>
+<ol>
+<li>Prendi carta e penna e datti <b>2 ore e mezza</b>. Niente appunti, niente simulatori.</li>
+<li>Rispondi a tutti gli esercizi. Se ti blocchi, passa al successivo e torna dopo.</li>
+<li>Solo alla fine apri le soluzioni e correggiti. Segna dove hai perso punti: sono gli argomenti da ripassare.</li>
+<li>Se vuoi una correzione dettagliata, manda una foto dei fogli nella chat del corso.</li>
+</ol>
+<div class="remark"><span class="k">Cosa valuta di solito chi corregge</span>
+<ul>
+<li>Le <b>definizioni</b> devono essere precise (tuple complete, quantificatori nell'ordine giusto).</li>
+<li>Nelle <b>costruzioni</b> (automi, grammatiche, macchine) conta che siano corrette e complete, ma anche che sia spiegata l'idea.</li>
+<li>Nelle <b>dimostrazioni</b> conta la struttura: cosa si suppone, cosa si costruisce, dove sta la contraddizione.</li>
+<li>Nelle <b>riduzioni</b> si controlla prima di tutto la direzione.</li>
+</ul>
+</div>
+
+<h2>La prova</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Esercizio 1 · Automi finiti (punti 4)</span>
+<p>Sia \(L = \{w \in \{a, b\}^* : w \text{ contiene la sottostringa } aba\}\).</p>
+<p>(a) Costruisci un DFA per \(L\). (b) Costruisci un DFA per \(\overline L\). (c) Dimostra che il tuo DFA per \(L\) è minimo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) Stati \(s_0\) (nessun progresso), \(s_1\) (fine \(a\)), \(s_2\) (fine \(ab\)), \(s_3\) (trovata, finale). \(\delta(s_0, a) = s_1\), \(\delta(s_0, b) = s_0\); \(\delta(s_1, a) = s_1\), \(\delta(s_1, b) = s_2\); \(\delta(s_2, a) = s_3\), \(\delta(s_2, b) = s_0\); \(\delta(s_3, \cdot) = s_3\).</p>
+<p>(b) Stesso automa con finali \(\{s_0, s_1, s_2\}\) (il DFA è completo, quindi basta scambiare).</p>
+<p>(c) I prefissi \(\varepsilon, a, ab, aba\) sono a due a due distinguibili: \(aba\) è in \(L\), gli altri no (\(z = \varepsilon\)); \(ab\) si distingue da \(\varepsilon\) e da \(a\) con \(z = a\) (\(aba \in L\), \(a, aa \notin L\)); \(a\) da \(\varepsilon\) con \(z = ba\). Quattro classi, quindi almeno 4 stati (Myhill–Nerode).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 2 · Non determinismo (punti 3)</span>
+<p>Dato l'NFA con stati \(\{p, q, r\}\), iniziale \(p\), finale \(r\), transizioni \(\delta(p, 0) = \{p, q\}\), \(\delta(p, 1) = \{p\}\), \(\delta(q, 1) = \{r\}\), \(\delta(r, 0) = \delta(r, 1) = \{r\}\), costruisci il DFA equivalente con la costruzione per sottoinsiemi e descrivi il linguaggio.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\{p\} \xrightarrow{0} \{p,q\}\), \(\{p\} \xrightarrow{1} \{p\}\); \(\{p,q\} \xrightarrow{0} \{p,q\}\), \(\{p,q\} \xrightarrow{1} \{p,r\}\); \(\{p,r\} \xrightarrow{0} \{p,q,r\}\), \(\{p,r\} \xrightarrow{1} \{p,r\}\); \(\{p,q,r\} \xrightarrow{0} \{p,q,r\}\), \(\{p,q,r\} \xrightarrow{1} \{p,r\}\). Finali: \(\{p,r\}\), \(\{p,q,r\}\). Linguaggio: stringhe che contengono \(01\). (Gli ultimi due stati si potrebbero fondere: il DFA minimo ha 3 stati.)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 3 · Pumping lemma (punti 4)</span>
+<p>Dimostra che \(L = \{a^ib^j : i < j\}\) non è regolare. Poi dimostra che è context-free.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Non regolare: sia \(p\) la lunghezza di pumping, \(s = a^pb^{p+1}\). Ogni scomposizione con \(|xy| \le p\) ha \(y = a^k\), \(k \ge 1\). Con \(i = 2\): \(a^{p+k}b^{p+1}\), e \(p + k \ge p + 1\), quindi \(\notin L\).</p>
+<p>Context-free: \(S \to aSb \mid Sb \mid b\). Ogni derivazione accoppia \(a\) e \(b\) con \(aSb\) e aggiunge almeno una \(b\) in più (con \(Sb\) o con la base \(b\)).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 4 · Grammatiche e CNF (punti 4)</span>
+<p>Data \(G\): \(S \to aSb \mid A\), \(A \to cA \mid \varepsilon\). (a) Descrivi \(L(G)\). (b) Convertila in forma normale di Chomsky.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) \(L(G) = \{a^nc^mb^n : n, m \ge 0\}\).</p>
+<p>(b) Passo 1: \(S_0 \to S\). Passo 2 (\(A\) e poi \(S\) annullabili): \(A \to cA \mid c\); \(S \to aSb \mid ab \mid A\); \(S_0 \to S \mid \varepsilon\). Passo 3 (unitarie): \(S \to A\) diventa \(S \to cA \mid c\); \(S_0 \to S\) diventa \(S_0 \to aSb \mid ab \mid cA \mid c\). Passi 4–5 con \(U_a \to a\), \(U_b \to b\), \(U_c \to c\), \(X \to SU_b\):</p>
+<p>\(S_0 \to U_aX \mid U_aU_b \mid U_cA \mid c \mid \varepsilon\); \(S \to U_aX \mid U_aU_b \mid U_cA \mid c\); \(A \to U_cA \mid c\); \(X \to SU_b\); \(U_a \to a\); \(U_b \to b\); \(U_c \to c\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 5 · Automi a pila (punti 3)</span>
+<p>Progetta un PDA per \(\{a^ib^jc^k : i + k = j\}\) e descrivi l'idea.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Si impila un simbolo per ogni \(a\); leggendo le \(b\) si tolgono prima i simboli delle \(a\) e, quando si arriva al fondo \(\$\), si impila un simbolo per ogni \(b\) rimanente; leggendo le \(c\) si tolgono quei simboli; si accetta ritrovando \(\$\) alla fine. Stati: fase \(a\), fase \(b\) (due sotto-fasi), fase \(c\), più il controllo dell'ordine \(a^*b^*c^*\). È deterministico.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 6 · Funzioni ricorsive (punti 4)</span>
+<p>(a) Dimostra che \(f(x, y) = x^y\) e il predicato \(\mathrm{Pot2}(x)\) («\(x\) è una potenza di 2») sono primitivi ricorsivi. (b) Sia \(g(x) = \mu t\,[t \cdot t = x]\). Qual è il suo dominio? È primitiva ricorsiva?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) \(x^0 = 1 = s(n(x))\), \(x^{t+1} = x^t \cdot x\), passo \(h(t, v, x) = v \cdot x\), composizione del prodotto con proiezioni. \(\mathrm{Pot2}(x) \iff (\exists t)_{\le x}\,(2^t = x)\), quantificatore limitato su un predicato p.r.</p>
+<p>(b) Il dominio è l'insieme dei quadrati perfetti; lì \(g(x) = \sqrt x\). Non è primitiva ricorsiva perché non è totale (le primitive ricorsive sono tutte totali). È però parziale ricorsiva.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 7 · Linguaggio S e codifiche (punti 3)</span>
+<p>(a) Scrivi un programma S che calcola \(f(x) = x + 2\). (b) Calcola il numero dell'istruzione \([A]\ Y \leftarrow Y + 1\). (c) Quale programma ha numero 1?</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) Copia \(X\) in \(Y\) (macro, o ciclo con test iniziale), poi \(Y \leftarrow Y + 1\) due volte.</p>
+<p>(b) \(a = 1\), \(b = 1\), \(c = 0\): \(\langle 1, \langle 1, 0\rangle\rangle = \langle 1, 1\rangle = 2 \cdot 3 - 1 = 5\).</p>
+<p>(c) \(1 + 1 = 2 = [1]\): un'istruzione di codice 1 = \(\langle 1, 0\rangle\): etichetta \(A\), \(\langle b, c\rangle = 0\), cioè \([A]\ Y \leftarrow Y\). Il programma è \([A]\ Y \leftarrow Y\) e calcola la costante 0.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 8 · Indecidibilità (punti 4)</span>
+<p>(a) Enuncia il teorema di Rice. (b) L'insieme \(\{x : \Phi_x(x) = 0\}\) rientra nelle ipotesi del teorema di Rice? Motiva la risposta. (c) Dimostra che \(\{x : W_x = \mathbb N\}\) non è ricorsivo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) Se \(\Gamma\) è una classe di funzioni parzialmente calcolabili diversa da \(\emptyset\) e da tutte, \(\{x : \Phi_x \in \Gamma\}\) non è ricorsivo.</p>
+<p>(b) <b>No</b>: «\(\Phi_x(x) = 0\)» dipende da \(x\) anche come input, non solo dalla funzione \(\Phi_x\). Due programmi equivalenti \(x \neq x'\) possono dare risultati diversi sui rispettivi input \(x\) e \(x'\). Rice non si applica; serve una riduzione diretta (che comunque mostra l'indecidibilità, con il teorema del parametro o del punto fisso).</p>
+<p>(c) È \(R_\Gamma\) con \(\Gamma\) = funzioni totali: non vuota (la costante 0) e non tutto (la funzione mai definita). Per Rice non è ricorsivo.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 9 · Macchine di Turing (punti 3)</span>
+<p>Descrivi ad alto livello una macchina di Turing che decide \(\{w \in \{a,b\}^* : \#_a(w) = 2\,\#_b(w)\}\) e stimane il tempo di esecuzione su un nastro.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>Ripeti: cerca una \(b\) non marcata e marcala; cerca due \(a\) non marcate e marcale (se mancano, rifiuta). Quando non ci sono più \(b\) non marcate, controlla che non restino \(a\) non marcate: se sì accetta, altrimenti rifiuta. Ogni iterazione scorre il nastro (\(O(n)\)) e ci sono al più \(n\) iterazioni: \(O(n^2)\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Esercizio 10 · Complessità (punti 4)</span>
+<p>(a) Definisci P, NP e NP-completo. (b) Dimostra che \(\mathrm{DOUBLE\text{-}SAT} = \{\varphi : \varphi \text{ ha almeno due assegnazioni che la soddisfano}\}\) è NP-completo.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>(a) Vedi lezioni 24 e 25.</p>
+<p>(b) In NP: il certificato sono due assegnazioni distinte, si verificano entrambe. NP-difficile: SAT \(\le_P\) DOUBLE-SAT con \(\varphi \mapsto \varphi \wedge (y \vee \bar y)\), \(y\) variabile nuova. Se \(\varphi\) ha un'assegnazione che la soddisfa, la nuova formula ne ha almeno due (con \(y = 0\) e \(y = 1\)); se \(\varphi\) non è soddisfacibile, nemmeno la nuova. Costruzione lineare.</p>
+</div></details></div>
+</section>
+
+<h2>Dopo la prova</h2>
+<p>Totale: 36 punti, da riportare in trentesimi (punti × 30 / 36). Per ogni esercizio in cui hai perso più di metà dei punti, torna alla lezione corrispondente e rifai gli esercizi di fine lezione.</p>
+<div class="tblwrap"><table class="data">
+<tr><th>Esercizio</th><th>Lezioni da ripassare</th></tr>
+<tr><td>1, 2</td><td>3, 5, 6, 8 (Myhill–Nerode)</td></tr>
+<tr><td>3</td><td>8, 9</td></tr>
+<tr><td>4, 5</td><td>9, 10, 11</td></tr>
+<tr><td>6, 7</td><td>15, 16, 17, 18</td></tr>
+<tr><td>8</td><td>19, 21, 22</td></tr>
+<tr><td>9</td><td>20</td></tr>
+<tr><td>10</td><td>24, 25</td></tr>
+</table></div>

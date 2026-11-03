@@ -1,0 +1,144 @@
+<!--{"n":16,"mod":"C","title":"Funzioni primitive ricorsive","dsw":"§3.1–3.4 (PDF p. 58–68)","time":"3 ore","lead":"Un altro modo di definire funzioni calcolabili: invece di scrivere programmi, si parte da poche funzioni elementari e si costruisce tutto con due operazioni. Si ottiene una classe molto ampia di funzioni totali, ma non tutte quelle calcolabili."}-->
+
+<h2>Costruire funzioni invece di programmi</h2>
+<p>Nella lezione precedente le funzioni calcolabili erano definite da programmi. Qui seguiamo un approccio «algebrico», che risale a Dedekind e Gödel: si fissano poche <b>funzioni iniziali</b> ovviamente calcolabili e due <b>operazioni</b> che, applicate a funzioni calcolabili, producono funzioni calcolabili. Le funzioni che si ottengono così sono le <b>primitive ricorsive</b>.</p>
+<p>Se programmi in Java, puoi pensarle come le funzioni che si scrivono usando solo assegnazioni, composizione di chiamate e cicli <code>for</code> con un numero di iterazioni fissato prima di entrare nel ciclo. Niente <code>while</code>, niente ricorsione libera: per questo terminano sempre.</p>
+
+<h2>Funzioni iniziali</h2>
+<div class="def"><span class="k">Definizione · funzioni iniziali</span>
+<ul>
+<li><b>successore</b>: \(s(x) = x + 1\);</li>
+<li><b>zero</b>: \(n(x) = 0\);</li>
+<li><b>proiezioni</b>: \(u^n_i(x_1, \dots, x_n) = x_i\), per \(1 \le i \le n\).</li>
+</ul>
+</div>
+<p>Le proiezioni sembrano banali, ma servono a «scegliere e riordinare» gli argomenti, cosa che nella notazione informale facciamo senza pensarci. Per esempio \(g(x, y, z) = y\) è \(u^3_2\).</p>
+
+<h2>Le due operazioni</h2>
+<div class="def"><span class="k">Definizione · composizione</span>
+<p>Se \(h\) ha \(k\) argomenti e \(g_1, \dots, g_k\) hanno \(n\) argomenti, la funzione
+\[f(x_1, \dots, x_n) = h(g_1(x_1, \dots, x_n), \dots, g_k(x_1, \dots, x_n))\]
+si ottiene per <b>composizione</b> da \(h, g_1, \dots, g_k\).</p>
+</div>
+<div class="def"><span class="k">Definizione · ricorsione primitiva</span>
+<p>Con un argomento: dati un numero \(k\) e una funzione \(g\) di due argomenti,
+\[h(0) = k, \qquad h(t + 1) = g(t, h(t)).\]
+Con \(n + 1\) argomenti: date \(f\) di \(n\) argomenti e \(g\) di \(n + 2\) argomenti,
+\[h(x_1, \dots, x_n, 0) = f(x_1, \dots, x_n),\]
+\[h(x_1, \dots, x_n, t + 1) = g(t,\ h(x_1, \dots, x_n, t),\ x_1, \dots, x_n).\]</p>
+</div>
+<p>L'ultimo argomento è quello su cui si fa la ricorsione. Il passo ricorsivo può usare il valore precedente \(h(\dots, t)\), il contatore \(t\) e i parametri \(x_i\). È esattamente un ciclo <code>for (t = 0; t &lt; y; t++) v = g(t, v, x);</code> con \(v\) inizializzato a \(f(x)\).</p>
+
+<div class="def"><span class="k">Definizione · funzioni primitive ricorsive</span>
+<p>Una funzione è <b>primitiva ricorsiva</b> se si ottiene dalle funzioni iniziali con un numero finito di applicazioni di composizione e ricorsione primitiva.</p>
+</div>
+
+<h2>Classi PRC e calcolabilità</h2>
+<div class="def"><span class="k">Definizione · classe PRC</span>
+<p>Una classe di funzioni totali è <b>PRC</b> (primitive recursively closed) se contiene le funzioni iniziali ed è chiusa per composizione e ricorsione primitiva.</p>
+</div>
+<div class="thm"><span class="k">Teorema</span>
+<ol>
+<li>Le funzioni primitive ricorsive formano la <b>più piccola</b> classe PRC: sono contenute in ogni classe PRC.</li>
+<li>La classe delle funzioni <b>calcolabili</b> (totali) è PRC.</li>
+<li>Di conseguenza ogni funzione primitiva ricorsiva è calcolabile e totale.</li>
+</ol>
+</div>
+<div class="proof"><span class="k">Dimostrazione</span>
+<p>(1) Per induzione sul numero di passi con cui \(f\) è costruita: le iniziali stanno in ogni classe PRC, e ogni passo di composizione o ricorsione resta nella classe per definizione di PRC.</p>
+<p>(2) Le iniziali sono calcolabili (programmi di una o due istruzioni). Composizione: il programma calcola \(g_1, \dots, g_k\) (usate come macro) salvando i risultati in variabili locali, poi calcola \(h\) su quei valori; se tutte sono totali, termina sempre. Ricorsione primitiva: il programma inizializza \(Y \leftarrow f(X_1, \dots, X_n)\) e poi esegue un ciclo che si ripete esattamente \(X_{n+1}\) volte, aggiornando \(Y \leftarrow g(Z, Y, X_1, \dots, X_n)\) e incrementando il contatore \(Z\). Il numero di iterazioni è noto all'inizio, quindi il ciclo termina.</p>
+<p>(3) Da (1) e (2).</p>
+</div>
+
+<h2>Esempi: come si scrive una dimostrazione</h2>
+<p>All'esame «dimostra che \(f\) è primitiva ricorsiva» significa: scrivi \(f\) come composizione e ricorsione primitiva di funzioni <b>già note</b> come primitive ricorsive, indicando esplicitamente la funzione \(g\) del passo.</p>
+
+<div class="example"><span class="k">Somma \(x + y\)</span>
+<p>\(x + 0 = x\), \(x + (t + 1) = (x + t) + 1\). In forma canonica:
+\[f(x, 0) = u^1_1(x), \qquad f(x, t + 1) = g(t, f(x,t), x) \text{ con } g(t, v, x) = s(u^3_2(t, v, x)).\]
+\(g\) è composizione di \(s\) e di una proiezione, quindi primitiva ricorsiva.</p>
+</div>
+<div class="example"><span class="k">Prodotto \(x \cdot y\)</span>
+<p>\(x \cdot 0 = 0\), \(x \cdot (t + 1) = x \cdot t + x\). Base \(n(x)\); passo \(g(t, v, x) = v + x = f_{+}(u^3_2, u^3_3)\), composizione della somma (già primitiva ricorsiva) con proiezioni.</p>
+</div>
+<div class="example"><span class="k">Potenza, fattoriale, predecessore, sottrazione troncata</span>
+<ul>
+<li>\(x^0 = 1\), \(x^{t+1} = x^t \cdot x\).</li>
+<li>\(0! = 1\), \((t + 1)! = s(t) \cdot t!\).</li>
+<li>\(p(0) = 0\), \(p(t + 1) = t\) (il predecessore troncato).</li>
+<li>\(x \mathbin{\dot-} 0 = x\), \(x \mathbin{\dot-} (t + 1) = p(x \mathbin{\dot-} t)\).</li>
+<li>\(|x - y| = (x \mathbin{\dot-} y) + (y \mathbin{\dot-} x)\) (composizione).</li>
+<li>\(\alpha(x) = 1 \mathbin{\dot-} x\), che vale 1 se \(x = 0\) e 0 altrimenti.</li>
+</ul>
+</div>
+<p>Segui lo «srotolamento» della ricorsione: la definizione scende fino al caso base e poi risale calcolando i valori. Nota che il calcolo effettivo è dal basso verso l'alto, esattamente come il ciclo <code>for</code>.</p>
+<div data-w="primrec"></div>
+
+<div class="warn"><span class="k">Errore tipico</span>
+<p>Scrivere solo «\(f(x, y+1) = f(x, y) + x\)» senza dire che la funzione del passo, \(g(t, v, x) = v + x\), è primitiva ricorsiva. La dimostrazione deve citare i mattoni usati. Un altro errore è fare ricorsione su un argomento diverso dall'ultimo senza dirlo: si può fare, ma va giustificato con una permutazione degli argomenti (composizione con proiezioni).</p>
+</div>
+
+<h2>Che cosa resta fuori</h2>
+<p>Le primitive ricorsive sono tantissime: praticamente ogni funzione aritmetica «naturale» lo è (lo vedremo nella prossima lezione con predicati, quantificatori limitati e minimalizzazione limitata). Ma <b>non sono tutte le funzioni calcolabili totali</b>.</p>
+<div class="thm"><span class="k">Teorema</span>
+<p>Esiste una funzione calcolabile totale che non è primitiva ricorsiva.</p>
+</div>
+<div class="proof"><span class="k">Dimostrazione (per diagonalizzazione)</span>
+<p>Le definizioni di funzioni primitive ricorsive sono espressioni finite, quindi si possono elencare in modo effettivo: \(f_0, f_1, f_2, \dots\) (ristrette a un argomento). Esiste un programma che, dato \(i\) e \(x\), ricostruisce la definizione \(i\)-esima e calcola \(f_i(x)\). Allora \(g(x) = f_x(x) + 1\) è calcolabile e totale, ma differisce da ogni \(f_i\) nel punto \(i\): non è primitiva ricorsiva.</p>
+</div>
+<div class="remark"><span class="k">La funzione di Ackermann</span>
+<p>Un esempio esplicito è la funzione di Ackermann:
+\[A(0, y) = y + 1, \quad A(x + 1, 0) = A(x, 1), \quad A(x+1, y+1) = A(x, A(x+1, y)).\]
+È totale e calcolabile (la ricorsione scende in ordine lessicografico sulla coppia), ma cresce più rapidamente di ogni funzione primitiva ricorsiva: \(A(4, 2)\) ha già 19729 cifre. La ricorsione qui è «annidata» su due argomenti, cosa che lo schema primitivo non permette.</p>
+</div>
+<p>Questo è un punto importante: <b>nessuna classe di funzioni totali elencabile in modo effettivo può contenere tutte le calcolabili totali</b> (lo stesso argomento diagonale funziona sempre). Per catturare tutte le funzioni calcolabili bisogna ammettere funzioni <b>parziali</b>: è quello che fa la minimalizzazione non limitata della prossima lezione.</p>
+
+<div class="recap"><span class="k">Riepilogo</span>
+<ul>
+<li>Iniziali: \(s\), \(n\), \(u^n_i\). Operazioni: composizione e ricorsione primitiva.</li>
+<li>Primitive ricorsive = la più piccola classe PRC; le calcolabili totali formano una classe PRC; quindi primitive ricorsive ⊆ calcolabili totali.</li>
+<li>Per dimostrare che \(f\) è p.r.: caso base + passo con una \(g\) già nota come p.r.</li>
+<li>L'inclusione è stretta: diagonalizzazione, funzione di Ackermann.</li>
+</ul>
+</div>
+
+<h2>Esercizi</h2>
+<section class="exercises">
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che \(f(x) = 2^x\) e \(g(x) = x^2 + 3\) sono primitive ricorsive.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(2^0 = 1\), \(2^{t+1} = 2 \cdot 2^t\): passo \(h(t, v) = v + v\) (somma composta con proiezioni). \(g(x) = x \cdot x + 3 = s(s(s(x \cdot x)))\), composizione di prodotto e successore.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Base</span>
+<p>Dimostra che \(\mathrm{sg}(x)\) (= 0 se \(x = 0\), 1 altrimenti) e \(\max(x, y)\) sono primitive ricorsive.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(\mathrm{sg}(x) = \alpha(\alpha(x))\), oppure \(\mathrm{sg}(0) = 0\), \(\mathrm{sg}(t+1) = 1\). \(\max(x, y) = x + (y \mathbin{\dot-} x)\).</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Dimostra che la funzione \(F(n)\) = \(n\)-esimo numero di Fibonacci è primitiva ricorsiva. (Suggerimento: calcola insieme la coppia \((F(n), F(n+1))\).)</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>La ricorsione primitiva permette di usare solo il valore precedente, mentre Fibonacci ne usa due. Si codifica la coppia in un numero con una funzione di accoppiamento primitiva ricorsiva \(\langle a, b\rangle\) (lezione 18): \(G(0) = \langle 0, 1\rangle\), \(G(t+1) = \langle r(G(t)),\ l(G(t)) + r(G(t))\rangle\). Poi \(F(n) = l(G(n))\). Le funzioni \(l\), \(r\), \(\langle\cdot,\cdot\rangle\) sono primitive ricorsive.</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Medio</span>
+<p>Mostra che la classe delle funzioni primitive ricorsive è chiusa per «somma limitata»: se \(f(t, x)\) è p.r. allora \(g(y, x) = \sum_{t=0}^{y} f(t, x)\) è p.r.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(g(0, x) = f(0, x)\), \(g(t+1, x) = g(t, x) + f(t+1, x)\). Il passo usa la somma e \(f\) composta con \(s(t)\). (Formalmente l'argomento di ricorsione va messo per ultimo, con una permutazione degli argomenti.)</p>
+</div></details></div>
+
+<div class="ex"><span class="lvl">Sfida</span>
+<p>Calcola \(A(1, y)\) e \(A(2, y)\) per la funzione di Ackermann e deduci una formula.</p>
+<details class="sol"><summary>Soluzione</summary><div>
+<p>\(A(1, 0) = A(0, 1) = 2\); \(A(1, y+1) = A(0, A(1, y)) = A(1, y) + 1\). Quindi \(A(1, y) = y + 2\).</p>
+<p>\(A(2, 0) = A(1, 1) = 3\); \(A(2, y+1) = A(1, A(2, y)) = A(2, y) + 2\). Quindi \(A(2, y) = 2y + 3\). Proseguendo, \(A(3, y) = 2^{y+3} - 3\): ogni livello itera il precedente.</p>
+</div></details></div>
+</section>
+
+<section class="oral"><h3>Domande da orale</h3>
+<details><summary>Definisci la classe delle funzioni primitive ricorsive.</summary><div>La più piccola classe che contiene \(s(x) = x+1\), \(n(x) = 0\), le proiezioni \(u^n_i\), ed è chiusa per composizione e ricorsione primitiva.</div></details>
+<details><summary>Scrivi lo schema di ricorsione primitiva con parametri.</summary><div>\(h(\vec x, 0) = f(\vec x)\), \(h(\vec x, t+1) = g(t, h(\vec x, t), \vec x)\).</div></details>
+<details><summary>Perché ogni funzione primitiva ricorsiva è calcolabile e totale?</summary><div>Le calcolabili totali formano una classe PRC (iniziali calcolabili; composizione e ricorsione primitiva si programmano con cicli di lunghezza nota) e le primitive ricorsive sono la più piccola classe PRC.</div></details>
+<details><summary>Tutte le funzioni calcolabili totali sono primitive ricorsive?</summary><div>No: per diagonalizzazione sull'elenco effettivo delle definizioni p.r.; esempio esplicito, la funzione di Ackermann.</div></details>
+</section>

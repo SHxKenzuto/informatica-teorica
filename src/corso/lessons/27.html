@@ -1,0 +1,63 @@
+<!--{"n":27,"mod":"E","title":"Simulazione dell'orale","time":"1 ora a sessione","lead":"L'orale verifica che tu sappia esporre definizioni, enunciati e idee delle dimostrazioni in modo ordinato. Si prepara parlando ad alta voce, non rileggendo."}-->
+
+<h2>Come si risponde a una domanda d'orale</h2>
+<p>Quasi ogni domanda di teoria si affronta con lo stesso schema in quattro parti. Allenati a usarlo finché diventa automatico:</p>
+<ol>
+<li><b>Definizione</b> degli oggetti coinvolti, completa e precisa. Se la domanda è «dimostra che i regolari sono chiusi per intersezione», inizia definendo DFA e linguaggio regolare.</li>
+<li><b>Enunciato</b> del risultato, con le ipotesi giuste e i quantificatori nell'ordine giusto.</li>
+<li><b>Idea della dimostrazione</b> in una o due frasi, prima dei dettagli: «si simulano i due automi in parallelo».</li>
+<li><b>Dettagli ed esempio</b>: la costruzione formale, e un esempio piccolo che mostri che hai capito.</li>
+</ol>
+<p>Se il docente ti interrompe con una domanda, è un buon segno: vuol dire che vuole andare più a fondo. Rispondi a quella e poi riprendi il filo.</p>
+
+<div class="remark"><span class="k">Le domande «di collegamento»</span>
+<p>All'orale capita spesso una domanda che collega parti diverse del corso, per verificare che tu abbia una visione d'insieme. Esempi tipici:</p>
+<ul>
+<li>«Dove compare la diagonalizzazione nel corso?» (Cantor, HALT, funzioni p.r. vs calcolabili, \(\overline K\) non r.e., gerarchia di Chomsky.)</li>
+<li>«Il non determinismo aggiunge potere?» (No per automi finiti e macchine di Turing; sì per i PDA; per il tempo polinomiale non si sa: è P vs NP.)</li>
+<li>«Cosa è decidibile per i vari modelli?» (La tabella della lezione 23.)</li>
+<li>«Che relazione c'è tra pumping lemma regolare e CF?» (Ripetizione di uno stato su un cammino vs ripetizione di una variabile su un ramo dell'albero.)</li>
+<li>«Dove si usano le storie di computazione?» (PCP, problemi sulle grammatiche, Cook–Levin.)</li>
+</ul>
+</div>
+
+<h2>Interrogazione</h2>
+<p>Pesca una domanda, rispondi ad alta voce con lo schema in quattro parti (cronometrati: 3–5 minuti a domanda), poi apri i punti chiave e confronta. Ripeti finché le risposte ti vengono fluide.</p>
+<div data-w="oral"></div>
+
+<h2>Le dimostrazioni da saper esporre</h2>
+<p>Queste sono le dimostrazioni che più spesso vengono chieste per intero. Per ciascuna devi saper dire l'idea in una frase e poi svilupparla.</p>
+<div class="tblwrap"><table class="data">
+<tr><th>Risultato</th><th>Idea in una frase</th><th>Lezione</th></tr>
+<tr><td>Teorema di Cantor</td><td>L'insieme diagonale \(\{a : a \notin f(a)\}\) non è nell'immagine.</td><td>2</td></tr>
+<tr><td>NFA ≡ DFA</td><td>Stati del DFA = insiemi di stati dell'NFA.</td><td>5</td></tr>
+<tr><td>Chiusura per intersezione</td><td>Prodotto: i due automi in parallelo.</td><td>6</td></tr>
+<tr><td>Kleene (NFA → RE)</td><td>Eliminare gli stati di un GNFA con \(R_1R_2^*R_3 \cup R_4\).</td><td>7</td></tr>
+<tr><td>Pumping lemma regolare</td><td>Cassetti: un DFA con \(p\) stati ripete uno stato sui primi \(p\) simboli.</td><td>8</td></tr>
+<tr><td>Forma normale di Chomsky</td><td>Nuova iniziale, via \(\varepsilon\), via unitarie, spezzare, isolare terminali.</td><td>10</td></tr>
+<tr><td>CFG → PDA</td><td>La pila simula una derivazione sinistra.</td><td>12</td></tr>
+<tr><td>Pumping lemma CF</td><td>Un ramo lungo dell'albero ripete una variabile.</td><td>13</td></tr>
+<tr><td>Calcolabili totali formano una PRC</td><td>Composizione e ricorsione primitiva si programmano con cicli di lunghezza nota.</td><td>16</td></tr>
+<tr><td>HALT non calcolabile</td><td>\([A]\ \mathrm{IF}\ \mathrm{HALT}(X,X)\ \mathrm{GOTO}\ A\) eseguito sul proprio numero.</td><td>19</td></tr>
+<tr><td>NTM ≡ TM</td><td>Visita in ampiezza dell'albero delle computazioni.</td><td>20</td></tr>
+<tr><td>Teorema di Post (complemento)</td><td>Eseguire in parallelo i due semidecisori.</td><td>21</td></tr>
+<tr><td>Teorema di Rice</td><td>Il programma costruito esegue \(\Phi_x(x)\) e poi si comporta come \(f \in \Gamma\).</td><td>22</td></tr>
+<tr><td>Cook–Levin</td><td>Il tableau della computazione diventa una formula polinomiale.</td><td>25</td></tr>
+<tr><td>3SAT \(\le_P\) CLIQUE</td><td>Un nodo per letterale, archi tra letterali compatibili di clausole diverse.</td><td>25</td></tr>
+</table></div>
+
+<h2>Le definizioni da sapere a memoria</h2>
+<ul>
+<li>DFA, NFA (con \(\delta\) e accettazione), macchina di Mealy e di Moore.</li>
+<li>Espressione regolare (definizione induttiva).</li>
+<li>Grammatica CF, derivazione, linguaggio generato, ambiguità, CNF.</li>
+<li>PDA e accettazione; grammatiche di tipo 0, 1, 2, 3; LBA.</li>
+<li>Linguaggio S, \(\Psi^{(m)}_{\mathcal P}\), funzione (parzialmente) calcolabile.</li>
+<li>Funzioni iniziali, composizione, ricorsione primitiva, classe PRC, minimalizzazione limitata e non.</li>
+<li>\(\langle x, y \rangle\), \([a_1, \dots, a_n]\), \(\#(I)\), \(\#(\mathcal P)\).</li>
+<li>HALT, \(K\), \(W_n\), insieme ricorsivo e r.e., riduzione \(\le_m\).</li>
+<li>Macchina di Turing, configurazione, riconoscere/decidere.</li>
+<li>\(\mathrm{TIME}(t(n))\), P, verificatore, NP, \(\le_P\), NP-completo.</li>
+</ul>
+
+<p>Per una simulazione vera, con domande di approfondimento che dipendono da come rispondi, scrivi «Simulazione orale» nella chat del corso.</p>
