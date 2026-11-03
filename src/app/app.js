@@ -325,6 +325,6 @@
   }
 
   /* ---------- avvio ---------- */
-  if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(() => { }); } catch (e) { } }
+  if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).catch(() => { }); } catch (e) { } }
   route();
 })();
